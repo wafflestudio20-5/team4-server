@@ -27,5 +27,5 @@ class UserEntity (
     val id: Long = 0L
     
     @CreatedDate
-    val registrationDate: LocalDateTime = LocalDateTime.now()
+    var registrationDate: LocalDateTime = LocalDateTime.now()
 }
