@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.user.domain
+package com.wafflestudio.toyproject.team4.core.user.database
 
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
