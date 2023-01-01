@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component
 
 interface UserRepository : JpaRepository<UserEntity, Long>, UserRepositoryCustom {
     fun findByUsername(username: String): UserEntity?
+
+    fun findByNickname(nickname: String): UserEntity?
 }
 
 interface UserRepositoryCustom
@@ -14,4 +16,5 @@ interface UserRepositoryCustom
 class UserRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : UserRepositoryCustom
+
 

@@ -4,9 +4,11 @@ import com.wafflestudio.toyproject.team4.common.Seminar400
 import com.wafflestudio.toyproject.team4.common.Seminar401
 import com.wafflestudio.toyproject.team4.common.Seminar404
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.LoginResponse
+import com.wafflestudio.toyproject.team4.core.user.api.response.NicknameResponse
 import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.User
@@ -26,6 +28,8 @@ interface AuthService {
     fun logout(username: String)
 
     fun checkDuplicatedUsername(usernameRequest: UsernameRequest): UsernameResponse
+
+    fun checkDuplicatedNickname(nicknameRequest: NicknameRequest): NicknameResponse
 }
 
 @Service
@@ -81,5 +85,10 @@ class AuthServiceImpl(
     override fun checkDuplicatedUsername(usernameRequest: UsernameRequest): UsernameResponse {
         val isUnique = userRepository.findByUsername(usernameRequest.username) === null
         return UsernameResponse(isUnique)
+    }
+
+    override fun checkDuplicatedNickname(nicknameRequest: NicknameRequest): NicknameResponse {
+        val isUnique = userRepository.findByNickname(nicknameRequest.nickname) === null
+        return NicknameResponse(isUnique)
     }
 }

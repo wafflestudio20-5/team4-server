@@ -3,8 +3,10 @@ package com.wafflestudio.toyproject.team4.core.user.api
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
+import com.wafflestudio.toyproject.team4.core.user.api.response.NicknameResponse
 import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthService
 import org.springframework.http.HttpStatus
@@ -45,5 +47,12 @@ class AuthController(
         @RequestBody usernameRequest: UsernameRequest
     ): UsernameResponse {
         return authService.checkDuplicatedUsername(usernameRequest)
+    }
+
+    @PostMapping("/nickname")
+    fun checkDuplicatedNickname(
+        @RequestBody nicknameRequest: NicknameRequest
+    ): NicknameResponse {
+        return authService.checkDuplicatedNickname(nicknameRequest)
     }
 }
