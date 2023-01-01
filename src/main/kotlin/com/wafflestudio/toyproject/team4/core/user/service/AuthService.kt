@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
+import com.wafflestudio.toyproject.team4.common.Seminar400
 import com.wafflestudio.toyproject.team4.common.Seminar401
 import com.wafflestudio.toyproject.team4.common.Seminar404
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
@@ -17,6 +18,8 @@ interface AuthService {
     fun register(registerRequest: RegisterRequest)
 
     fun login(loginRequest: LoginRequest): ResponseEntity<LoginResponse>
+
+    fun refresh(refreshToken: String): ResponseEntity<LoginResponse>
 
     fun logout(username: String)
 }
@@ -46,6 +49,21 @@ class AuthServiceImpl(
         user.refreshToken = refreshToken
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, authTokenService.generateCookie(refreshToken).toString())
+            .body(LoginResponse(User.of(user), accessToken))
+    }
+
+    @Transactional
+    override fun refresh(refreshToken: String): ResponseEntity<LoginResponse> {
+        val username = authTokenService.getUsernameFromToken(refreshToken)
+        val user = userRepository.findByUsername(username) ?: throw Seminar404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        user.refreshToken ?: throw Seminar400("해당 사용자는 로그인 상태가 아닙니다.")
+        if (refreshToken != user.refreshToken) throw Seminar400("잘못된 요청입니다.")
+
+        val accessToken = authTokenService.generateTokenByUsername(username).accessToken
+        val newRefreshToken = authTokenService.generateRefreshTokenByUsername(username)
+        user.refreshToken = newRefreshToken
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, authTokenService.generateCookie(newRefreshToken).toString())
             .body(LoginResponse(User.of(user), accessToken))
     }
 
