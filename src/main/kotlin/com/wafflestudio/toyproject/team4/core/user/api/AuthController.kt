@@ -4,6 +4,8 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
+import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -37,4 +39,11 @@ class AuthController(
     fun logout(
         @UserContext username: String
     ) = authService.logout(username)
+
+    @PostMapping("/username")
+    fun checkDuplicatedUsername(
+        @RequestBody usernameRequest: UsernameRequest
+    ): UsernameResponse {
+        return authService.checkDuplicatedUsername(usernameRequest)
+    }
 }

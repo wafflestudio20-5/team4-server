@@ -5,7 +5,9 @@ import com.wafflestudio.toyproject.team4.common.Seminar401
 import com.wafflestudio.toyproject.team4.common.Seminar404
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.LoginResponse
+import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.http.HttpHeaders
@@ -22,6 +24,8 @@ interface AuthService {
     fun refresh(refreshToken: String): ResponseEntity<LoginResponse>
 
     fun logout(username: String)
+
+    fun checkDuplicatedUsername(usernameRequest: UsernameRequest): UsernameResponse
 }
 
 @Service
@@ -72,5 +76,10 @@ class AuthServiceImpl(
         val user = userRepository.findByUsername(username)
             ?: throw Seminar404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         user.refreshToken = null
+    }
+
+    override fun checkDuplicatedUsername(usernameRequest: UsernameRequest): UsernameResponse {
+        val isUnique = userRepository.findByUsername(usernameRequest.username) === null
+        return UsernameResponse(isUnique)
     }
 }
