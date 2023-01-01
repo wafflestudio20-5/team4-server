@@ -13,7 +13,7 @@ class UserEntity (
     val username: String,
     var encodedPassword: String,
     var nickname: String,
-    var imageURL: String? = null,
+    var imageUrl: String? = null,
     var reviewCount: Long? = 0L,
     
     val sex: String? = null,
