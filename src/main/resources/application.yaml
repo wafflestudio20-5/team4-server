@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    default: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/team4?serverTimezone=UTC
+    username: root
+    password: team4
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+    hibernate:
+      ddl-auto: update
+
+auth.jwt:
+  issuer: WAFFLE_STUDIO
+  jwtSecret: WAFFLE_STUDIO_TOY_PROJECT_TEAM4_JSON_WEB_TOKEN_SECRET_KEY
+  jwtExpiration: 300
+  refreshExpiration: 3600
+
+---
+
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+#  datasource:
+#    url: jdbc:mysql://toyproject-team4-db.cwcfnggnsjrh.ap-northeast-2.rds.amazonaws.com:3306/myseminarDB
+#    username: team4
+#    password: toyprojectteam4
+#  jpa:
+#    properties:
+#      hibernate:
+#        show_sql: false
+#    hibernate:
+#      ddl-auto: update
+#
+#auth.jwt:
+#  issuer: WAFFLE_STUDIO
+#  jwtSecret: WAFFLE_STUDIO_SPRING_AND_KOTLIN_SEMINAR_SECRET_KEY
+#  jwtExpiration: 3600
