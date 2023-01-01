@@ -17,6 +17,8 @@ interface AuthService {
     fun register(registerRequest: RegisterRequest)
 
     fun login(loginRequest: LoginRequest): ResponseEntity<LoginResponse>
+
+    fun logout(username: String)
 }
 
 @Service
@@ -45,5 +47,12 @@ class AuthServiceImpl(
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, authTokenService.generateCookie(refreshToken).toString())
             .body(LoginResponse(User.of(user), accessToken))
+    }
+
+    @Transactional
+    override fun logout(username: String) {
+        val user = userRepository.findByUsername(username)
+            ?: throw Seminar404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        user.refreshToken = null
     }
 }
