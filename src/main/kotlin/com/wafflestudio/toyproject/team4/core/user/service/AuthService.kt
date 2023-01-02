@@ -8,7 +8,7 @@ import javax.transaction.Transactional
 
 
 interface AuthService {
-    fun register(request: RegisterRequest)
+    fun register(registerRequest: RegisterRequest)
 }
 
 @Service
@@ -18,8 +18,8 @@ class AuthServiceImpl(
 ): AuthService {
     
     @Transactional
-    override fun register(request: RegisterRequest) {
-        val encodedPwd = authConfig.passwordEncoder().encode(request.password)
-        userRepository.save(request.toUserEntity(encodedPwd))
+    override fun register(registerRequest: RegisterRequest) {
+        val encodedPwd = authConfig.passwordEncoder().encode(registerRequest.password)
+        userRepository.save(registerRequest.toUserEntity(encodedPwd))
     }
 }

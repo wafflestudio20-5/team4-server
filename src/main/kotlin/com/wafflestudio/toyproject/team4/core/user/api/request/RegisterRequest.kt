@@ -7,6 +7,6 @@ data class RegisterRequest(
     val password: String,
     val nickname: String
 ) {
-    fun toUserEntity(encodedPwd: String): UserEntity
-    = UserEntity(username, encodedPwd, nickname)
+    fun toUserEntity(encodedPassword: String): UserEntity
+    = UserEntity(username, encodedPassword, nickname)
 }
