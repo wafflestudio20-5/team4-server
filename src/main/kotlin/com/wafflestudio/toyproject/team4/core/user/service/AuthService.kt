@@ -8,7 +8,7 @@ import javax.transaction.Transactional
 
 
 interface AuthService {
-    fun register(request: RegisterRequest)
+    fun register(registerRequest: RegisterRequest)
 }
 
 @Service
