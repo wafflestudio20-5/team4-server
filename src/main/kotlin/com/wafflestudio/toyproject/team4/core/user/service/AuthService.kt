@@ -13,7 +13,7 @@ interface AuthService {
 
 @Service
 class AuthServiceImpl(
-    private val authConfig: AuthConfig,
+    private val passwordEncoder: PasswordEncoder
     private val userRepository: UserRepository
 ): AuthService {
     
