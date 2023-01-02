@@ -1,8 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.config.AuthConfig
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -13,13 +13,13 @@ interface AuthService {
 
 @Service
 class AuthServiceImpl(
-    private val authConfig: AuthConfig,
+    private val passwordEncoder: PasswordEncoder,
     private val userRepository: UserRepository
 ): AuthService {
     
     @Transactional
     override fun register(registerRequest: RegisterRequest) {
-        val encodedPwd = authConfig.passwordEncoder().encode(registerRequest.password)
-        userRepository.save(registerRequest.toUserEntity(encodedPwd))
+        val encodedPassword = passwordEncoder.encode(registerRequest.password)
+        userRepository.save(registerRequest.toUserEntity(encodedPassword))
     }
 }
