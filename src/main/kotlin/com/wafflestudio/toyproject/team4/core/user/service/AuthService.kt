@@ -18,8 +18,8 @@ class AuthServiceImpl(
 ): AuthService {
     
     @Transactional
-    override fun register(request: RegisterRequest) {
-        val encodedPassword = passwordEncoder.encode(request.password)
-        userRepository.save(request.toUserEntity(encodedPassword))
+    override fun register(registerRequest: RegisterRequest) {
+        val encodedPassword = passwordEncoder.encode(registerRequest.password)
+        userRepository.save(registerRequest.toUserEntity(encodedPassword))
     }
 }
