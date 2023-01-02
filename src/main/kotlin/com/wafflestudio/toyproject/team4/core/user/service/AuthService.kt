@@ -19,7 +19,7 @@ class AuthServiceImpl(
     
     @Transactional
     override fun register(request: RegisterRequest) {
-        val encodedPwd = authConfig.passwordEncoder().encode(request.password)
+        val encodedPassword = passwordEncoder.encode(request.password)
         userRepository.save(request.toUserEntity(encodedPwd))
     }
 }
