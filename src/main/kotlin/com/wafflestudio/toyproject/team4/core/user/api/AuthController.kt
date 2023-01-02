@@ -18,6 +18,6 @@ class AuthController (
     @Transactional
     @PostMapping("api/auth/register")
     fun register(
-        @RequestBody request: RegisterRequest
-    ) = ResponseEntity(authService.register(request), HttpStatus.CREATED)
+        @RequestBody registerRequest: RegisterRequest
+    ) = ResponseEntity(authService.register(registerRequest), HttpStatus.CREATED)
 }
