@@ -18,7 +18,7 @@ spring:
 auth.jwt:
   issuer: WAFFLE_STUDIO
   jwtSecret: WAFFLE_STUDIO_TOY_PROJECT_TEAM4_JSON_WEB_TOKEN_SECRET_KEY
-  jwtExpiration: 300
+  jwtExpiration: 900
   refreshExpiration: 3600
 
 ---
