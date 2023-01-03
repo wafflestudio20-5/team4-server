@@ -1,8 +1,8 @@
 package com.wafflestudio.toyproject.team4.config
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
-import com.wafflestudio.toyproject.team4.common.Seminar400
-import com.wafflestudio.toyproject.team4.common.Seminar403
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
@@ -62,9 +62,9 @@ class AuthInterceptor(
         val needAuthentication = handlerCasted.hasMethodAnnotation(Authenticated::class.java)
 
         if (needAuthentication) {
-            val authToken = request.getHeader("Authorization") ?: throw Seminar403("NO ACCESS TOKEN")
+            val authToken = request.getHeader("Authorization") ?: throw CustomHttp403("NO ACCESS TOKEN")
             val username = authTokenService.getUsernameFromToken(authToken)
-            userRepository.findByUsername(username) ?: throw Seminar400("INVALID ACCESS TOKEN")
+            userRepository.findByUsername(username) ?: throw CustomHttp400("INVALID ACCESS TOKEN")
             request.setAttribute("username", username)
         }
         return super.preHandle(request, response, handler)

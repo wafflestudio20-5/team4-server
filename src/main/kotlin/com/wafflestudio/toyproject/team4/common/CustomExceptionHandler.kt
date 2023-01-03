@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
-class SeminarExceptionHandler {
+class CustomExceptionHandler {
     @ExceptionHandler(value = [Exception::class])
     fun handle(e: Exception): ResponseEntity<Any> {
         return ResponseEntity(e.javaClass, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @ExceptionHandler(value = [SeminarException::class])
-    fun handle(e: SeminarException): ResponseEntity<Any> {
+    @ExceptionHandler(value = [CustomHttpException::class])
+    fun handle(e: CustomHttpException): ResponseEntity<Any> {
         return ResponseEntity(e.message, e.status)
     }
 

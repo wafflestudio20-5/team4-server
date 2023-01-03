@@ -1,7 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.common.Seminar400
-import com.wafflestudio.toyproject.team4.common.Seminar401
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.common.CustomHttp401
 import com.wafflestudio.toyproject.team4.core.user.api.response.AuthToken
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
@@ -64,9 +64,9 @@ class AuthTokenService(
         return try {
             parse(authToken).body["username"] as String
         } catch (e: ExpiredJwtException) {
-            throw Seminar401("토큰 인증 시간이 만료되었습니다.")
+            throw CustomHttp401("토큰 인증 시간이 만료되었습니다.")
         } catch (e: Exception) {
-            throw Seminar400("INVALID TOKEN")
+            throw CustomHttp400("INVALID TOKEN")
         }
     }
 
