@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.api
 
+
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
@@ -25,7 +26,7 @@ class AuthController(
     fun register(
         @RequestBody registerRequest: RegisterRequest
     ) = ResponseEntity(authService.register(registerRequest), HttpStatus.CREATED)
-
+    
     @PostMapping("/login")
     fun login(
         @RequestBody loginRequest: LoginRequest

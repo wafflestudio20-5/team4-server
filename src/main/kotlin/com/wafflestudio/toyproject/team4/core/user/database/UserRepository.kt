@@ -16,5 +16,3 @@ interface UserRepositoryCustom
 class UserRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : UserRepositoryCustom
-
-

@@ -34,6 +34,4 @@ class UserEntity(
 
     @CreatedDate
     var registrationDate: LocalDateTime = LocalDateTime.now()
-
-
 }
