@@ -20,6 +20,7 @@ class ItemEntity(
     var sale: Long? = 0L,
 
     @ElementCollection(fetch=FetchType.LAZY) 
+    @Column(name="OptionsName")
     val options: List<String>,
     
     @Enumerated(EnumType.STRING)
