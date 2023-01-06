@@ -2,11 +2,7 @@ package com.wafflestudio.toyproject.team4.core.item.api
 
 import com.wafflestudio.toyproject.team4.core.item.api.request.ItemRequest
 import com.wafflestudio.toyproject.team4.core.item.service.ItemService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -15,14 +11,14 @@ class ItemController(
     private val itemService: ItemService
 ) {
     
-    @GetMapping("/items/")
+    @GetMapping("/items")
     fun getHomepage(
         @RequestBody itemRequest: ItemRequest
     ) = itemService.getItemRankingList(itemRequest)
     
     @GetMapping("/item/{id}")
     fun getItem(
-        @RequestParam itemId: Long
+        @PathVariable(value="id") itemId: Long
     ) = itemService.getItem(itemId)
 
 }
