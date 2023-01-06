@@ -7,7 +7,7 @@ data class Item (
     val name: String,
     val brand: String,
     val imageUrl: String,
-    val label: String,
+    val label: String?,
     val oldPrice: Long,
     val newPrice: Long,
     val sale: Long,

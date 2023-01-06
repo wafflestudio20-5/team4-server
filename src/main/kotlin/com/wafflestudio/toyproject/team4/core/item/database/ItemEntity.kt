@@ -19,9 +19,13 @@ class ItemEntity(
     val oldPrice: Long,
     var sale: Long? = 0L,
 
-    @ElementCollection(fetch=FetchType.LAZY) 
-    @Column(name="OptionsName")
-    val options: List<String>,
+    @OneToMany(
+        mappedBy = "item",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    val options: MutableList<OptionEntity>? = mutableListOf(),
     
     @Enumerated(EnumType.STRING)
     val category: Item.Category,
