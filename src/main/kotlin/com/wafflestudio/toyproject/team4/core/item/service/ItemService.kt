@@ -25,10 +25,10 @@ class ItemServiceImpl(
     override fun getItemRankingList(itemRequest: ItemRequest): ItemRankingResponse {
         val category = itemRequest.category
         val rankingList = with(itemRepository) {
-            if (category == null) this.findAllByOrderByRatingDesc()
+            if (category.isNullOrEmpty()) this.findAllByOrderByRatingDesc()
             else this.findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category))
         }
-        val nextItemId = rankingList[0].nextItemId
+        val nextItemId = rankingList.firstOrNull()?.nextItemId
         
         return ItemRankingResponse(
             items = rankingList.map { entity -> Item.of(entity) },
