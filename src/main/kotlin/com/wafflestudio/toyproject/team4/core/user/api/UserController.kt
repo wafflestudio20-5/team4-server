@@ -29,12 +29,12 @@ class UserController(
         @UserContext username: String,
     ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
 
-//    @Authenticated
-//    @GetMapping("/me/purchases")
-//    fun getPurchases(
-//        @RequestHeader(value = "Authorization") authorization: String,
-//        @UserContext username: String,
-//    ) = ResponseEntity(userService.getPurchases(username), HttpStatus.OK)
+    @Authenticated
+    @GetMapping("/me/purchases")
+    fun getPurchases(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.getPurchases(username), HttpStatus.OK)
 //    
 //    @Authenticated
 //    @GetMapping("/me/shopping-cart")

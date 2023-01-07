@@ -15,7 +15,7 @@ import javax.transaction.Transactional
 interface UserService {
     fun getMe(username: String): UserResponse
     fun getReviews(username: String): MutableList<ReviewResponse>
-//    fun getPurchases(username: String): MutableList<PurchaseResponse>
+    fun getPurchases(username: String): MutableList<PurchaseResponse>
 //    fun getShoppingCart(username: String): MutableList<Item>
 //    fun getRecentlyViewed(username: String): MutableList<Item>
 }
@@ -24,7 +24,7 @@ interface UserService {
 class UserServiceImpl(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
-//    private val purchaseRepository: PurchaseRepository,
+    private val purchaseRepository: PurchaseRepository,
 //    private val itemRepository: ItemRepository,
 ) : UserService {
 
@@ -44,12 +44,12 @@ class UserServiceImpl(
         return reviewRepository.getReviewResponses(userEntity.reviewEntities)
     }
 
-//    @Transactional
-//    override fun getPurchases(username: String): MutableList<PurchaseResponse> {
-//        val userEntity = userRepository.findByUsername(username)
-//            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-//        return purchaseRepository.getPurchaseResponses(userEntity.purchaseEntities)
-//    }
+    @Transactional
+    override fun getPurchases(username: String): MutableList<PurchaseResponse> {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        return purchaseRepository.getPurchaseResponses(userEntity.purchaseEntities)
+    }
 //
 //    @Transactional
 //    override fun getShoppingCart(username: String): MutableList<Item> {
