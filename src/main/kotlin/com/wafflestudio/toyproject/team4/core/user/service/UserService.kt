@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 interface UserService {
-//    fun getMe(username: String): UserResponse
+    fun getMe(username: String): UserResponse
     fun getReviews(username: String): MutableList<ReviewResponse>
 //    fun getPurchases(username: String): MutableList<PurchaseResponse>
 //    fun getShoppingCart(username: String): MutableList<Item>
@@ -28,14 +28,14 @@ class UserServiceImpl(
 //    private val itemRepository: ItemRepository,
 ) : UserService {
 
-//    @Transactional
-//    override fun getMe(username: String): UserResponse {
-//        val userEntity = userRepository.findByUsername(username)
-//            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-//        val userResponse = UserResponse.of(userEntity)
-//        userResponse.reviews = reviewRepository.getReviewResponses(userEntity.reviewEntities)
-//        return userResponse
-//    }
+    @Transactional
+    override fun getMe(username: String): UserResponse {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val userResponse = UserResponse.of(userEntity)
+        userResponse.reviews = reviewRepository.getReviewResponses(userEntity.reviewEntities)
+        return userResponse
+    }
 
     @Transactional
     override fun getReviews(username: String): MutableList<ReviewResponse> {

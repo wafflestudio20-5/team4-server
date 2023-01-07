@@ -15,12 +15,12 @@ class UserController(
     private val userService: UserService
 ) {
 
-//    @Authenticated
-//    @GetMapping("/me")
-//    fun getMe(
-//        @RequestHeader(value = "Authorization") authorization: String,
-//        @UserContext username: String,
-//        ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
+    @Authenticated
+    @GetMapping("/me")
+    fun getMe(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/reviews")
