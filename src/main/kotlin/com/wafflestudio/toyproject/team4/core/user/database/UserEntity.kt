@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
+import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -26,7 +27,10 @@ class UserEntity(
     var weight: Long? = null,
     var socialKey: String? = null,
 
-    var refreshToken: String? = null
+    var refreshToken: String? = null,
+
+    var shoppingCart: MutableList<ItemEntity> = mutableListOf(),
+    var recentlyViewed: MutableList<ItemEntity> = mutableListOf(),
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,4 +38,10 @@ class UserEntity(
 
     @CreatedDate
     var registrationDate: LocalDateTime = LocalDateTime.now()
+    
+    @OneToMany(mappedBy = "userEntity", cascade = [CascadeType.REMOVE])
+    var reviewEntities: MutableList<ReviewEntity> = mutableListOf()
+    
+    @OneToMany(mappedBy = "userEntity", cascade = [CascadeType.REMOVE])
+    var purchaseEntities: MutableList<PurchaseEntity> = mutableListOf()
 }
