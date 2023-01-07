@@ -17,7 +17,7 @@ interface UserService {
     fun getReviews(username: String): MutableList<ReviewResponse>
     fun getPurchases(username: String): MutableList<PurchaseResponse>
     fun getShoppingCart(username: String): MutableList<Item>
-//    fun getRecentlyViewed(username: String): MutableList<Item>
+    fun getRecentlyViewed(username: String): MutableList<Item>
 }
 
 @Service
@@ -57,11 +57,11 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         return itemRepository.getItems(userEntity.shoppingCart)
     }
-//
-//    @Transactional
-//    override fun getRecentlyViewed(username: String): MutableList<Item> {
-//        val userEntity = userRepository.findByUsername(username)
-//            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-//        return itemRepository.getItems(userEntity.recentlyViewed)
-//    }
+
+    @Transactional
+    override fun getRecentlyViewed(username: String): MutableList<Item> {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        return itemRepository.getItems(userEntity.recentlyViewed)
+    }
 }
