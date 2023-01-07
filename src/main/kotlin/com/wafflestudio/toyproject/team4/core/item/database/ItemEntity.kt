@@ -13,10 +13,11 @@ class ItemEntity(
     @Enumerated(EnumType.STRING)
     val label: Item.Label? = null,
     @Enumerated(EnumType.STRING)
-    val sex: Item.Sex,
+    val sex: Item.Sex? = null,
     val rating: Long? = 0L,
 
     val oldPrice: Long,
+    var newPrice: Long,
     var sale: Long? = 0L,
 
     @OneToMany(
@@ -26,7 +27,7 @@ class ItemEntity(
         orphanRemoval = true
     )
     val options: MutableList<OptionEntity>? = mutableListOf(),
-    
+
     @Enumerated(EnumType.STRING)
     val category: Item.Category,
     @Enumerated(EnumType.STRING)
@@ -39,8 +40,7 @@ class ItemEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    
-    var newPrice: Long = (oldPrice * (1- sale!!) + 5) / 10 * 10
-    val nextItemId: Long = id + 10
 
+    val nextItemId: Long = id + 10
+    
 }
