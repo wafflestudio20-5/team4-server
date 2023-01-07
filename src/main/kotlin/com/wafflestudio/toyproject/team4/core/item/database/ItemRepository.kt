@@ -10,9 +10,19 @@ interface ItemRepository : JpaRepository<ItemEntity, Long>, ItemRepositoryCustom
     fun findAllByOrderByRatingDesc(): List<ItemEntity>
 }
 
-interface ItemRepositoryCustom
+interface ItemRepositoryCustom {
+    fun getItems(itemEntities: MutableList<ItemEntity>): MutableList<Item>
+}
 
 @Component
 class ItemRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
-) : ItemRepositoryCustom
+) : ItemRepositoryCustom {
+    override fun getItems(itemEntities: MutableList<ItemEntity>): MutableList<Item> {
+        val result = mutableListOf<Item>()
+        for (itemEntity in itemEntities) {
+            result.add(Item.of(itemEntity))
+        }
+        return result
+    }
+}

@@ -35,13 +35,13 @@ class UserController(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getPurchases(username), HttpStatus.OK)
-//    
-//    @Authenticated
-//    @GetMapping("/me/shopping-cart")
-//    fun getShoppingCart(
-//        @RequestHeader(value = "Authorization") authorization: String,
-//        @UserContext username: String,
-//    ) = ResponseEntity(userService.getShoppingCart(username), HttpStatus.OK)
+
+    @Authenticated
+    @GetMapping("/me/shopping-cart")
+    fun getShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.getShoppingCart(username), HttpStatus.OK)
 //    
 //    @Authenticated
 //    @GetMapping("/me/recently-viewed")
