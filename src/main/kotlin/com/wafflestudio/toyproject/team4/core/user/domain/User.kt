@@ -12,15 +12,13 @@ data class User(
     var height: Long? = null,
     var weight: Long? = null,
     val sex: Sex? = null,
-//    var socialKey: String? = null,
-
-//    val reviews: List<Review>,
-//    val purchases: List<Item>,
-//    val shoppingCart: List<Item>,
-//    val recentlyViewed: List<Item>
 ) {
     enum class Sex {
         MALE, FEMALE
+    }
+
+    enum class Role {
+        ROLE_USER, ROLE_ADMIN
     }
 
     companion object {

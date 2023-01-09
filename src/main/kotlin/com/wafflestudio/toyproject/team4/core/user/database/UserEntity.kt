@@ -1,11 +1,11 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
 import com.wafflestudio.toyproject.team4.core.user.domain.User
+import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import javax.persistence.*
-
 
 @Entity
 @Table(name = "users")
@@ -24,7 +24,12 @@ class UserEntity(
     val sex: User.Sex? = null,
     var height: Long? = null,
     var weight: Long? = null,
-    var socialKey: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    var socialKey: ProviderType? = null,
+
+    @Enumerated(EnumType.STRING)
+    val role: User.Role = User.Role.ROLE_USER,
 
     var refreshToken: String? = null
 ) {
