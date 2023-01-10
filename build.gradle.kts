@@ -47,8 +47,6 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-	// jsoup - Web Crawling
-	implementation("org.jsoup:jsoup:1.15.3")
 
 	// Kotlin Features
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
