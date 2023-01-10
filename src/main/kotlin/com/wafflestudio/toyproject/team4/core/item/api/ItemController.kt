@@ -12,7 +12,7 @@ class ItemController(
 ) {
     
     @GetMapping("/items")
-    fun getHomepage(
+    fun getItemRankingList(
         @RequestBody itemRequest: ItemRequest
     ) = itemService.getItemRankingList(itemRequest)
     

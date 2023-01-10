@@ -18,7 +18,7 @@ data class Item (
     }
     
     enum class Sex {
-        MALE, FEMALE, UNISEX
+        MALE, FEMALE, BOTH
     }
     
     enum class Category {

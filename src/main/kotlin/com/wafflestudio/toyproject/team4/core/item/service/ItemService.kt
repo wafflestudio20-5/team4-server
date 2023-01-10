@@ -3,7 +3,7 @@ package com.wafflestudio.toyproject.team4.core.item.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.api.request.ItemRequest
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
-import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import org.springframework.data.repository.findByIdOrNull
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 
 interface ItemService {
     fun getItemRankingList(itemRequest: ItemRequest): ItemRankingResponse
-    fun getItem(itemId: Long): ItemEntity
+    fun getItem(itemId: Long): ItemResponse
 }
 
 @Service
@@ -28,7 +28,7 @@ class ItemServiceImpl(
             if (category.isNullOrEmpty()) this.findAllByOrderByRatingDesc()
             else this.findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category))
         }
-        val nextItemId = rankingList.firstOrNull()?.nextItemId
+        val nextItemId = rankingList.lastOrNull()?.nextItemId
         
         return ItemRankingResponse(
             items = rankingList.map { entity -> Item.of(entity) },
@@ -36,8 +36,9 @@ class ItemServiceImpl(
         )
     }
 
-    override fun getItem(itemId: Long): ItemEntity {
-        return itemRepository.findByIdOrNull(itemId)
+    override fun getItem(itemId: Long): ItemResponse {
+        val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
+        return ItemResponse(item)
     }
 }
