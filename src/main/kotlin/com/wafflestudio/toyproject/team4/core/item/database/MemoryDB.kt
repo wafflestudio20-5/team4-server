@@ -26,11 +26,36 @@ class MemoryDB (
          * PANTS : 003       - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
          * SKIRT : 022       - MINISKIRT(022001), MEDISKIRT(022002), LONGSKIRT(022003)
          * BAG   : 004       - BACKPACK(004001), CROSSBAG(004002), ECHOBAG(004014)
-         * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 18)
+         * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
          * HEADWEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
          **/
 
         crawling("001", "001006")
+        crawling("001", "001004")
+        crawling("001", "001005")
+        crawling("001", "001002")
+        crawling("002", "002007")
+        crawling("002", "002002")
+        crawling("002", "002016")
+        crawling("002", "002020")
+        crawling("003", "003002")
+        crawling("003", "003008")
+        crawling("003", "003004")
+        crawling("003", "003005")
+        crawling("022", "022001")
+        crawling("022", "022002")
+        crawling("022", "022003")
+        crawling("004", "004001")
+        crawling("004", "004002")
+        crawling("004", "004014")
+        crawling("005", "005014")
+        crawling("005", "005004")
+        crawling("005", "005018")
+        crawling("018", "")
+        crawling("007", "007001")
+        crawling("007", "007004")
+        crawling("007", "007005")
+
     }
 
 
@@ -55,11 +80,43 @@ class MemoryDB (
                     //label = labelInfoList[idx],
                     oldPrice = priceInfoList[idx].substringBefore(" ").dropLast(1).replace(",", "").toLong(),
                     newPrice = priceInfoList[idx].substringAfter(" ").dropLast(1).replace(",", "").toLong(),
-                    category = Item.Category.TOP,
-                    subCategory = Item.SubCategory.SWEATER
+                    category = getMainCategory(mainCategoryId),
+                    subCategory = getSubCategory(subCategoryId)
                 )
                 itemRepository.save(newItem)
-            }
-        }
+           }
+       }
+    }
+    
+    
+    private fun getMainCategory(mainCategoryId: String): Item.Category {
+        
+        val mainCategoryDict = mapOf(
+            "001" to Item.Category.TOP,
+            "002" to Item.Category.OUTER,
+            "003" to Item.Category.PANTS,
+            "022" to Item.Category.SKIRT,
+            "004" to Item.Category.BAG,
+            "005" to Item.Category.SHOES,
+            "007" to Item.Category.HEADWEAR,
+            "018" to Item.Category.SHOES,  // SNEAKERS
+        )
+        
+        return mainCategoryDict[mainCategoryId]!!
+    }
+    
+    private fun getSubCategory(subCategoryId: String): Item.SubCategory {
+        
+        val subCategoryDict = mapOf(
+            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEATER, "001002" to Item.SubCategory.SHIRT,
+            "002007" to Item.SubCategory.COAT, "002002" to Item.SubCategory.JACKET, "002016" to Item.SubCategory.PADDING, "002020" to Item.SubCategory.CARDIGAN,
+            "003002" to Item.SubCategory.DENIM, "003008" to Item.SubCategory.SLACKS, "003004" to Item.SubCategory.JOGGER, "003005" to Item.SubCategory.LEGGINGS,
+            "022001" to Item.SubCategory.MINISKIRT, "022002" to Item.SubCategory.MEDISKIRT, "022003" to Item.SubCategory.LONGSKIRT,
+            "004004" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSSBAG, "004014" to Item.SubCategory.ECHOBAG,
+            "005014" to Item.SubCategory.GOODOO, "005004" to Item.SubCategory.SANDAL, "005018" to Item.SubCategory.SLIPPER,
+            "007001" to Item.SubCategory.CAP, "007004" to Item.SubCategory.HAT, "007005" to Item.SubCategory.BEANIE,
+        )
+
+        return subCategoryDict[subCategoryId]?: Item.SubCategory.SNEAKERS
     }
 }
