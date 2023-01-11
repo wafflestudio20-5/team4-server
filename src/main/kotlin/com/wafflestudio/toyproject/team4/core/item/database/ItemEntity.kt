@@ -32,15 +32,10 @@ class ItemEntity(
     val category: Item.Category,
     @Enumerated(EnumType.STRING)
     val subCategory: Item.SubCategory,
-
-    //"reviews": Review[],    # 구매후기
-    
 ) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
-    val nextItemId: Long = id + 10
-    
 }
