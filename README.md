@@ -9,6 +9,7 @@
 
 ## How to run
 
+- Clone this repositoory
 - Run 'Docker Desktop' and type the following command in terminal: `docker-compose up -d`
 - Check the following
 
