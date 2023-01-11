@@ -7,6 +7,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.lang.Math.round
 
 @Component
 class MemoryDB (
@@ -14,7 +15,7 @@ class MemoryDB (
 ) {
     /**
      * 서버가 시작하면, 크롤링을 통해 무신사에서 실시간 랭킹 긁어와서 아이템 repository에 저장
-     * 각 대분류 - 소분류별로 5개씩
+     * 각 대분류 - 소분류별로 10개씩
      */
 
     @EventListener
@@ -71,26 +72,45 @@ class MemoryDB (
             val brandInfoList = this.select("div p[class=item_title] a").map { it.text() }
             val itemNameList = this.select("div p[class=list_info] a").map { it.attr("title") }
             val priceInfoList = this.select("div p[class=price]").map { it.text() }
-
-            for (idx in 0..4) {
+            val sexInfoList = this.select("div [class=icon_group]").map { it.text() }
+            
+            for (idx in 0..9) {
                 val newItem = ItemEntity(
                     name = itemNameList[idx],
                     brand = brandInfoList[idx],
                     imageUrl = imageInfoList[idx],
-                    //label = labelInfoList[idx],
+                    label = getLabel(labelInfoList[idx]),
                     oldPrice = priceInfoList[idx].substringBefore(" ").dropLast(1).replace(",", "").toLong(),
                     newPrice = priceInfoList[idx].substringAfter(" ").dropLast(1).replace(",", "").toLong(),
                     category = getMainCategory(mainCategoryId),
-                    subCategory = getSubCategory(subCategoryId)
+                    subCategory = getSubCategory(subCategoryId),
+                    sex = getSexInfo(sexInfoList[idx])
                 )
+                newItem.sale = round((1.0-(newItem.newPrice.toFloat()/newItem.oldPrice))*100)
                 itemRepository.save(newItem)
            }
        }
     }
     
+    private fun getLabel(label: String): Item.Label? {
+        val labelDict = mapOf(
+            "한정 판매" to Item.Label.LIMITED,
+            "부티크" to Item.Label.BOUTIQUE,
+            "무신사 단독" to Item.Label.EXCLUSIVE,
+            "선주문" to Item.Label.PREORDER,
+            )
+        return labelDict[label]
+    }
+    
+    private fun getSexInfo(sex: String): Item.Sex
+    = when(sex) {
+        "남성" -> Item.Sex.MALE
+        "여성" -> Item.Sex.FEMALE
+        "남성 여성" -> Item.Sex.BOTH
+        else -> Item.Sex.BOTH
+    }
     
     private fun getMainCategory(mainCategoryId: String): Item.Category {
-        
         val mainCategoryDict = mapOf(
             "001" to Item.Category.TOP,
             "002" to Item.Category.OUTER,
@@ -101,22 +121,19 @@ class MemoryDB (
             "007" to Item.Category.HEADWEAR,
             "018" to Item.Category.SHOES,  // SNEAKERS
         )
-        
         return mainCategoryDict[mainCategoryId]!!
     }
     
     private fun getSubCategory(subCategoryId: String): Item.SubCategory {
-        
         val subCategoryDict = mapOf(
             "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEATER, "001002" to Item.SubCategory.SHIRT,
             "002007" to Item.SubCategory.COAT, "002002" to Item.SubCategory.JACKET, "002016" to Item.SubCategory.PADDING, "002020" to Item.SubCategory.CARDIGAN,
             "003002" to Item.SubCategory.DENIM, "003008" to Item.SubCategory.SLACKS, "003004" to Item.SubCategory.JOGGER, "003005" to Item.SubCategory.LEGGINGS,
             "022001" to Item.SubCategory.MINISKIRT, "022002" to Item.SubCategory.MEDISKIRT, "022003" to Item.SubCategory.LONGSKIRT,
-            "004004" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSSBAG, "004014" to Item.SubCategory.ECHOBAG,
+            "004001" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSSBAG, "004014" to Item.SubCategory.ECHOBAG,
             "005014" to Item.SubCategory.GOODOO, "005004" to Item.SubCategory.SANDAL, "005018" to Item.SubCategory.SLIPPER,
             "007001" to Item.SubCategory.CAP, "007004" to Item.SubCategory.HAT, "007005" to Item.SubCategory.BEANIE,
         )
-
         return subCategoryDict[subCategoryId]?: Item.SubCategory.SNEAKERS
     }
 }
