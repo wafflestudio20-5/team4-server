@@ -28,11 +28,9 @@ class ItemServiceImpl(
             if (category.isNullOrEmpty()) this.findAllByOrderByRatingDesc()
             else this.findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category))
         }
-        val nextItemId = rankingList.lastOrNull()?.nextItemId
         
         return ItemRankingResponse(
-            items = rankingList.map { entity -> Item.of(entity) },
-            nextItemId = nextItemId
+            items = rankingList.map { entity -> Item.of(entity) }
         )
     }
 
