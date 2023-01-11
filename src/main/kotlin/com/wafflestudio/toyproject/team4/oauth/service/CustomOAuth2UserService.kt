@@ -41,14 +41,14 @@ class CustomOAuth2UserService(
         var savedUser = userRepository.findByUsername(username)
 
         if (savedUser != null) {
-            if (!savedUser.imageUrl.equals(userInfo.imageUrl))
-                savedUser.imageUrl = userInfo.imageUrl // Update image
+            if (!savedUser.image.equals(userInfo.image))
+                savedUser.image = userInfo.image // Update image
         } else {
             savedUser = UserEntity(
                 username = username,
                 encodedPassword = "NONE", // Arbitrary meaningless password
                 nickname = username,
-                imageUrl = userInfo.imageUrl,
+                image = userInfo.image,
                 socialKey = providerType
             )
             userRepository.save(savedUser)

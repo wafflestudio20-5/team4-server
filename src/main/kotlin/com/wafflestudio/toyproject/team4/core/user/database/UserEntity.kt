@@ -17,7 +17,7 @@ class UserEntity(
 
     @Column(unique = true)
     var nickname: String,
-    var imageUrl: String? = null,
+    var image: String? = null,
     var reviewCount: Long? = 0L,
 
     @Enumerated(EnumType.STRING)

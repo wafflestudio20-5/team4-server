@@ -4,5 +4,5 @@ abstract class OAuth2UserInfo(
     var attributes: Map<String, Any>
 ) {
     abstract val id: String
-    abstract val imageUrl: String?
+    abstract val image: String?
 }
