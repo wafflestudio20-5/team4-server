@@ -97,7 +97,7 @@ class MemoryDB (
             "한정 판매" to Item.Label.LIMITED,
             "부티크" to Item.Label.BOUTIQUE,
             "무신사 단독" to Item.Label.EXCLUSIVE,
-            "선주문" to Item.Label.PREORDER,
+            "선발매" to Item.Label.PREORDER,
             )
         return labelDict[label]
     }
