@@ -16,7 +16,7 @@ git clone https://github.com/wafflestudio20-5/team4-server.git
 
 - Run 'Docker Desktop' and type the following command in terminal
 ``` 
-docker-compose up -d`
+docker-compose up -d
 ```
 
 - Check the following
