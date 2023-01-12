@@ -9,7 +9,16 @@
 
 ## How to run
 
-- Run 'Docker Desktop' and type the following command in terminal: `docker-compose up -d`
+- Clone this repository
+```
+git clone https://github.com/wafflestudio20-5/team4-server.git
+```
+
+- Run 'Docker Desktop' and type the following command in terminal
+``` 
+docker-compose up -d
+```
+
 - Check the following
 
   ![image](https://user-images.githubusercontent.com/74580163/210161547-74fff8db-a2d3-477b-8af9-86a831b71b70.png)
