@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import javax.servlet.http.Cookie
 
 @Service
 @EnableConfigurationProperties(AuthProperties::class)
@@ -20,7 +21,7 @@ class AuthTokenService(
     private val tokenPrefix = "Bearer "
     private val signingKey = Keys.hmacShaKeyFor(authProperties.jwtSecret.toByteArray())
 
-    fun generateTokenByUsername(username: String): AuthToken {
+    fun generateAccessTokenByUsername(username: String): AuthToken {
         val claims: Claims = Jwts.claims()
         claims["username"] = username
         val issuer = authProperties.issuer
@@ -79,7 +80,16 @@ class AuthTokenService(
             .parseClaimsJws(prefixRemoved)
     }
 
-    fun generateCookie(token: String): ResponseCookie {
+    fun generateCookie(token: String): Cookie {
+        val cookie = Cookie("refreshToken", token)
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.path = "/"
+        cookie.maxAge = 3600
+        return cookie
+    }
+
+    fun generateResponseCookie(token: String): ResponseCookie {
         return ResponseCookie.from("refreshToken", token)
             .httpOnly(true)
             .secure(true)
