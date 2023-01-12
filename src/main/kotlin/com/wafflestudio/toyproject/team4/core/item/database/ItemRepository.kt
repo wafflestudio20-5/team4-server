@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 
 interface ItemRepository : JpaRepository<ItemEntity, Long>, ItemRepositoryCustom {
     fun findAllByCategoryOrderByRatingDesc(category: Item.Category): List<ItemEntity>
+    fun findAllBySubCategoryOrderByRatingDesc(subCategory: Item.SubCategory): List<ItemEntity>
     fun findAllByOrderByRatingDesc(): List<ItemEntity>
 }
 

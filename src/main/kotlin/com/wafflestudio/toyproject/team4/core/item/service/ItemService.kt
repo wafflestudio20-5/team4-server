@@ -1,7 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.item.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.core.item.api.request.ItemRequest
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -12,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 
 interface ItemService {
-    fun getItemRankingList(itemRequest: ItemRequest): ItemRankingResponse
+    fun getItemRankingList(category: String, subCategory: String, index: Long, count: Long): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
 }
 
@@ -22,13 +21,22 @@ class ItemServiceImpl(
 ) : ItemService {
 
     @Transactional(readOnly = true)
-    override fun getItemRankingList(itemRequest: ItemRequest): ItemRankingResponse {
-        val category = itemRequest.category
+    override fun getItemRankingList(category: String, subCategory: String, index: Long, count: Long): ItemRankingResponse {
+        val categoryInfo = Item.Category.valueOf(category.uppercase())
+        val subCategoryInfo = Item.SubCategory.valueOf(subCategory.uppercase())
         val rankingList = with(itemRepository) {
-            if (category.isNullOrEmpty()) this.findAllByOrderByRatingDesc()
-            else this.findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category))
+            if(categoryInfo == null && subCategoryInfo == null) {
+                // all items
+                findAllByOrderByRatingDesc().subList(0, count.toInt())
+            } else if (categoryInfo != null && subCategoryInfo == null) {
+                // category 전체
+                findAllByCategoryOrderByRatingDesc(categoryInfo).subList(0, count.toInt())
+            } else {
+                // subCategory is not null
+                findAllBySubCategoryOrderByRatingDesc(subCategoryInfo).subList(0, count.toInt())
+            }
         }
-        
+
         return ItemRankingResponse(
             items = rankingList.map { entity -> Item.of(entity) }
         )
