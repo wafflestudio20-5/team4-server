@@ -22,20 +22,15 @@ class ItemServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getItemRankingList(category: String, subCategory: String, index: Long, count: Long): ItemRankingResponse {
-        val categoryInfo = Item.Category.valueOf(category.uppercase())
-        val subCategoryInfo = Item.SubCategory.valueOf(subCategory.uppercase())
         val rankingList = with(itemRepository) {
-            if(categoryInfo == null && subCategoryInfo == null) {
-                // all items
-                findAllByOrderByRatingDesc().subList(0, count.toInt())
-            } else if (categoryInfo != null && subCategoryInfo == null) {
-                // category 전체
-                findAllByCategoryOrderByRatingDesc(categoryInfo).subList(0, count.toInt())
-            } else {
-                // subCategory is not null
-                findAllBySubCategoryOrderByRatingDesc(subCategoryInfo).subList(0, count.toInt())
+            if(category == "" && subCategory == "") {         // all items
+                findAllByOrderByRatingDesc()
+            } else if (category != "" && subCategory == "") { // category 전체
+                findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category.uppercase()))
+            } else { // subCategory is not null
+                findAllBySubCategoryOrderByRatingDesc(Item.SubCategory.valueOf(subCategory.uppercase()))
             }
-        }
+        }.filterIndexed { idx, _ -> (idx/count) == index}
 
         return ItemRankingResponse(
             items = rankingList.map { entity -> Item.of(entity) }
