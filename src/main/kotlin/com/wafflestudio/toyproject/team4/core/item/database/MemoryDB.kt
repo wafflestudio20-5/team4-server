@@ -126,7 +126,7 @@ class MemoryDB (
 
     private fun getSubCategory(subCategoryId: String): Item.SubCategory {
         val subCategoryDict = mapOf(
-            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEATER, "001002" to Item.SubCategory.SHIRT,
+            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEATSHIRT, "001002" to Item.SubCategory.SHIRT,
             "002007" to Item.SubCategory.COAT, "002002" to Item.SubCategory.JACKET, "002016" to Item.SubCategory.PADDING, "002020" to Item.SubCategory.CARDIGAN,
             "003002" to Item.SubCategory.DENIM, "003008" to Item.SubCategory.SLACKS, "003004" to Item.SubCategory.JOGGER, "003005" to Item.SubCategory.LEGGINGS,
             "022001" to Item.SubCategory.MINISKIRT, "022002" to Item.SubCategory.MEDISKIRT, "022003" to Item.SubCategory.LONGSKIRT,

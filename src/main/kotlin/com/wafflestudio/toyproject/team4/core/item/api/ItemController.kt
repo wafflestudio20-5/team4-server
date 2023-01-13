@@ -17,7 +17,7 @@ class ItemController(
         @RequestParam index: Long?,
         @RequestParam count: Long?,
     ) = itemService.getItemRankingList(
-        category?:"", subcategory?:"",
+        category, subcategory,
         index?:0L, count?:12L
     )
     

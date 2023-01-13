@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 
 interface ItemService {
-    fun getItemRankingList(category: String, subCategory: String, index: Long, count: Long): ItemRankingResponse
+    fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
 }
 
@@ -21,14 +21,14 @@ class ItemServiceImpl(
 ) : ItemService {
 
     @Transactional(readOnly = true)
-    override fun getItemRankingList(category: String, subCategory: String, index: Long, count: Long): ItemRankingResponse {
+    override fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse {
         val rankingList = with(itemRepository) {
-            if(category == "" && subCategory == "") {         // all items
+            if(category.isNullOrEmpty() && subCategory.isNullOrEmpty()) {         // all items
                 findAllByOrderByRatingDesc()
-            } else if (category != "" && subCategory == "") { // category 전체
+            } else if (!category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // category 전체
                 findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category.uppercase()))
             } else { // subCategory is not null
-                findAllBySubCategoryOrderByRatingDesc(Item.SubCategory.valueOf(subCategory.uppercase()))
+                findAllBySubCategoryOrderByRatingDesc(Item.SubCategory.valueOf(subCategory!!.uppercase()))
             }
         }.filterIndexed { idx, _ -> (idx/count) == index}
 
