@@ -1,6 +1,5 @@
 package com.wafflestudio.toyproject.team4.core.item.api
 
-import com.wafflestudio.toyproject.team4.core.item.api.request.ItemRequest
 import com.wafflestudio.toyproject.team4.core.item.service.ItemService
 import org.springframework.web.bind.annotation.*
 
@@ -13,8 +12,14 @@ class ItemController(
     
     @GetMapping("/items")
     fun getItemRankingList(
-        @RequestBody itemRequest: ItemRequest
-    ) = itemService.getItemRankingList(itemRequest)
+        @RequestParam category: String?,
+        @RequestParam subcategory: String?,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = itemService.getItemRankingList(
+        category, subcategory,
+        index?:0L, count?:12L
+    )
     
     @GetMapping("/item/{id}")
     fun getItem(

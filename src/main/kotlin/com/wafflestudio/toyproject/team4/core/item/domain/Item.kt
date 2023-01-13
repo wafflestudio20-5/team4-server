@@ -1,16 +1,22 @@
 package com.wafflestudio.toyproject.team4.core.item.domain
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.item.database.OptionEntity
 
-data class Item (
+data class Item(
     val id: Long,
     val name: String,
     val brand: String,
-    val imageUrl: String,
+    val image: String,
     val label: String?,
     val oldPrice: Long,
-    val newPrice: Long,
-    val sale: Long,
+    val newPrice: Long?,
+    val sale: Long?,
+    val sex: String,
+    val rating: Long?,
+    val options: MutableList<OptionEntity>? = mutableListOf(),
+    val category: String,
+    val subCategory: String,
 ) {
     
     enum class Label {
@@ -42,11 +48,16 @@ data class Item (
                 id = id,
                 name = name,
                 brand = brand,
-                imageUrl = imageUrl,
+                image = image,
                 label = label.toString(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,
-                sale = sale!!
+                sale = sale!!,
+                sex = sex.toString(),
+                rating = rating,
+                options = options,
+                category = category.toString(),
+                subCategory = subCategory.toString()
             )
         }
     }
