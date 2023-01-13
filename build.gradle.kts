@@ -51,6 +51,9 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
+    // Crawling
+    implementation("org.jsoup:jsoup:1.15.3")
+    
     // Kotlin Features
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
