@@ -49,15 +49,15 @@ data class Item(
                 name = name,
                 brand = brand,
                 image = image,
-                label = label.toString(),
+                label = label.toString().lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,
                 sale = sale!!,
-                sex = sex.toString(),
+                sex = sex.toString().lowercase(),
                 rating = rating,
                 options = options,
-                category = category.toString(),
-                subCategory = subCategory.toString()
+                category = category.toString().lowercase(),
+                subCategory = subCategory.toString().lowercase()
             )
         }
     }
