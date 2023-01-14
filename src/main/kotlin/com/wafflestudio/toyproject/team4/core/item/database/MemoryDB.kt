@@ -107,8 +107,10 @@ class MemoryDB (
     private fun getItemImages(itemDetailDoc: Document): List<String> {
         return itemDetailDoc
             .select("div ul[class=product_thumb] li img")
-            .map { it.attr("src").replace("60.jpg", "500.jpg") }
-            .filterNot { it.contains("thumb-video.gif") }
+            .map { it.attr("src")
+                    .replace("60.jpg", "500.jpg")
+                    .replace("60.png", "500.png")
+            }.filterNot { it.contains("thumb-video.gif") }
     }
     
     private fun getOptionList(itemDetailDoc: Document): List<String> {
