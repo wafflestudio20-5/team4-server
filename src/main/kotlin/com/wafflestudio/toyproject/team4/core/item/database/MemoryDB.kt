@@ -69,15 +69,16 @@ class MemoryDB (
 
         document.run {
             val labelInfoList = this.getElementsByClass("box-icon-right").map { it.text() }
-            val imageInfoList = this.getElementsByClass("lazyload lazy").map { it.attr("data-original") }
+            val detailUrlList = this.select("div a[class=img-block]").map { it.attr("href") }
             val brandInfoList = this.select("div p[class=item_title] a").map { it.text() }
             val itemNameList = this.select("div p[class=list_info] a").map { it.attr("title") }
             val priceInfoList = this.select("div p[class=price]").map { it.text() }
             val sexInfoList = this.select("div [class=icon_group]").map { it.text() }
-
+            
             for (idx in 0..9) {
                 val priceList = priceInfoList[idx].replace(",","").split(" ")
-                
+                val itemDetailDoc: Document = Jsoup.connect(detailUrlList[idx]).get()
+
                 val newItem = ItemEntity(
                     name = itemNameList[idx],
                     brand = brandInfoList[idx],
@@ -89,19 +90,37 @@ class MemoryDB (
                     sex = getSexInfo(sexInfoList[idx]),
                     rating = round((0.0 + Random().nextDouble() * 10) * 100) / 100.0
                 )
-                newItem.images = mutableListOf(
-                    ImageEntity(newItem, imageInfoList[idx]),
-                    ImageEntity(newItem, imageInfoList[idx]),
-                    )
+                
+                newItem.updateImages(getItemImages(itemDetailDoc))
+                newItem.updateOptionList(getOptionList(itemDetailDoc))
+                
                 // if "newPrice" is null, then we could not evaluate "sale" field
                 if(newItem.newPrice != null) {
                     newItem.sale = round((1.0 - (newItem.newPrice!!.toFloat() / newItem.oldPrice)) * 100)
                 }
+                
                 itemRepository.save(newItem)
             }
         }
     }
 
+    private fun getItemImages(itemDetailDoc: Document): List<String> {
+        return itemDetailDoc
+            .select("div ul[class=product_thumb] li img")
+            .map { it.attr("src").replace("60.jpg", "500.jpg") }
+            .filterNot { it.contains("thumb-video.gif") }
+    }
+    
+    private fun getOptionList(itemDetailDoc: Document): List<String> {
+        return itemDetailDoc
+            .select("div [id=buy_option_area] div div[class=option_cont] select option")
+            .map { 
+                if(it.attr("value") == "none") { it.attr("data-txt") }
+                else { it.attr("value")} 
+            }.filterNot { it.isEmpty() }
+    }
+    
+    
     private fun getLabel(label: String): Item.Label? {
         val labelDict = mapOf(
             "한정 판매" to Item.Label.LIMITED,

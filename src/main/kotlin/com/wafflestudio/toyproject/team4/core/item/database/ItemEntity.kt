@@ -35,4 +35,21 @@ class ItemEntity(
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var options: MutableList<OptionEntity>? = null
     
+    
+    fun updateImages(
+        imageUrlList: List<String>
+    ) {
+        this.images = imageUrlList.map {
+            url -> ImageEntity(this, url)
+        }.toMutableList()
+    }
+    
+    fun updateOptionList(
+        optionList: List<String>
+    ) {
+        this.options = optionList.map {
+            option -> OptionEntity(this, option)
+        }.toMutableList()
+    }
+    
 }

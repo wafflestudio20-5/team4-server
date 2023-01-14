@@ -3,7 +3,7 @@ package com.wafflestudio.toyproject.team4.core.item.database
 import javax.persistence.*
 
 @Entity
-@Table(name = "options")
+@Table(name = "item_options")
 class OptionEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")
