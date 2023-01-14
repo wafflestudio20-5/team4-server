@@ -14,11 +14,11 @@ class ItemEntity(
     val label: Item.Label? = null,
     @Enumerated(EnumType.STRING)
     val sex: Item.Sex,
-    val rating: Long? = 0L,
+    val rating: Double? = 0.0,
 
     val oldPrice: Long,
-    var newPrice: Long,
-    var sale: Long? = 0L,
+    var newPrice: Long? = null,
+    var sale: Long? = null,
 
     @OneToMany(
         mappedBy = "item",
