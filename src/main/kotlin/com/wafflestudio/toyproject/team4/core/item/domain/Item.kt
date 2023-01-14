@@ -13,7 +13,7 @@ data class Item(
     val newPrice: Long?,
     val sale: Long?,
     val sex: String,
-    val rating: Long?,
+    val rating: Double?,
     val options: MutableList<OptionEntity>? = mutableListOf(),
     val category: String,
     val subCategory: String,
