@@ -40,6 +40,6 @@ class ItemServiceImpl(
     override fun getItem(itemId: Long): ItemResponse {
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
-        return ItemResponse(item)
+        return ItemResponse(Item.of(item))
     }
 }

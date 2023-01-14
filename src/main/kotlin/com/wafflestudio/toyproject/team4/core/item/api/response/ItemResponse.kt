@@ -1,8 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.item.api.response
 
-import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.item.domain.Item
 
 
 data class ItemResponse (
-    val item: ItemEntity
+    val item: Item
 ) 

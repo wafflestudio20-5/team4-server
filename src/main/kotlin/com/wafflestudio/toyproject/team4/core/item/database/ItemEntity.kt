@@ -8,7 +8,6 @@ import javax.persistence.*
 class ItemEntity(
     val name: String,
     val brand: String,
-    val image: String,
 
     @Enumerated(EnumType.STRING)
     val label: Item.Label? = null,
@@ -19,15 +18,7 @@ class ItemEntity(
     val oldPrice: Long,
     var newPrice: Long? = null,
     var sale: Long? = null,
-
-    @OneToMany(
-        mappedBy = "item",
-        fetch = FetchType.LAZY,
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true
-    )
-    val options: MutableList<OptionEntity>? = null,
-
+    
     @Enumerated(EnumType.STRING)
     val category: Item.Category,
     @Enumerated(EnumType.STRING)
@@ -38,4 +29,10 @@ class ItemEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var images: MutableList<ImageEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var options: MutableList<OptionEntity>? = null
+    
 }

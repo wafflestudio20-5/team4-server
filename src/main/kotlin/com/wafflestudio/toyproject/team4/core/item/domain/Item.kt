@@ -1,20 +1,19 @@
 package com.wafflestudio.toyproject.team4.core.item.domain
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
-import com.wafflestudio.toyproject.team4.core.item.database.OptionEntity
 
 data class Item(
     val id: Long,
     val name: String,
     val brand: String,
-    val image: String,
+    val images: List<String>,
     val label: String? = null,
     val oldPrice: Long,
     val newPrice: Long? = null,
     val sale: Long? = null,
     val sex: String,
-    val rating: Double?,
-    val options: MutableList<OptionEntity>? = null,
+    var rating: Double?,
+    val options: List<String>? = null,
     val category: String,
     val subCategory: String,
 ) {
@@ -48,14 +47,14 @@ data class Item(
                 id = id,
                 name = name,
                 brand = brand,
-                image = image,
+                images = images.map{ it.cloudinaryUrl },
                 label = label?.toString()?.lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,
                 sale = sale,
                 sex = sex.toString().lowercase(),
                 rating = rating,
-                options = if(options.isNullOrEmpty()) null else options,
+                options = if(options.isNullOrEmpty()) null else options?.map{ it.optionName },
                 category = category.toString().lowercase(),
                 subCategory = subCategory.toString().lowercase()
             )
