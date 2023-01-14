@@ -26,7 +26,7 @@ class ItemEntity(
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    val options: MutableList<OptionEntity>? = mutableListOf(),
+    val options: MutableList<OptionEntity>? = null,
 
     @Enumerated(EnumType.STRING)
     val category: Item.Category,

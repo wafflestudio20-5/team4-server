@@ -8,7 +8,6 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Math.round
-import java.util.*
 
 @Component
 class MemoryDB (
@@ -77,7 +76,7 @@ class MemoryDB (
 
             for (idx in 0..9) {
                 val priceList = priceInfoList[idx].replace(",","").split(" ")
-
+                
                 val newItem = ItemEntity(
                     name = itemNameList[idx],
                     brand = brandInfoList[idx],
@@ -87,11 +86,9 @@ class MemoryDB (
                     newPrice = priceList.getOrNull(1)?.dropLast(1)?.toLong(),
                     category = getMainCategory(mainCategoryId),
                     subCategory = getSubCategory(subCategoryId),
-                    sex = getSexInfo(sexInfoList[idx]),
-                    // generate a random number in the range [0, 10]
-                    rating = round((0.0 + Random().nextDouble() * 10) * 100.0) / 100.0
+                    sex = getSexInfo(sexInfoList[idx])
                 )
-
+                
                 // if "newPrice" is null, then we could not evaluate "sale" field
                 if(newItem.newPrice != null) {
                     newItem.sale = round((1.0 - (newItem.newPrice!!.toFloat() / newItem.oldPrice)) * 100)
