@@ -17,8 +17,8 @@ class ItemEntity(
     val rating: Long? = 0L,
 
     val oldPrice: Long,
-    var newPrice: Long,
-    var sale: Long? = 0L,
+    var newPrice: Long? = null,
+    var sale: Long? = null,
 
     @OneToMany(
         mappedBy = "item",
@@ -26,7 +26,7 @@ class ItemEntity(
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    val options: MutableList<OptionEntity>? = mutableListOf(),
+    val options: MutableList<OptionEntity>? = null,
 
     @Enumerated(EnumType.STRING)
     val category: Item.Category,

@@ -75,18 +75,24 @@ class MemoryDB (
             val sexInfoList = this.select("div [class=icon_group]").map { it.text() }
 
             for (idx in 0..9) {
+                val priceList = priceInfoList[idx].replace(",","").split(" ")
+                
                 val newItem = ItemEntity(
                     name = itemNameList[idx],
                     brand = brandInfoList[idx],
                     image = imageInfoList[idx],
                     label = getLabel(labelInfoList[idx]),
-                    oldPrice = priceInfoList[idx].substringBefore(" ").dropLast(1).replace(",", "").toLong(),
-                    newPrice = priceInfoList[idx].substringAfter(" ").dropLast(1).replace(",", "").toLong(),
+                    oldPrice = priceList[0].dropLast(1).toLong(),
+                    newPrice = priceList.getOrNull(1)?.dropLast(1)?.toLong(),
                     category = getMainCategory(mainCategoryId),
                     subCategory = getSubCategory(subCategoryId),
                     sex = getSexInfo(sexInfoList[idx])
                 )
-                newItem.sale = round((1.0-(newItem.newPrice.toFloat()/newItem.oldPrice))*100)
+                
+                // if "newPrice" is null, then we could not evaluate "sale" field
+                if(newItem.newPrice != null) {
+                    newItem.sale = round((1.0 - (newItem.newPrice!!.toFloat() / newItem.oldPrice)) * 100)
+                }
                 itemRepository.save(newItem)
             }
         }
