@@ -23,13 +23,13 @@ class MemoryDB (
     fun makeMockData(event: ApplicationStartedEvent) {
 
         /** mainCategory - subCategory
-         * TOP   : 001       - SWEATER(001006), HOODIE(001004), SWEATSHIRT(001005), SHIRT(001002)
+         * TOP   : 001       - SWEATER(001006), HOODIE(001004), SWEAT_SHIRT(001005), SHIRT(001002)
          * OUTER : 002       - COAT(002007), JACKET(002002), PADDING(002016), CARDIGAN(002020)
          * PANTS : 003       - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
-         * SKIRT : 022       - MINISKIRT(022001), MEDISKIRT(022002), LONGSKIRT(022003)
-         * BAG   : 004       - BACKPACK(004001), CROSSBAG(004002), ECHOBAG(004014)
+         * SKIRT : 022       - MINISKIRT(022001), MEDI_SKIRT(022002), LONG_SKIRT(022003)
+         * BAG   : 004       - BACKPACK(004001), CROSS_BAG(004002), ECHO_BAG(004014)
          * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
-         * HEADWEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
+         * HEAD_WEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
          **/
 
         crawling("001", "001006")
@@ -149,7 +149,7 @@ class MemoryDB (
             "022" to Item.Category.SKIRT,
             "004" to Item.Category.BAG,
             "005" to Item.Category.SHOES,
-            "007" to Item.Category.HEADWEAR,
+            "007" to Item.Category.HEAD_WEAR,
             "018" to Item.Category.SHOES,  // SNEAKERS
         )
         return mainCategoryDict[mainCategoryId]!!
@@ -157,11 +157,11 @@ class MemoryDB (
 
     private fun getSubCategory(subCategoryId: String): Item.SubCategory {
         val subCategoryDict = mapOf(
-            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEATSHIRT, "001002" to Item.SubCategory.SHIRT,
+            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEAT_SHIRT, "001002" to Item.SubCategory.SHIRT,
             "002007" to Item.SubCategory.COAT, "002002" to Item.SubCategory.JACKET, "002016" to Item.SubCategory.PADDING, "002020" to Item.SubCategory.CARDIGAN,
             "003002" to Item.SubCategory.DENIM, "003008" to Item.SubCategory.SLACKS, "003004" to Item.SubCategory.JOGGER, "003005" to Item.SubCategory.LEGGINGS,
-            "022001" to Item.SubCategory.MINISKIRT, "022002" to Item.SubCategory.MEDISKIRT, "022003" to Item.SubCategory.LONGSKIRT,
-            "004001" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSSBAG, "004014" to Item.SubCategory.ECHOBAG,
+            "022001" to Item.SubCategory.MINI_SKIRT, "022002" to Item.SubCategory.MEDI_SKIRT, "022003" to Item.SubCategory.LONG_SKIRT,
+            "004001" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSS_BAG, "004014" to Item.SubCategory.ECHO_BAG,
             "005014" to Item.SubCategory.GOODOO, "005004" to Item.SubCategory.SANDAL, "005018" to Item.SubCategory.SLIPPER,
             "007001" to Item.SubCategory.CAP, "007004" to Item.SubCategory.HAT, "007005" to Item.SubCategory.BEANIE,
         )
