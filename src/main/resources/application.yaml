@@ -38,6 +38,9 @@ auth.jwt:
   jwtExpiration: 900
   refreshExpiration: 3600
 
+cloudinary:
+  apiEnvironment: ${cloudinary-key}
+
 ---
 
 server:
