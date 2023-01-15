@@ -7,8 +7,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
-import com.wafflestudio.toyproject.team4.core.user.api.response.NicknameResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,7 +24,7 @@ class AuthController(
     fun register(
         @RequestBody registerRequest: RegisterRequest
     ) = ResponseEntity(authService.register(registerRequest), HttpStatus.CREATED)
-    
+
     @PostMapping("/login")
     fun login(
         @RequestBody loginRequest: LoginRequest
@@ -46,14 +44,10 @@ class AuthController(
     @PostMapping("/username")
     fun checkDuplicatedUsername(
         @RequestBody usernameRequest: UsernameRequest
-    ): UsernameResponse {
-        return authService.checkDuplicatedUsername(usernameRequest)
-    }
+    ) = authService.checkDuplicatedUsername(usernameRequest)
 
     @PostMapping("/nickname")
     fun checkDuplicatedNickname(
         @RequestBody nicknameRequest: NicknameRequest
-    ): NicknameResponse {
-        return authService.checkDuplicatedNickname(nicknameRequest)
-    }
+    ) = authService.checkDuplicatedNickname(nicknameRequest)
 }
