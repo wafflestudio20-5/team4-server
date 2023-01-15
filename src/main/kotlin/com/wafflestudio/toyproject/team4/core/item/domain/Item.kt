@@ -1,20 +1,20 @@
 package com.wafflestudio.toyproject.team4.core.item.domain
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
-import com.wafflestudio.toyproject.team4.core.item.database.OptionEntity
+import org.apache.commons.text.CaseUtils
 
 data class Item(
     val id: Long,
     val name: String,
     val brand: String,
-    val image: String,
-    val label: String?,
+    val images: List<String>,
+    val label: String? = null,
     val oldPrice: Long,
-    val newPrice: Long?,
-    val sale: Long?,
+    val newPrice: Long? = null,
+    val sale: Long? = null,
     val sex: String,
-    val rating: Double?,
-    val options: MutableList<OptionEntity>? = mutableListOf(),
+    var rating: Double?,
+    val options: List<String>? = null,
     val category: String,
     val subCategory: String,
 ) {
@@ -28,15 +28,15 @@ data class Item(
     }
     
     enum class Category {
-        TOP, OUTER, PANTS, SKIRT, BAG, SHOES, HEADWEAR
+        TOP, OUTER, PANTS, SKIRT, BAG, SHOES, HEAD_WEAR
     }
 
     enum class SubCategory {
-        SWEATER, HOODIE, SWEATSHIRT, SHIRT,  // TOP
+        SWEATER, HOODIE, SWEAT_SHIRT, SHIRT,  // TOP
         COAT, JACKET, PADDING, CARDIGAN,     // OUTER
         DENIM, SLACKS, JOGGER, LEGGINGS,     // PANTS
-        MINISKIRT, MEDISKIRT, LONGSKIRT,     // SKIRT
-        BACKPACK, CROSSBAG, ECHOBAG,         // BAG
+        MINI_SKIRT, MEDI_SKIRT, LONG_SKIRT,     // SKIRT
+        BACKPACK, CROSS_BAG, ECHO_BAG,         // BAG
         GOODOO, SANDAL, SLIPPER, SNEAKERS,   // SHOES
         CAP, HAT, BEANIE                     // HEADWEAR 
     }
@@ -48,16 +48,16 @@ data class Item(
                 id = id,
                 name = name,
                 brand = brand,
-                image = image,
-                label = label.toString(),
+                images = images.map { it.cloudinaryUrl },
+                label = label?.toString()?.lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,
-                sale = sale!!,
-                sex = sex.toString(),
+                sale = sale,
+                sex = sex.toString().lowercase(),
                 rating = rating,
-                options = options,
-                category = category.toString(),
-                subCategory = subCategory.toString()
+                options = if(options.isNullOrEmpty()) null else options?.map{ it.optionName },
+                category = CaseUtils.toCamelCase(category.toString(), false, '_'),
+                subCategory = CaseUtils.toCamelCase(subCategory.toString(), false, '_')
             )
         }
     }

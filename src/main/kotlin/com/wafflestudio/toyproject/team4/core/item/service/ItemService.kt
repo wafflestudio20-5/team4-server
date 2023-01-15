@@ -26,9 +26,13 @@ class ItemServiceImpl(
             if(category.isNullOrEmpty() && subCategory.isNullOrEmpty()) {         // all items
                 findAllByOrderByRatingDesc()
             } else if (!category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // category 전체
-                findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(category.uppercase()))
+                findAllByCategoryOrderByRatingDesc(Item.Category.valueOf(
+                    """([a-z])([A-Z]+)""".toRegex().replace(category, "$1_$2").uppercase()
+                ))
             } else { // subCategory is not null
-                findAllBySubCategoryOrderByRatingDesc(Item.SubCategory.valueOf(subCategory!!.uppercase()))
+                findAllBySubCategoryOrderByRatingDesc(Item.SubCategory.valueOf(
+                    """([a-z])([A-Z]+)""".toRegex().replace(subCategory!!, "$1_$2").uppercase()
+                ))
             }
         }.filterIndexed { idx, _ -> (idx/count) == index}
 
@@ -40,6 +44,6 @@ class ItemServiceImpl(
     override fun getItem(itemId: Long): ItemResponse {
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
-        return ItemResponse(item)
+        return ItemResponse(Item.of(item))
     }
 }
