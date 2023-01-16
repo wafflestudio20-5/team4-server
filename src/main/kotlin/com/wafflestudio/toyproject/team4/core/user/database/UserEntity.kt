@@ -31,12 +31,26 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     val role: User.Role = User.Role.ROLE_USER,
 
-    var refreshToken: String? = null
+    var refreshToken: String? = null,
 ) {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
     @CreatedDate
     var registrationDate: LocalDateTime = LocalDateTime.now()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var reviews: MutableList<ReviewEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var purchases: MutableList<PurchaseEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var cartItems: MutableList<CartItemEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var recentItems: MutableList<RecentItemEntity> = mutableListOf()
 }

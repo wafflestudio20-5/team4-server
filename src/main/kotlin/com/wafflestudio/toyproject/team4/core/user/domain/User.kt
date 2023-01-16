@@ -8,10 +8,11 @@ data class User(
     val username: String,
     val nickname: String,
     var image: String? = null,
+    var reviewCount: Long?,
     var registrationDate: LocalDateTime,
     var height: Long? = null,
     var weight: Long? = null,
-    val sex: Sex? = null,
+    val sex: String? = null,
 ) {
     enum class Sex {
         MALE, FEMALE
@@ -28,10 +29,11 @@ data class User(
                 username = username,
                 nickname = nickname,
                 image = image,
+                reviewCount = reviewCount,
                 registrationDate = registrationDate,
                 height = height,
                 weight = weight,
-                sex = sex
+                sex = sex.toString().lowercase(),
             )
         }
     }
