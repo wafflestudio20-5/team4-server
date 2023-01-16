@@ -7,20 +7,19 @@ data class User(
     val id: Long,
     val username: String,
     val nickname: String,
-    var imageUrl: String? = null,
+    var image: String? = null,
+    var reviewCount: Long?,
     var registrationDate: LocalDateTime,
     var height: Long? = null,
     var weight: Long? = null,
-    val sex: Sex? = null,
-//    var socialKey: String? = null,
-
-//    val reviews: List<Review>,
-//    val purchases: List<Item>,
-//    val shoppingCart: List<Item>,
-//    val recentlyViewed: List<Item>
+    val sex: String? = null,
 ) {
     enum class Sex {
         MALE, FEMALE
+    }
+
+    enum class Role {
+        ROLE_USER, ROLE_ADMIN
     }
 
     companion object {
@@ -29,11 +28,12 @@ data class User(
                 id = id,
                 username = username,
                 nickname = nickname,
-                imageUrl = imageUrl,
+                image = image,
+                reviewCount = reviewCount,
                 registrationDate = registrationDate,
                 height = height,
                 weight = weight,
-                sex = sex
+                sex = sex.toString().lowercase(),
             )
         }
     }

@@ -9,6 +9,7 @@ import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -32,9 +33,7 @@ class UserServiceImpl(
     override fun getMe(username: String): UserResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val userResponse = UserResponse.of(userEntity)
-        userResponse.reviews = reviewRepository.getReviewResponses(userEntity.reviewEntities)
-        return userResponse
+        return UserResponse(User.of(userEntity))
     }
 
     @Transactional
