@@ -8,39 +8,48 @@ import javax.persistence.*
 class ItemEntity(
     val name: String,
     val brand: String,
-    val imageUrl: String,
 
     @Enumerated(EnumType.STRING)
     val label: Item.Label? = null,
     @Enumerated(EnumType.STRING)
     val sex: Item.Sex,
-    val rating: Long? = 0L,
+    val rating: Double? = 0.0,
 
     val oldPrice: Long,
-    var sale: Long? = 0L,
-
-    @OneToMany(
-        mappedBy = "item",
-        fetch = FetchType.LAZY,
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true
-    )
-    val options: MutableList<OptionEntity>? = mutableListOf(),
+    var newPrice: Long? = null,
+    var sale: Long? = null,
     
     @Enumerated(EnumType.STRING)
     val category: Item.Category,
     @Enumerated(EnumType.STRING)
     val subCategory: Item.SubCategory,
-
-    //"reviews": Review[],    # 구매후기
-    
 ) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    
-    var newPrice: Long = (oldPrice * (1- sale!!) + 5) / 10 * 10
-    val nextItemId: Long = id + 10
 
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var images: MutableList<ImageEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var options: MutableList<OptionEntity>? = null
+    
+    
+    fun updateImages(
+        imageUrlList: List<String>
+    ) {
+        this.images = imageUrlList.map {
+            url -> ImageEntity(this, url)
+        }.toMutableList()
+    }
+    
+    fun updateOptionList(
+        optionList: List<String>
+    ) {
+        this.options = optionList.map {
+            option -> OptionEntity(this, option)
+        }.toMutableList()
+    }
+    
 }

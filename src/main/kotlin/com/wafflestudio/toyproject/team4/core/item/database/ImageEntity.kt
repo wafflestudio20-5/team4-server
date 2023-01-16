@@ -3,13 +3,13 @@ package com.wafflestudio.toyproject.team4.core.item.database
 import javax.persistence.*
 
 @Entity
-@Table(name = "item_options")
-class OptionEntity(
+@Table(name = "item_images")
+class ImageEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")
     val item: ItemEntity,
     
-    val optionName: String
+    var cloudinaryUrl: String
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

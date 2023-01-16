@@ -51,11 +51,11 @@ class AuthServiceImpl(
             throw CustomHttp401("비밀번호가 올바르지 않습니다.")
         }
 
-        val accessToken = authTokenService.generateTokenByUsername(loginRequest.username).accessToken
+        val accessToken = authTokenService.generateAccessTokenByUsername(loginRequest.username).accessToken
         val refreshToken = authTokenService.generateRefreshTokenByUsername(loginRequest.username)
         user.refreshToken = refreshToken
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, authTokenService.generateCookie(refreshToken).toString())
+            .header(HttpHeaders.SET_COOKIE, authTokenService.generateResponseCookie(refreshToken).toString())
             .body(AuthToken(accessToken))
     }
 
@@ -66,11 +66,11 @@ class AuthServiceImpl(
         user.refreshToken ?: throw CustomHttp400("해당 사용자는 로그인 상태가 아닙니다.")
         if (refreshToken != user.refreshToken) throw CustomHttp400("잘못된 요청입니다.")
 
-        val accessToken = authTokenService.generateTokenByUsername(username).accessToken
+        val accessToken = authTokenService.generateAccessTokenByUsername(username).accessToken
         val newRefreshToken = authTokenService.generateRefreshTokenByUsername(username)
         user.refreshToken = newRefreshToken
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, authTokenService.generateCookie(newRefreshToken).toString())
+            .header(HttpHeaders.SET_COOKIE, authTokenService.generateResponseCookie(newRefreshToken).toString())
             .body(AuthToken(accessToken))
     }
 

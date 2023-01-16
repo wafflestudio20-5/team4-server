@@ -13,3 +13,5 @@ class CustomHttp409(msg: String) : CustomHttpException(msg, HttpStatus.CONFLICT)
 class CustomHttp401(msg: String) : CustomHttpException(msg, HttpStatus.UNAUTHORIZED)
 
 class CustomHttp403(msg: String) : CustomHttpException(msg, HttpStatus.FORBIDDEN)
+
+class CustomHttp502(msg: String) : CustomHttpException(msg, HttpStatus.BAD_GATEWAY)

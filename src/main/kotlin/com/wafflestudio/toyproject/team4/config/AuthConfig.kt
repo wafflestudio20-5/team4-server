@@ -1,16 +1,17 @@
 package com.wafflestudio.toyproject.team4.config
 
+import com.wafflestudio.toyproject.team4.oauth.handler.OAuth2AuthenticationSuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
-class AuthConfig {
-
+class AuthConfig(
+    private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler
+) {
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
@@ -18,11 +19,8 @@ class AuthConfig {
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain =
         httpSecurity
             .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests()
-            .anyRequest().permitAll()
+            .oauth2Login()
+            .successHandler(oAuth2AuthenticationSuccessHandler)
             .and()
             .build()
-
 }
