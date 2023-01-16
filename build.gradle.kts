@@ -76,6 +76,9 @@ dependencies {
     implementation("com.querydsl:querydsl-core:$querydslVersion")
     kapt("com.querydsl:querydsl-apt:$querydslVersion:jpa")
     kapt(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+
+    // Cloudinary
+    implementation("com.cloudinary:cloudinary-http44:1.33.0")
 }
 
 // QueryDSL
