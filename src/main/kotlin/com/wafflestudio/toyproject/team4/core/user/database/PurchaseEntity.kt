@@ -1,7 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
-import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
@@ -14,13 +13,13 @@ import javax.persistence.*
 class PurchaseEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    val userEntity: UserEntity,
-    
+    val user: UserEntity,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")
-    val itemEntity: ItemEntity,
-    
-    val optionName: String,
+    val item: ItemEntity,
+
+    val optionName: String?,
     val payment: Long,
     val quantity: Long,
 ) {
@@ -29,5 +28,8 @@ class PurchaseEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var date: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now()
+
+    @OneToMany(mappedBy = "purchase", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var reviews: MutableList<ReviewEntity> = mutableListOf()
 }
