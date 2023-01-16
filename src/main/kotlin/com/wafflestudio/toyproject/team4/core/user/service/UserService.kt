@@ -4,7 +4,7 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.user.api.response.PurchaseResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.ReviewResponse
+import com.wafflestudio.toyproject.team4.core.user.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.ReviewRepository
@@ -15,7 +15,7 @@ import javax.transaction.Transactional
 
 interface UserService {
     fun getMe(username: String): UserResponse
-    fun getReviews(username: String): MutableList<ReviewResponse>
+    fun getReviews(username: String): MutableList<ReviewsResponse>
     fun getPurchases(username: String): MutableList<PurchaseResponse>
     fun getShoppingCart(username: String): MutableList<Item>
     fun getRecentlyViewed(username: String): MutableList<Item>
@@ -37,10 +37,11 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun getReviews(username: String): MutableList<ReviewResponse> {
+    override fun getReviews(username: String): ReviewsResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        return reviewRepository.getReviewResponses(userEntity.reviewEntities)
+        val reviewEntities = reviewRepository.findAllByUser(userEntity)
+        return ReviewsResponse(reviewEntities.map { reviewEntity -> Review.of(reviewEntity) })
     }
 
     @Transactional

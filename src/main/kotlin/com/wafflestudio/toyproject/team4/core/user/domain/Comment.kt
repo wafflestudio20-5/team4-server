@@ -5,17 +5,16 @@ import java.time.LocalDateTime
 
 data class Comment(
     val id: Long,
-    val username: String,
-    val text: String,
-    val date: LocalDateTime,
+    val content: String,
+    val createdDateTime: LocalDateTime,
 ) {
     companion object {
-        fun of(commentEntity: CommentEntity) =
+        fun of(commentEntity: CommentEntity) = commentEntity.run {
             Comment(
-                id = commentEntity.id,
-                username = commentEntity.userEntity.username,
-                text = commentEntity.text,
-                date = commentEntity.date,
+                id = id,
+                content = content,
+                createdDateTime = createdDateTime,
             )
+        }
     }
 }

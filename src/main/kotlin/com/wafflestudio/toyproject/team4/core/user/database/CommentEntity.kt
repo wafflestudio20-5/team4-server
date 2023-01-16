@@ -11,15 +11,15 @@ import javax.persistence.*
 @EntityListeners(AuditingEntityListener::class)
 class CommentEntity(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    val userEntity: UserEntity,
-    
-    var text: String,
+    @JoinColumn(name = "itemId")
+    val review: ReviewEntity,
+
+    var content: String,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
     @CreatedDate
-    var date: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now()
 }

@@ -1,7 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
-import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
 import javax.persistence.*
 
 
@@ -11,31 +12,35 @@ import javax.persistence.*
 class ReviewEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    val userEntity: UserEntity,
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId")
-    val itemEntity: ItemEntity,
+    val user: UserEntity,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseId")
-    val purchaseEntity: PurchaseEntity,
-    
+    val purchase: PurchaseEntity,
+
     var rating: Long,
-    var text: String,
+    var content: String,
     val size: Size,
     val color: Color,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    
-    @OneToMany(cascade = [CascadeType.REMOVE])
-    var commentEntities: MutableList<CommentEntity> = mutableListOf()
+
+    @CreatedDate
+    var createdDateTime: LocalDateTime = LocalDateTime.now()
+
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var comments: MutableList<CommentEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "review", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var images: MutableList<ReviewImageEntity> = mutableListOf()
 }
 
 enum class Size {
-    BIG, NORMAL, SMALL,
+    LARGE, MID, SMALL,
 }
 
 enum class Color {
-    BRIGHT, NORMAL, BLURRY,
+    BRIGHT, MID, DIM,
 }
