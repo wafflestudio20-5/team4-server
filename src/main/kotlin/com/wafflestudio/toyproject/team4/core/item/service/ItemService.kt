@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 interface ItemService {
     fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
+    fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse
 }
 
 @Service
@@ -45,5 +46,16 @@ class ItemServiceImpl(
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
         return ItemResponse(Item.of(item))
+    }
+
+    override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
+        // 일단은 아이템 품목명에서만 검색 결과 일치한 거 내보이기 -> 대문자로 입력하면은 검색 일치 안 해서 결과 안 나옴
+        val itemList = itemRepository
+            .findAllByNameContainingOrderByRatingDesc(query)
+            .filterIndexed { idx, _ -> (idx/count) == index}
+        
+        return ItemRankingResponse(
+            items = itemList.map { entity -> Item.of(entity) }
+        )
     }
 }

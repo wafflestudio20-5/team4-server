@@ -26,4 +26,10 @@ class ItemController(
         @PathVariable(value="id") itemId: Long
     ) = itemService.getItem(itemId)
 
+    @GetMapping("/search")
+    fun searchItemByQuery(
+        @RequestParam query: String,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = itemService.searchItemByQuery(query, index?:0L, count?:12L)
 }

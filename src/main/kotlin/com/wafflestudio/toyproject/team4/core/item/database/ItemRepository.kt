@@ -9,6 +9,7 @@ interface ItemRepository : JpaRepository<ItemEntity, Long>, ItemRepositoryCustom
     fun findAllByCategoryOrderByRatingDesc(category: Item.Category): List<ItemEntity>
     fun findAllBySubCategoryOrderByRatingDesc(subCategory: Item.SubCategory): List<ItemEntity>
     fun findAllByOrderByRatingDesc(): List<ItemEntity>
+    fun findAllByNameContainingOrderByRatingDesc(query: String): List<ItemEntity>
 }
 
 interface ItemRepositoryCustom
