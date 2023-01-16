@@ -1,8 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.*
 import com.wafflestudio.toyproject.team4.core.user.domain.*

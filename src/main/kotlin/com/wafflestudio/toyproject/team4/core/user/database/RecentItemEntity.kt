@@ -19,7 +19,7 @@ class RecentItemEntity(
     @JoinColumn(name = "itemId")
     val item: ItemEntity,
     
-) {
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L

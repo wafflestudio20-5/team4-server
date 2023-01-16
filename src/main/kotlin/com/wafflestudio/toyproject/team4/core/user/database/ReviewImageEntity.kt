@@ -8,7 +8,7 @@ class ReviewImageEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewId")
     val review: ReviewEntity,
-    
+
     var cloudinaryUrl: String
 ) {
     @Id

@@ -26,11 +26,7 @@ class UserEntity(
     var height: Long? = null,
     var weight: Long? = null,
     var socialKey: String? = null,
-
     var refreshToken: String? = null,
-
-    var shoppingCart: MutableList<ItemEntity> = mutableListOf(),
-    var recentlyViewed: MutableList<ItemEntity> = mutableListOf(),
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,10 +34,16 @@ class UserEntity(
 
     @CreatedDate
     var registrationDate: LocalDateTime = LocalDateTime.now()
-    
-    @OneToMany(mappedBy = "userEntity", cascade = [CascadeType.REMOVE])
-    var reviewEntities: MutableList<ReviewEntity> = mutableListOf()
-    
-    @OneToMany(mappedBy = "userEntity", cascade = [CascadeType.REMOVE])
-    var purchaseEntities: MutableList<PurchaseEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var reviews: MutableList<ReviewEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var purchases: MutableList<PurchaseEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var cartItems: MutableList<CartItemEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var recentItems: MutableList<RecentItemEntity> = mutableListOf()
 }
