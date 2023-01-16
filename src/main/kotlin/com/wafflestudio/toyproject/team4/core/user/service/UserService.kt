@@ -3,18 +3,9 @@ package com.wafflestudio.toyproject.team4.core.user.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.user.api.response.CartItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.PurchaseItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
-import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
-import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
-import com.wafflestudio.toyproject.team4.core.user.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
-import com.wafflestudio.toyproject.team4.core.user.domain.CartItem
-import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
-import com.wafflestudio.toyproject.team4.core.user.domain.Review
-import com.wafflestudio.toyproject.team4.core.user.domain.User
+import com.wafflestudio.toyproject.team4.core.user.api.response.*
+import com.wafflestudio.toyproject.team4.core.user.database.*
+import com.wafflestudio.toyproject.team4.core.user.domain.*
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -23,7 +14,7 @@ interface UserService {
     fun getReviews(username: String): ReviewsResponse
     fun getPurchases(username: String): PurchaseItemsResponse
     fun getShoppingCart(username: String): CartItemsResponse
-    fun getRecentlyViewed(username: String): MutableList<Item>
+    fun getRecentlyViewed(username: String): RecentItemsResponse
 }
 
 @Service
@@ -31,8 +22,8 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
     private val purchaseRepository: PurchaseRepository,
-    private val itemRepository: ItemRepository,
     private val cartItemRepository: CartItemRepository,
+    private val recentItemRepository: RecentItemRepository,
 ) : UserService {
 
     @Transactional
@@ -67,9 +58,10 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun getRecentlyViewed(username: String): MutableList<Item> {
+    override fun getRecentlyViewed(username: String): RecentItemsResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        return itemRepository.getItems(userEntity.recentlyViewed)
+        val recentItemEntities = recentItemRepository.findAllByUser(userEntity)
+        return RecentItemsResponse(recentItemEntities.map { recentItemEntity -> RecentItem.of(recentItemEntity) })
     }
 }
