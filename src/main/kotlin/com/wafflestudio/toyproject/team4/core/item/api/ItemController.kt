@@ -1,5 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.item.api
 
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
 import com.wafflestudio.toyproject.team4.core.item.service.ItemService
 import org.springframework.web.bind.annotation.*
 
@@ -29,8 +31,11 @@ class ItemController(
 
     @GetMapping("/search")
     fun searchItemByQuery(
-        @RequestParam query: String,
+        @RequestParam query: String?,
         @RequestParam index: Long?,
         @RequestParam count: Long?,
-    ) = itemService.searchItemByQuery(query, index?:0L, count?:20L)
+    ): ItemRankingResponse {
+        if(query.isNullOrEmpty()) throw CustomHttp400("검색어를 입력하세요")
+        else return itemService.searchItemByQuery(query, index?:0L, count?:20L)
+    } 
 }
