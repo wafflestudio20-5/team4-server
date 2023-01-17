@@ -4,6 +4,7 @@ package com.wafflestudio.toyproject.team4.core.user.api
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -51,6 +52,14 @@ class UserController(
         @UserContext username: String,
         @RequestBody postShoppingCartRequest: PostShoppingCartRequest
     ) = ResponseEntity(userService.postShoppingCart(username, postShoppingCartRequest), HttpStatus.CREATED)
+
+    @Authenticated
+    @PutMapping("/me/shopping-cart")
+    fun putShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @RequestBody putShoppingCartRequest: PutShoppingCartRequest
+    ) = ResponseEntity(userService.putShoppingCart(username, putShoppingCartRequest), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/recently-viewed")

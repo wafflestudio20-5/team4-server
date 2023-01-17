@@ -18,7 +18,7 @@ class CartItemEntity(
     val item: ItemEntity,
 
     val optionName: String? = null,
-    val quantity: Long,
+    var quantity: Long,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
