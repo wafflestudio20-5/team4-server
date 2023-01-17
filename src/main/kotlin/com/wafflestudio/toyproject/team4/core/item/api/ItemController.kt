@@ -18,7 +18,7 @@ class ItemController(
         @RequestParam count: Long?,
     ) = itemService.getItemRankingList(
         category, subcategory,
-        index?:0L, count?:12L
+        index?:0L, count?:20L
     )
     
     @GetMapping("/item/{id}")
@@ -26,4 +26,11 @@ class ItemController(
         @PathVariable(value="id") itemId: Long
     ) = itemService.getItem(itemId)
 
+
+    @GetMapping("/search")
+    fun searchItemByQuery(
+        @RequestParam query: String,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = itemService.searchItemByQuery(query, index?:0L, count?:20L)
 }
