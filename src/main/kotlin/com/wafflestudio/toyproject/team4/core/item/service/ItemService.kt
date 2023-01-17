@@ -49,10 +49,17 @@ class ItemServiceImpl(
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
-        // 일단은 아이템 품목명에서만 검색 결과 일치한 거 내보이기 -> 대문자로 입력하면은 검색 일치 안 해서 결과 안 나옴
-        val itemList = itemRepository
-            .findAllByNameContainingOrderByRatingDesc(query)
-            .filterIndexed { idx, _ -> (idx/count) == index}
+        val itemList = with(itemRepository) {
+            val itemsSearchedByName = this.findAllByNameContainingOrderByRatingDesc(query)
+            val itemSearchedByBrand = this.findAllByBrandContainingOrderByRatingDesc(query)
+            
+            // to give high priority to the results searched by name(=itemsSearchedByName),
+            // simply add the results searched by brand(=itemsSearchedByBrand) afterwards
+            itemsSearchedByName + itemSearchedByBrand
+        }.filterIndexed {
+            // and finally, filter for pagination
+            idx, _ -> (idx/count) == index
+        }
         
         return ItemRankingResponse(
             items = itemList.map { entity -> Item.of(entity) }
