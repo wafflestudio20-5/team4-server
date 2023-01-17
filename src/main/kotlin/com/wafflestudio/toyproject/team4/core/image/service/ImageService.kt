@@ -35,4 +35,9 @@ class ImageService(
             throw CustomHttp502("[서버 오류] 이미지 업로드에 실패했습니다.")
         }
     }
+
+    fun getDefaultImage(username: String): String {
+        val firstLetter = username.find { it.isLetter() }?.lowercase() ?: "a"
+        return "//image.msscdn.net/mfile_s01/_simbols/_basic/$firstLetter.png"
+    }
 } 
