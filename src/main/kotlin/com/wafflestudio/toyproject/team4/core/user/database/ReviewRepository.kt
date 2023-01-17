@@ -9,9 +9,14 @@ interface ReviewRepository : JpaRepository<ReviewEntity, Long>, ReviewRepository
 }
 
 interface ReviewRepositoryCustom {
+    fun findAllByItemId(itemId: Long): List<ReviewEntity>
 }
 
 @Component
 class ReviewRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory,
-) : ReviewRepositoryCustom
+) : ReviewRepositoryCustom {
+    override fun findAllByItemId(itemId: Long): List<ReviewEntity> {
+        return listOf()
+    }
+}

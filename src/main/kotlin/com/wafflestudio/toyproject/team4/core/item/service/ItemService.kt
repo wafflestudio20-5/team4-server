@@ -4,18 +4,24 @@ import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingRespo
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.user.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.user.database.ReviewRepository
+import com.wafflestudio.toyproject.team4.core.user.domain.Review
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+
 interface ItemService {
     fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
+    fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
     fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse
 }
 
 @Service
 class ItemServiceImpl(
     private val itemRepository: ItemRepository,
+    private val reviewRepository: ReviewRepository
 ) : ItemService {
     @Transactional(readOnly = true)
     override fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse {
@@ -36,10 +42,18 @@ class ItemServiceImpl(
             items = rankingList.map { entity -> Item.of(entity) }
         )
     }
+    
     override fun getItem(itemId: Long): ItemResponse {
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
         return ItemResponse(Item.of(item))
+    }
+
+    override fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse {
+        val itemReviews = reviewRepository.findAllByItemId(itemId)
+        return ReviewsResponse(
+            reviews = itemReviews.map { entity -> Review.of(entity) }
+        )
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
