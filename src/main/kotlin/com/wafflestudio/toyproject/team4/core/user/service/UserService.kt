@@ -19,6 +19,7 @@ interface UserService {
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
     fun putShoppingCart(username: String, putShoppingCartRequest: PutShoppingCartRequest)
+    fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
 }
 
@@ -90,6 +91,15 @@ class UserServiceImpl(
         val cartItemEntity = userEntity.cartItems.find { it.id == putShoppingCartRequest.id }
             ?: throw CustomHttp404("장바구니에 해당 상품이 없습니다.")
         cartItemEntity.quantity = putShoppingCartRequest.quantity
+    }
+
+    @Transactional
+    override fun deleteShoppingCart(username: String, cartItemId: Long) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val cartItemEntity = userEntity.cartItems.find { it.id == cartItemId }
+            ?: throw CustomHttp404("장바구니에 해당 상품이 없습니다.")
+        userEntity.cartItems.remove(cartItemEntity)
     }
 
     @Transactional

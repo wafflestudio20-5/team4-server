@@ -62,6 +62,14 @@ class UserController(
     ) = ResponseEntity(userService.putShoppingCart(username, putShoppingCartRequest), HttpStatus.OK)
 
     @Authenticated
+    @DeleteMapping("/me/shopping-cart/{id}")
+    fun deleteShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "id") cartItemId: Long
+    ) = ResponseEntity(userService.deleteShoppingCart(username, cartItemId), HttpStatus.OK)
+
+    @Authenticated
     @GetMapping("/me/recently-viewed")
     fun getRecentlyViewed(
         @RequestHeader(value = "Authorization") authorization: String,
