@@ -14,7 +14,7 @@ class ReviewEntity(
     @JoinColumn(name = "userId")
     val user: UserEntity,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseId")
     val purchase: PurchaseEntity,
 

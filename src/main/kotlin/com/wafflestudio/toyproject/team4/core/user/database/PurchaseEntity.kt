@@ -30,6 +30,6 @@ class PurchaseEntity(
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
 
-    @OneToMany(mappedBy = "purchase", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var reviews: MutableList<ReviewEntity> = mutableListOf()
+    @OneToOne(mappedBy = "purchase", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var review: ReviewEntity? = null
 }
