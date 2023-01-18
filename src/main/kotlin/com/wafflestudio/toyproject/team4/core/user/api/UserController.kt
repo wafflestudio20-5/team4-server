@@ -5,6 +5,7 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,6 +32,16 @@ class UserController(
         @UserContext username: String,
     ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
 
+    @Authenticated
+    @PostMapping("/me/reviews")
+    fun postReview(
+        @RequestBody request: ReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.postReview(username, request)
+    }
+    
     @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(
