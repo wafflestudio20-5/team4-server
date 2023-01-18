@@ -5,6 +5,7 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
@@ -21,6 +22,7 @@ interface UserService {
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
+    fun deleteReview(username: String, request: DeleteReviewRequest)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
@@ -114,6 +116,15 @@ class UserServiceImpl(
         reviewRepository.save(reviewEntity)
     }
 
+    @Transactional
+    override fun deleteReview(username: String, request: DeleteReviewRequest) {
+        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewRepository.delete(reviewEntity)
+    }
+    
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)

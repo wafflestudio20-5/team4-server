@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
@@ -50,6 +51,16 @@ class UserController(
         @UserContext username: String,
     ) {
         userService.putReview(username, request)
+    }
+    
+    @Authenticated
+    @DeleteMapping("/me/reviews")
+    fun deleteReview(
+        @RequestBody request: DeleteReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.deleteReview(username, request)
     }
     
     @Authenticated
