@@ -3,8 +3,8 @@ package com.wafflestudio.toyproject.team4.core.user.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.*
 import com.wafflestudio.toyproject.team4.core.user.domain.*
@@ -18,7 +18,7 @@ interface UserService {
     fun getPurchases(username: String): PurchaseItemsResponse
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
-    fun putShoppingCart(username: String, putShoppingCartRequest: PutShoppingCartRequest)
+    fun patchShoppingCart(username: String, patchShoppingCartRequest: PatchShoppingCartRequest)
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
 }
@@ -85,12 +85,12 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun putShoppingCart(username: String, putShoppingCartRequest: PutShoppingCartRequest) {
+    override fun patchShoppingCart(username: String, patchShoppingCartRequest: PatchShoppingCartRequest) {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val cartItemEntity = userEntity.cartItems.find { it.id == putShoppingCartRequest.id }
+        val cartItemEntity = userEntity.cartItems.find { it.id == patchShoppingCartRequest.id }
             ?: throw CustomHttp404("장바구니에 해당 상품이 없습니다.")
-        cartItemEntity.quantity = putShoppingCartRequest.quantity
+        cartItemEntity.quantity = patchShoppingCartRequest.quantity
     }
 
     @Transactional
