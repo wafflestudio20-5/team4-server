@@ -1,13 +1,17 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
+import com.wafflestudio.toyproject.team4.core.item.database.ImageEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.*
 import com.wafflestudio.toyproject.team4.core.user.domain.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.lang.IllegalArgumentException
 import javax.transaction.Transactional
 
 interface UserService {
@@ -43,7 +47,6 @@ class UserServiceImpl(
         val reviewEntities = reviewRepository.findAllByUser(userEntity)
         return ReviewsResponse(reviewEntities.map { reviewEntity -> Review.of(reviewEntity) })
     }
-
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -56,7 +59,7 @@ class UserServiceImpl(
     override fun postPurchases(username: String, request: PurchasesRequest) {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        request.purchaseitems.forEach {
+        request.purchaseItems.forEach {
             val itemEntity = itemRepository.findByIdOrNull(it.id)
                 ?: throw CustomHttp404("아이템 정보가 올바르지 않습니다.")
             purchaseRepository.save(
