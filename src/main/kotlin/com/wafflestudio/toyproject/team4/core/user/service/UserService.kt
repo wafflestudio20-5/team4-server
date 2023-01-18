@@ -1,6 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -19,7 +20,7 @@ interface UserService {
     fun getMe(username: String): UserResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
-
+    fun putReview(username: String, request: ReviewRequest)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
@@ -35,7 +36,8 @@ class UserServiceImpl(
     private val purchaseRepository: PurchaseRepository,
     private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val reviewImageRepository: ReviewImageRepository,
 ) : UserService {
 
     @Transactional
@@ -55,7 +57,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun postReview(username: String, request: ReviewRequest) {
-        val purchaseEntity = purchaseRepository.findByIdOrNull(request.purchaseId)
+        val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
         if (request.rating < 0 || request.rating > 10)
             throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
@@ -77,10 +79,42 @@ class UserServiceImpl(
             size = Size.valueOf(request.size.uppercase()),
             color = Color.valueOf(request.color.uppercase()),
         )
-        reviewEntity.images = request.images.map { ReviewImageEntity(reviewEntity, it) } as MutableList<ReviewImageEntity>
+        reviewEntity.images =
+            request.images.map { ReviewImageEntity(reviewEntity, it) } as MutableList<ReviewImageEntity>
         reviewRepository.save(reviewEntity)
     }
-    
+
+    @Transactional
+    override fun putReview(username: String, request: ReviewRequest) {
+        if (request.rating < 0 || request.rating > 10)
+            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
+        try {
+            Size.valueOf(request.size.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("사이즈가 적절하지 않습니다.")
+        }
+        try {
+            Color.valueOf(request.color.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("색감이 적절하지 않습니다.")
+        }
+        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewEntity.run {
+            rating = request.rating
+            content = request.content
+            size = Size.valueOf(request.size.uppercase())
+            color = Color.valueOf(request.color.uppercase())
+        }
+        reviewImageRepository.deleteAll(reviewEntity.images)
+        request.images.forEach {
+            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
+        }
+        reviewRepository.save(reviewEntity)
+    }
+
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)

@@ -43,6 +43,16 @@ class UserController(
     }
     
     @Authenticated
+    @PutMapping("/me/reviews")
+    fun putReview(
+        @RequestBody request: ReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.putReview(username, request)
+    }
+    
+    @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(
         @RequestHeader(value = "Authorization") authorization: String,

@@ -20,8 +20,8 @@ class ReviewEntity(
 
     var rating: Long,
     var content: String,
-    val size: Size,
-    val color: Color,
+    var size: Size,
+    var color: Color,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
