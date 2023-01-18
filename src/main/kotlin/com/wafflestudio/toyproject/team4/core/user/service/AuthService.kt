@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp401
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
+import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
@@ -36,11 +37,14 @@ class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val userRepository: UserRepository,
     private val authTokenService: AuthTokenService,
+    private val imageService: ImageService
 ) : AuthService {
     @Transactional
     override fun register(registerRequest: RegisterRequest) {
         val encodedPassword = passwordEncoder.encode(registerRequest.password)
-        userRepository.save(registerRequest.toUserEntity(encodedPassword))
+        val user = registerRequest.toUserEntity(encodedPassword)
+        user.image = imageService.getDefaultImage(registerRequest.username)
+        userRepository.save(user)
     }
 
     @Transactional

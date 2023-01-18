@@ -3,6 +3,8 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,7 +22,7 @@ class UserController(
     fun getMe(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-        ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
+    ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/reviews")
@@ -42,6 +44,30 @@ class UserController(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getShoppingCart(username), HttpStatus.OK)
+
+    @Authenticated
+    @PostMapping("/me/shopping-cart")
+    fun postShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @RequestBody postShoppingCartRequest: PostShoppingCartRequest
+    ) = ResponseEntity(userService.postShoppingCart(username, postShoppingCartRequest), HttpStatus.CREATED)
+
+    @Authenticated
+    @PatchMapping("/me/shopping-cart")
+    fun patchShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @RequestBody patchShoppingCartRequest: PatchShoppingCartRequest
+    ) = ResponseEntity(userService.patchShoppingCart(username, patchShoppingCartRequest), HttpStatus.OK)
+
+    @Authenticated
+    @DeleteMapping("/me/shopping-cart/{id}")
+    fun deleteShoppingCart(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "id") cartItemId: Long
+    ) = ResponseEntity(userService.deleteShoppingCart(username, cartItemId), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/recently-viewed")
