@@ -79,8 +79,7 @@ class UserServiceImpl(
             size = Size.valueOf(request.size.uppercase()),
             color = Color.valueOf(request.color.uppercase()),
         )
-        reviewEntity.images =
-            request.images.map { ReviewImageEntity(reviewEntity, it) } as MutableList<ReviewImageEntity>
+        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
     }
 
