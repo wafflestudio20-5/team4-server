@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
 interface RecentItemRepository : JpaRepository<RecentItemEntity, Long>, RecentItemRepositoryCustom {
-    fun findAllByUser(userEntity: UserEntity): List<RecentItemEntity>
+    fun findAllByUserOrderByViewedDateTimeDesc(user: UserEntity): List<RecentItemEntity>
 }
 
 interface RecentItemRepositoryCustom

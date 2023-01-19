@@ -4,12 +4,12 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "item_images")
-class ImageEntity(
+class ItemImageEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")
     val item: ItemEntity,
     
-    var cloudinaryUrl: String
+    var imageUrl: String
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

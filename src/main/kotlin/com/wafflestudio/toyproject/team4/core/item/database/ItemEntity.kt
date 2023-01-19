@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
+import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import javax.persistence.*
 
@@ -13,7 +14,8 @@ class ItemEntity(
     val label: Item.Label? = null,
     @Enumerated(EnumType.STRING)
     val sex: Item.Sex,
-    val rating: Double? = 0.0,
+    var reviewCount: Long? = 0,
+    var rating: Double? = 0.0,
 
     val oldPrice: Long,
     var newPrice: Long? = null,
@@ -29,18 +31,21 @@ class ItemEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
-    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var images: MutableList<ImageEntity> = mutableListOf()
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var images: MutableList<ItemImageEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var options: MutableList<OptionEntity>? = null
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var inquiries: MutableList<InquiryEntity>? = null
     
-    
+
     fun updateImages(
         imageUrlList: List<String>
     ) {
         this.images = imageUrlList.map {
-            url -> ImageEntity(this, url)
+            url -> ItemImageEntity(this, url)
         }.toMutableList()
     }
     
