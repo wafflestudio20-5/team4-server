@@ -2,6 +2,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
+import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
