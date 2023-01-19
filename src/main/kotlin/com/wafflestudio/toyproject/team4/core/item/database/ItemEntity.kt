@@ -1,7 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.user.database.ReviewEntity
 import javax.persistence.*
 
 @Entity
@@ -36,10 +35,6 @@ class ItemEntity(
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var options: MutableList<OptionEntity>? = null
-
-
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var reviews: MutableList<ReviewEntity>? = null
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var inquiries: MutableList<InquiryEntity>? = null
