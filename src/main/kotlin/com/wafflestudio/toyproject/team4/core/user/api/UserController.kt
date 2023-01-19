@@ -6,6 +6,7 @@ import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
@@ -98,4 +99,35 @@ class UserController(
         userService.postRecentlyViewed(username, postRecentlyViewedRequest.itemId),
         HttpStatus.CREATED
     )
+
+
+    @Authenticated
+    @GetMapping("/me/item-inquiries")
+    fun getItemInquiries(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) = userService.getItemInquiries(username)
+
+    @Authenticated
+    @PutMapping("/me/item-inquiries")
+    fun putItemInquiries(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @RequestBody putItemInquiriesRequest: PutItemInquiriesRequest 
+    ) = ResponseEntity(
+        userService.putItemInquiries(username, putItemInquiriesRequest),
+        HttpStatus.OK
+    )
+
+    @Authenticated
+    @DeleteMapping("/me/item-inquiry/{id}")
+    fun deleteItemInquiry(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "id") itemInquiryId: Long
+    ) = ResponseEntity(
+        userService.deleteItemInquiry(username, itemInquiryId),
+        HttpStatus.OK
+    )
+    
 }
