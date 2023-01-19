@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
@@ -39,6 +40,16 @@ class UserController(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getPurchases(username), HttpStatus.OK)
+
+    @Authenticated
+    @PostMapping("/me/purchases")
+    fun postPurchases(
+        @RequestBody request: PurchasesRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.postPurchases(username, request)
+    }
 
     @Authenticated
     @GetMapping("/me/shopping-cart")
