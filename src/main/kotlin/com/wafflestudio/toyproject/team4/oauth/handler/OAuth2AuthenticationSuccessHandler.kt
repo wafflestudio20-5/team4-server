@@ -40,7 +40,7 @@ class OAuth2AuthenticationSuccessHandler(
     }
 
     private fun makeRedirectUrl(accessToken: String): String {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect/$accessToken")
+        return UriComponentsBuilder.fromUriString("https://musin4.netlify.app/oauth2/redirect/$accessToken")
             .build().toUriString()
     }
 }
