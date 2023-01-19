@@ -56,7 +56,7 @@ class ItemServiceImpl(
     }
 
     override fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse {
-        val itemReviews = reviewRepository.findAllByItemId(itemId)
+        val itemReviews = reviewRepository.findAllByItemIdOrderByRatingDesc(itemId)
         return ReviewsResponse(
             reviews = itemReviews.map { entity -> Review.of(entity) }
         )
