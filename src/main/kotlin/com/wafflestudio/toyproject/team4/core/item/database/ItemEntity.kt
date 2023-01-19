@@ -40,8 +40,11 @@ class ItemEntity(
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var reviews: MutableList<ReviewEntity>? = null
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var inquiries: MutableList<InquiryEntity>? = null
     
-    
+
     fun updateImages(
         imageUrlList: List<String>
     ) {

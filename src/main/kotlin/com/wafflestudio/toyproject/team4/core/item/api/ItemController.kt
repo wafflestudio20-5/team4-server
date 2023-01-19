@@ -29,11 +29,18 @@ class ItemController(
     ) = itemService.getItem(itemId)
 
     @GetMapping("/item/{id}/reviews")
-    fun getItem(
+    fun getItemReviews(
         @PathVariable(value="id") itemId: Long,
         @RequestParam index: Long?,
         @RequestParam count: Long?
     ) = itemService.getItemReviews(itemId, index?: 0L, count?: 5L)
+
+    @GetMapping("/item/{id}/inquiries")
+    fun getItemInquiries(
+        @PathVariable(value="id") itemId: Long,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?
+    ) = itemService.getItemInquiries(itemId, index?: 0L, count?: 5L)
 
 
     @GetMapping("/search")
