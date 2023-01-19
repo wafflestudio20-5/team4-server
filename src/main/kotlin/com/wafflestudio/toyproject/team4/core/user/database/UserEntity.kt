@@ -58,4 +58,12 @@ class UserEntity(
     
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var itemInquiries: MutableList<InquiryEntity> = mutableListOf()
+
+
+    fun viewItem(
+        item: ItemEntity
+    ) {
+        val recentItem = RecentItemEntity(this, item)
+        recentItems.add(recentItem)
+    }
 }
