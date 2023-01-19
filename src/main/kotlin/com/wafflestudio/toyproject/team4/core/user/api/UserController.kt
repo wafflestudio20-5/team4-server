@@ -96,4 +96,12 @@ class UserController(
         @UserContext username: String,
     ) = userService.getItemInquiries(username)
 
+    @Authenticated
+    @DeleteMapping("/me/item-inquiry/{id}")
+    fun deleteItemInquiry(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "id") itemInquiryId: Long
+    ) = userService.deleteItemInquiry(username, itemInquiryId)
+    
 }

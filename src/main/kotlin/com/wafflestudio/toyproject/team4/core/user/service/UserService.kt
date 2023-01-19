@@ -33,6 +33,7 @@ interface UserService {
     fun postRecentlyViewed(username: String, itemId: Long)
     
     fun getItemInquiries(username:String): InquiriesResponse
+    fun deleteItemInquiry(username:String, itemInquiryId: Long)
 }
 
 @Service
@@ -164,5 +165,13 @@ class UserServiceImpl(
         return InquiriesResponse(
             inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
         )
+    }
+
+    override fun deleteItemInquiry(username: String, itemInquiryId: Long) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val itemInquiry = user.itemInquiries.find { it.id == itemInquiryId }
+            ?: throw CustomHttp404("작성한 상품 후기가 없습니다.")
+        user.itemInquiries.remove(itemInquiry)
     }
 }
