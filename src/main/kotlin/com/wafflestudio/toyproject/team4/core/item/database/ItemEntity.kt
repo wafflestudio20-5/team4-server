@@ -32,7 +32,7 @@ class ItemEntity(
     val id: Long = 0L
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var images: MutableList<ImageEntity> = mutableListOf()
+    var images: MutableList<ItemImageEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var options: MutableList<OptionEntity>? = null
@@ -49,7 +49,7 @@ class ItemEntity(
         imageUrlList: List<String>
     ) {
         this.images = imageUrlList.map {
-            url -> ImageEntity(this, url)
+            url -> ItemImageEntity(this, url)
         }.toMutableList()
     }
     
