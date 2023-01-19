@@ -49,7 +49,7 @@ data class Item(
                 id = id,
                 name = name,
                 brand = brand,
-                images = images.map { it.cloudinaryUrl },
+                images = images.map { it.imageUrl },
                 label = label?.toString()?.lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,

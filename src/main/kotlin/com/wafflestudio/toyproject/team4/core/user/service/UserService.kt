@@ -3,12 +3,19 @@ package com.wafflestudio.toyproject.team4.core.user.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.common.CustomHttp409
+import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
+import com.wafflestudio.toyproject.team4.core.board.domain.Review
+import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.board.database.*
+import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.*
 import com.wafflestudio.toyproject.team4.core.user.domain.*
@@ -24,11 +31,17 @@ interface UserService {
     fun putReview(username: String, request: ReviewRequest)
     fun deleteReview(username: String, request: DeleteReviewRequest)
     fun getPurchases(username: String): PurchaseItemsResponse
+    fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
     fun patchShoppingCart(username: String, patchShoppingCartRequest: PatchShoppingCartRequest)
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
+    fun postRecentlyViewed(username: String, itemId: Long)
+    
+    fun getItemInquiries(username:String): InquiriesResponse
+    fun putItemInquiries(username:String, putItemInquiriesRequest: PutItemInquiriesRequest)
+    fun deleteItemInquiry(username:String, itemInquiryId: Long)
 }
 
 @Service
@@ -40,6 +53,8 @@ class UserServiceImpl(
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
     private val reviewImageRepository: ReviewImageRepository,
+    private val inquiryRepository: InquiryRepository,
+    private val inquiryImageRepository: InquiryImageRepository
 ) : UserService {
 
     @Transactional
@@ -56,7 +71,6 @@ class UserServiceImpl(
         val reviewEntities = reviewRepository.findAllByUser(userEntity)
         return ReviewsResponse(reviewEntities.map { reviewEntity -> Review.of(reviewEntity) })
     }
-
     @Transactional
     override fun postReview(username: String, request: ReviewRequest) {
         val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
@@ -133,6 +147,30 @@ class UserServiceImpl(
         return PurchaseItemsResponse(purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) })
     }
 
+
+    /* **********************************************************
+    //                      Shopping Cart                      //
+    ********************************************************** */
+    
+    @Transactional
+    override fun postPurchases(username: String, request: PurchasesRequest) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        request.purchaseItems.forEach {
+            val itemEntity = itemRepository.findByIdOrNull(it.id)
+                ?: throw CustomHttp404("아이템 정보가 올바르지 않습니다.")
+            purchaseRepository.save(
+                PurchaseEntity(
+                    user = userEntity,
+                    item = itemEntity,
+                    optionName = it.option,
+                    payment = it.payment,
+                    quantity = it.quantity,
+                )
+            )
+        }
+    }
+
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -179,11 +217,77 @@ class UserServiceImpl(
         userEntity.cartItems.remove(cartItemEntity)
     }
 
+    
+    
+    /* **********************************************************
+    //                    Recently Viewed                      //
+    ********************************************************** */
+    
     @Transactional
     override fun getRecentlyViewed(username: String): RecentItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val recentItemEntities = recentItemRepository.findAllByUser(userEntity)
-        return RecentItemsResponse(recentItemEntities.map { recentItemEntity -> RecentItem.of(recentItemEntity) })
+        
+        val recentItemList = recentItemRepository
+            .findAllByUserOrderByViewedDateTimeDesc(user)
+            .groupBy( { it.item }, { it } )
+            .map { entry -> entry.value.maxBy { it.id } }
+            .filterIndexed { idx, _ -> idx < 12 }
+        
+        return RecentItemsResponse(
+            recentItems = recentItemList.map { recentItem -> RecentItem.of(recentItem) }
+        )
+    }
+
+    @Transactional
+    override fun postRecentlyViewed(username: String, itemId: Long) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val item = itemRepository.findByIdOrNull(itemId)
+            ?: throw CustomHttp404("존재하지 않는 상품입니다.")
+        
+        user.viewItem(item)
+    }
+
+
+    /* **********************************************************
+    //                     Item Inquiries                      //
+    ********************************************************** */
+
+    @Transactional
+    override fun getItemInquiries(username: String): InquiriesResponse {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        return InquiriesResponse(
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+        )
+    }
+    
+    @Transactional
+    override fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest) {
+        val targetInquiryId = putItemInquiriesRequest.id
+        val targetItemInquiry = inquiryRepository.findByIdOrNull(targetInquiryId)
+            ?: throw CustomHttp404("작성한 상품 문의가 없습니다.")
+        
+        if(targetItemInquiry.user.username != username)
+            throw CustomHttp403("수정 권한이 없습니다.")
+        
+        with(putItemInquiriesRequest) {
+            if (!this.images.isNullOrEmpty()) {
+                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
+                inquiryImageRepository.deleteAll(deletedImages)
+            }
+            targetItemInquiry.update(this)
+        }
+    }
+
+    @Transactional
+    override fun deleteItemInquiry(username: String, itemInquiryId: Long) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val itemInquiry = user.itemInquiries.find { it.id == itemInquiryId }
+            ?: throw CustomHttp404("작성한 상품 문의가 없습니다.")
+        user.itemInquiries.remove(itemInquiry)
     }
 }
