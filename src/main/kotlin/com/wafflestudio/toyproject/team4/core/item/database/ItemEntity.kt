@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
+import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import javax.persistence.*
 

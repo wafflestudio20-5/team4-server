@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.item.database
+package com.wafflestudio.toyproject.team4.core.board.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.jpa.repository.JpaRepository

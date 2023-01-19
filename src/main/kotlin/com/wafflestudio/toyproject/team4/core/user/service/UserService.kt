@@ -1,6 +1,9 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
+import com.wafflestudio.toyproject.team4.core.board.domain.Review
+import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.*
 import com.wafflestudio.toyproject.team4.core.user.domain.*

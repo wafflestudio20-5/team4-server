@@ -1,5 +1,6 @@
-package com.wafflestudio.toyproject.team4.core.item.database
+package com.wafflestudio.toyproject.team4.core.board.database
 
+import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
@@ -12,7 +13,7 @@ class InquiryEntity(
     val user: UserEntity,
     @ManyToOne(fetch = FetchType.LAZY)
     val item: ItemEntity,
-    
+
     var title: String,
     var content: String,
     val type: Type,

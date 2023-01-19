@@ -1,6 +1,7 @@
-package com.wafflestudio.toyproject.team4.core.item.domain
+package com.wafflestudio.toyproject.team4.core.board.domain
 
-import com.wafflestudio.toyproject.team4.core.item.database.InquiryEntity
+import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
+import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import java.time.LocalDateTime
 
