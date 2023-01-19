@@ -45,7 +45,6 @@ class UserController(
         @UserContext username: String,
     ) {
         userService.postPurchases(username, request)
-        return
     }
 
     @Authenticated
