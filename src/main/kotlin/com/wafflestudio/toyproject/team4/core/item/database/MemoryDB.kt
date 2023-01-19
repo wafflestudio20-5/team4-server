@@ -4,14 +4,13 @@ import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.boot.context.event.ApplicationStartedEvent
-import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Math.round
-import java.util.*
+import java.util.Random
 
 @Component
-class MemoryDB (
+class MemoryDB(
     private val itemRepository: ItemRepository
 ) {
     /**
@@ -19,7 +18,6 @@ class MemoryDB (
      * 각 대분류 - 소분류별로 10개씩
      */
 
-    @EventListener
     fun makeMockData(event: ApplicationStartedEvent) {
 
         /** mainCategory - subCategory
@@ -57,9 +55,7 @@ class MemoryDB (
         crawling("007", "007001")
         crawling("007", "007004")
         crawling("007", "007005")
-
     }
-
 
     @Transactional
     fun crawling(mainCategoryId: String, subCategoryId: String) {
@@ -74,9 +70,9 @@ class MemoryDB (
             val itemNameList = this.select("div p[class=list_info] a").map { it.attr("title") }
             val priceInfoList = this.select("div p[class=price]").map { it.text() }
             val sexInfoList = this.select("div [class=icon_group]").map { it.text() }
-            
+
             for (idx in 0..9) {
-                val priceList = priceInfoList[idx].replace(",","").split(" ")
+                val priceList = priceInfoList[idx].replace(",", "").split(" ")
                 val itemDetailDoc: Document = Jsoup.connect(detailUrlList[idx]).get()
 
                 val newItem = ItemEntity(
@@ -90,15 +86,15 @@ class MemoryDB (
                     sex = getSexInfo(sexInfoList[idx]),
                     rating = round((0.0 + Random().nextDouble() * 10) * 100) / 100.0
                 )
-                
+
                 newItem.updateImages(getItemImages(itemDetailDoc))
                 newItem.updateOptionList(getOptionList(itemDetailDoc))
-                
+
                 // if "newPrice" is null, then we could not evaluate "sale" field
-                if(newItem.newPrice != null) {
+                if (newItem.newPrice != null) {
                     newItem.sale = round((1.0 - (newItem.newPrice!!.toFloat() / newItem.oldPrice)) * 100)
                 }
-                
+
                 itemRepository.save(newItem)
             }
         }
@@ -107,22 +103,25 @@ class MemoryDB (
     private fun getItemImages(itemDetailDoc: Document): List<String> {
         return itemDetailDoc
             .select("div ul[class=product_thumb] li img")
-            .map { it.attr("src")
+            .map {
+                it.attr("src")
                     .replace("60.jpg", "500.jpg")
                     .replace("60.png", "500.png")
             }.filterNot { it.contains("thumb-video.gif") }
     }
-    
+
     private fun getOptionList(itemDetailDoc: Document): List<String> {
         return itemDetailDoc
             .select("div [id=buy_option_area] div div[class=option_cont] select option")
-            .map { 
-                if(it.attr("value") == "none") { it.attr("data-txt") }
-                else { it.attr("value")} 
+            .map {
+                if (it.attr("value") == "none") {
+                    it.attr("data-txt")
+                } else {
+                    it.attr("value")
+                }
             }.filterNot { it.isEmpty() }
     }
-    
-    
+
     private fun getLabel(label: String): Item.Label? {
         val labelDict = mapOf(
             "한정 판매" to Item.Label.LIMITED,
@@ -133,8 +132,7 @@ class MemoryDB (
         return labelDict[label]
     }
 
-    private fun getSexInfo(sex: String): Item.Sex
-        = when(sex) {
+    private fun getSexInfo(sex: String): Item.Sex = when (sex) {
         "남성" -> Item.Sex.MALE
         "여성" -> Item.Sex.FEMALE
         "남성 여성" -> Item.Sex.BOTH
@@ -150,21 +148,38 @@ class MemoryDB (
             "004" to Item.Category.BAG,
             "005" to Item.Category.SHOES,
             "007" to Item.Category.HEAD_WEAR,
-            "018" to Item.Category.SHOES,  // SNEAKERS
+            "018" to Item.Category.SHOES, // SNEAKERS
         )
         return mainCategoryDict[mainCategoryId]!!
     }
 
     private fun getSubCategory(subCategoryId: String): Item.SubCategory {
         val subCategoryDict = mapOf(
-            "001006" to Item.SubCategory.SWEATER, "001004" to Item.SubCategory.HOODIE, "001005" to Item.SubCategory.SWEAT_SHIRT, "001002" to Item.SubCategory.SHIRT,
-            "002007" to Item.SubCategory.COAT, "002002" to Item.SubCategory.JACKET, "002016" to Item.SubCategory.PADDING, "002020" to Item.SubCategory.CARDIGAN,
-            "003002" to Item.SubCategory.DENIM, "003008" to Item.SubCategory.SLACKS, "003004" to Item.SubCategory.JOGGER, "003005" to Item.SubCategory.LEGGINGS,
-            "022001" to Item.SubCategory.MINI_SKIRT, "022002" to Item.SubCategory.MEDI_SKIRT, "022003" to Item.SubCategory.LONG_SKIRT,
-            "004001" to Item.SubCategory.BACKPACK, "004002" to Item.SubCategory.CROSS_BAG, "004014" to Item.SubCategory.ECHO_BAG,
-            "005014" to Item.SubCategory.GOODOO, "005004" to Item.SubCategory.SANDAL, "005018" to Item.SubCategory.SLIPPER,
-            "007001" to Item.SubCategory.CAP, "007004" to Item.SubCategory.HAT, "007005" to Item.SubCategory.BEANIE,
+            "001006" to Item.SubCategory.SWEATER,
+            "001004" to Item.SubCategory.HOODIE,
+            "001005" to Item.SubCategory.SWEAT_SHIRT,
+            "001002" to Item.SubCategory.SHIRT,
+            "002007" to Item.SubCategory.COAT,
+            "002002" to Item.SubCategory.JACKET,
+            "002016" to Item.SubCategory.PADDING,
+            "002020" to Item.SubCategory.CARDIGAN,
+            "003002" to Item.SubCategory.DENIM,
+            "003008" to Item.SubCategory.SLACKS,
+            "003004" to Item.SubCategory.JOGGER,
+            "003005" to Item.SubCategory.LEGGINGS,
+            "022001" to Item.SubCategory.MINI_SKIRT,
+            "022002" to Item.SubCategory.MEDI_SKIRT,
+            "022003" to Item.SubCategory.LONG_SKIRT,
+            "004001" to Item.SubCategory.BACKPACK,
+            "004002" to Item.SubCategory.CROSS_BAG,
+            "004014" to Item.SubCategory.ECHO_BAG,
+            "005014" to Item.SubCategory.GOODOO,
+            "005004" to Item.SubCategory.SANDAL,
+            "005018" to Item.SubCategory.SLIPPER,
+            "007001" to Item.SubCategory.CAP,
+            "007004" to Item.SubCategory.HAT,
+            "007005" to Item.SubCategory.BEANIE,
         )
-        return subCategoryDict[subCategoryId]?: Item.SubCategory.SNEAKERS
+        return subCategoryDict[subCategoryId] ?: Item.SubCategory.SNEAKERS
     }
 }

@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 class Team4Application
 
 fun main(args: Array<String>) {
-	runApplication<Team4Application>(*args)
+    runApplication<Team4Application>(*args)
 }

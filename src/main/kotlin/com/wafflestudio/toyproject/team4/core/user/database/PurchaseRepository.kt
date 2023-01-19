@@ -8,11 +8,9 @@ interface PurchaseRepository : JpaRepository<PurchaseEntity, Long>, PurchaseRepo
     fun findAllByUser(userEntity: UserEntity): List<PurchaseEntity>
 }
 
-interface PurchaseRepositoryCustom {
-}
+interface PurchaseRepositoryCustom
 
 @Component
 class PurchaseRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
-) : PurchaseRepositoryCustom {
-}
+) : PurchaseRepositoryCustom

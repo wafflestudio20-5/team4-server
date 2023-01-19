@@ -9,7 +9,7 @@ import com.wafflestudio.toyproject.team4.core.image.api.response.ImageUploadResp
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
+import java.util.Base64
 
 @Service
 @EnableConfigurationProperties(CloudinaryProperties::class)
@@ -40,4 +40,4 @@ class ImageService(
         val firstLetter = username.find { it.isLetter() }?.lowercase() ?: "a"
         return "//image.msscdn.net/mfile_s01/_simbols/_basic/$firstLetter.png"
     }
-} 
+}

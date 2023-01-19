@@ -55,7 +55,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.15.3")
     // Converting String to Camel Case
     implementation("org.apache.commons:commons-text:1.9")
-    
+
     // Kotlin Features
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

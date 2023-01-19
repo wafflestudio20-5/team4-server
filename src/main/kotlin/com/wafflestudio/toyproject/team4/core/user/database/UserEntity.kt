@@ -8,7 +8,18 @@ import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.EntityListeners
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "users")
@@ -37,7 +48,6 @@ class UserEntity(
     var refreshToken: String? = null,
 ) {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
@@ -56,10 +66,9 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var recentItems: MutableList<RecentItemEntity> = mutableListOf()
-    
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var itemInquiries: MutableList<InquiryEntity> = mutableListOf()
-
 
     fun viewItem(
         item: ItemEntity

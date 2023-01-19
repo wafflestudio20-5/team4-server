@@ -36,4 +36,3 @@ data class Inquiry(
         }
     }
 }
-

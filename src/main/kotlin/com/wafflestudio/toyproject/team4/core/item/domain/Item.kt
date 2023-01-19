@@ -19,30 +19,29 @@ data class Item(
     val category: String,
     val subCategory: String,
 ) {
-    
+
     enum class Label {
         LIMITED, BOUTIQUE, PREORDER, EXCLUSIVE
     }
-    
+
     enum class Sex {
         MALE, FEMALE, BOTH
     }
-    
+
     enum class Category {
         TOP, OUTER, PANTS, SKIRT, BAG, SHOES, HEAD_WEAR
     }
 
     enum class SubCategory {
-        SWEATER, HOODIE, SWEAT_SHIRT, SHIRT,  // TOP
-        COAT, JACKET, PADDING, CARDIGAN,     // OUTER
-        DENIM, SLACKS, JOGGER, LEGGINGS,     // PANTS
-        MINI_SKIRT, MEDI_SKIRT, LONG_SKIRT,     // SKIRT
-        BACKPACK, CROSS_BAG, ECHO_BAG,         // BAG
-        GOODOO, SANDAL, SLIPPER, SNEAKERS,   // SHOES
-        CAP, HAT, BEANIE                     // HEADWEAR 
+        SWEATER, HOODIE, SWEAT_SHIRT, SHIRT, // TOP
+        COAT, JACKET, PADDING, CARDIGAN, // OUTER
+        DENIM, SLACKS, JOGGER, LEGGINGS, // PANTS
+        MINI_SKIRT, MEDI_SKIRT, LONG_SKIRT, // SKIRT
+        BACKPACK, CROSS_BAG, ECHO_BAG, // BAG
+        GOODOO, SANDAL, SLIPPER, SNEAKERS, // SHOES
+        CAP, HAT, BEANIE // HEADWEAR 
     }
-    
-    
+
     companion object {
         fun of(entity: ItemEntity): Item = entity.run {
             Item(
@@ -57,7 +56,7 @@ data class Item(
                 sex = sex.toString().lowercase(),
                 reviewCount = reviewCount!!,
                 rating = rating,
-                options = if(options.isNullOrEmpty()) null else options?.map{ it.optionName },
+                options = if (options.isNullOrEmpty()) null else options?.map { it.optionName },
                 category = CaseUtils.toCamelCase(category.toString(), false, '_'),
                 subCategory = CaseUtils.toCamelCase(subCategory.toString(), false, '_')
             )

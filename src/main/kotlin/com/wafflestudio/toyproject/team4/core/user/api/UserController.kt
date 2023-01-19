@@ -1,20 +1,21 @@
 package com.wafflestudio.toyproject.team4.core.user.api
 
-
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
-import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.*
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/user")
@@ -45,7 +46,7 @@ class UserController(
     ) {
         userService.postReview(username, request)
     }
-    
+
     @Authenticated
     @PutMapping("/me/reviews")
     fun putReview(
@@ -55,7 +56,7 @@ class UserController(
     ) {
         userService.putReview(username, request)
     }
-    
+
     @Authenticated
     @DeleteMapping("/me/reviews")
     fun deleteReview(
@@ -65,7 +66,7 @@ class UserController(
     ) {
         userService.deleteReview(username, request)
     }
-    
+
     @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(
@@ -132,7 +133,6 @@ class UserController(
         HttpStatus.CREATED
     )
 
-
     @Authenticated
     @GetMapping("/me/item-inquiries")
     fun getItemInquiries(
@@ -145,7 +145,7 @@ class UserController(
     fun putItemInquiries(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-        @RequestBody putItemInquiriesRequest: PutItemInquiriesRequest 
+        @RequestBody putItemInquiriesRequest: PutItemInquiriesRequest
     ) = ResponseEntity(
         userService.putItemInquiries(username, putItemInquiriesRequest),
         HttpStatus.OK
@@ -161,5 +161,4 @@ class UserController(
         userService.deleteItemInquiry(username, itemInquiryId),
         HttpStatus.OK
     )
-    
 }

@@ -6,7 +6,15 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesR
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "inquiries")
@@ -23,7 +31,7 @@ class InquiryEntity(
     var isSecret: Boolean,
     val isAnswered: Boolean
 ) {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
@@ -34,33 +42,29 @@ class InquiryEntity(
     @CreatedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 
-    
     @OneToMany(mappedBy = "inquiry", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var images: MutableList<InquiryImageEntity> = mutableListOf()
 
-    
     fun update(
         request: PutItemInquiriesRequest
     ) {
         val itemOptionList = item.options!!.map { it.optionName }
-        if(!request.option.isNullOrEmpty() && !itemOptionList.contains(request.option))
+        if (!request.option.isNullOrEmpty() && !itemOptionList.contains(request.option))
             throw CustomHttp400("유효하지 않은 상품 옵션입니다.")
-        
+
         this.title = request.title!!
         this.content = request.content!!
         this.optionName = request.option
         this.type = Type.valueOf(request.type.uppercase())
         this.isSecret = request.isSecret
         if (request.images != null) {
-            this.images = request.images.map {
-                url -> InquiryImageEntity(this, url)
+            this.images = request.images.map { url ->
+                InquiryImageEntity(this, url)
             }.toMutableList()
         }
     }
-    
-    
+
     enum class Type {
         SIZE, DELIVERY, RESTOCK, DETAIL
     }
-    
 }
