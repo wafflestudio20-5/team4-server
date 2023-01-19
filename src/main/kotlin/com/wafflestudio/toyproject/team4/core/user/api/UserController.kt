@@ -3,9 +3,11 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
-import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
@@ -34,6 +36,36 @@ class UserController(
         @UserContext username: String,
     ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
 
+    @Authenticated
+    @PostMapping("/me/reviews")
+    fun postReview(
+        @RequestBody request: ReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.postReview(username, request)
+    }
+    
+    @Authenticated
+    @PutMapping("/me/reviews")
+    fun putReview(
+        @RequestBody request: ReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.putReview(username, request)
+    }
+    
+    @Authenticated
+    @DeleteMapping("/me/reviews")
+    fun deleteReview(
+        @RequestBody request: DeleteReviewRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.deleteReview(username, request)
+    }
+    
     @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(

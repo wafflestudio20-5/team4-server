@@ -1,9 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.core.item.database.ImageEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
@@ -11,11 +10,9 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
+import com.wafflestudio.toyproject.team4.core.board.database.*
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
-import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
@@ -30,6 +27,9 @@ import javax.transaction.Transactional
 interface UserService {
     fun getMe(username: String): UserResponse
     fun getReviews(username: String): ReviewsResponse
+    fun postReview(username: String, request: ReviewRequest)
+    fun putReview(username: String, request: ReviewRequest)
+    fun deleteReview(username: String, request: DeleteReviewRequest)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -52,8 +52,9 @@ class UserServiceImpl(
     private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
+    private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRespotiory: InquiryImageRepository
+    private val inquiryImageRepository: InquiryImageRepository
 ) : UserService {
 
     @Transactional
@@ -70,6 +71,74 @@ class UserServiceImpl(
         val reviewEntities = reviewRepository.findAllByUser(userEntity)
         return ReviewsResponse(reviewEntities.map { reviewEntity -> Review.of(reviewEntity) })
     }
+    @Transactional
+    override fun postReview(username: String, request: ReviewRequest) {
+        val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
+        if (request.rating < 0 || request.rating > 10)
+            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
+        try {
+            Size.valueOf(request.size.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("사이즈가 적절하지 않습니다.")
+        }
+        try {
+            Color.valueOf(request.color.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("색감이 적절하지 않습니다.")
+        }
+        val reviewEntity = ReviewEntity(
+            user = purchaseEntity.user,
+            purchase = purchaseEntity,
+            rating = request.rating,
+            content = request.content,
+            size = Size.valueOf(request.size.uppercase()),
+            color = Color.valueOf(request.color.uppercase()),
+        )
+        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
+        reviewRepository.save(reviewEntity)
+    }
+
+    @Transactional
+    override fun putReview(username: String, request: ReviewRequest) {
+        if (request.rating < 0 || request.rating > 10)
+            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
+        try {
+            Size.valueOf(request.size.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("사이즈가 적절하지 않습니다.")
+        }
+        try {
+            Color.valueOf(request.color.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("색감이 적절하지 않습니다.")
+        }
+        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewEntity.run {
+            rating = request.rating
+            content = request.content
+            size = Size.valueOf(request.size.uppercase())
+            color = Color.valueOf(request.color.uppercase())
+        }
+        reviewImageRepository.deleteAll(reviewEntity.images)
+        request.images.forEach {
+            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
+        }
+        reviewRepository.save(reviewEntity)
+    }
+
+    @Transactional
+    override fun deleteReview(username: String, request: DeleteReviewRequest) {
+        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewRepository.delete(reviewEntity)
+    }
+    
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -206,8 +275,8 @@ class UserServiceImpl(
         
         with(putItemInquiriesRequest) {
             if (!this.images.isNullOrEmpty()) {
-                val deletedImages = inquiryImageRespotiory.findAllByInquiry_Id(targetInquiryId)
-                inquiryImageRespotiory.deleteAll(deletedImages)
+                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
+                inquiryImageRepository.deleteAll(deletedImages)
             }
             targetItemInquiry.update(this)
         }
