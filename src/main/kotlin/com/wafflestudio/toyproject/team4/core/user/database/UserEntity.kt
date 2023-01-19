@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
+import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
@@ -53,4 +54,11 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var recentItems: MutableList<RecentItemEntity> = mutableListOf()
+
+    fun viewItem(
+        item: ItemEntity
+    ) {
+        val recentItem = RecentItemEntity(this, item)
+        recentItems.add(recentItem)
+    }
 }

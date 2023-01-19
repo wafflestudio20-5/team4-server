@@ -15,12 +15,16 @@ import javax.transaction.Transactional
 interface UserService {
     fun getMe(username: String): UserResponse
     fun getReviews(username: String): ReviewsResponse
+    
     fun getPurchases(username: String): PurchaseItemsResponse
+    
     fun getShoppingCart(username: String): CartItemsResponse
     fun postShoppingCart(username: String, postShoppingCartRequest: PostShoppingCartRequest)
     fun patchShoppingCart(username: String, patchShoppingCartRequest: PatchShoppingCartRequest)
     fun deleteShoppingCart(username: String, cartItemId: Long)
+    
     fun getRecentlyViewed(username: String): RecentItemsResponse
+    fun postRecentlyViewed(username: String, itemId: Long)
 }
 
 @Service
@@ -56,6 +60,11 @@ class UserServiceImpl(
         return PurchaseItemsResponse(purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) })
     }
 
+
+    /* **********************************************************
+    //                      Shopping Cart                      //
+    ********************************************************** */
+    
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -102,11 +111,35 @@ class UserServiceImpl(
         userEntity.cartItems.remove(cartItemEntity)
     }
 
+    
+    
+    /* **********************************************************
+    //                    Recently Viewed                      //
+    ********************************************************** */
+    
     @Transactional
     override fun getRecentlyViewed(username: String): RecentItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val recentItemEntities = recentItemRepository.findAllByUser(userEntity)
-        return RecentItemsResponse(recentItemEntities.map { recentItemEntity -> RecentItem.of(recentItemEntity) })
+        
+        val recentItemList = recentItemRepository
+            .findAllByUserOrderByViewedDateTimeDesc(user)
+            .groupBy( { it.item }, { it } )
+            .map { entry -> entry.value.maxBy { it.id } }
+            .filterIndexed { idx, _ -> idx < 12 }
+        
+        return RecentItemsResponse(
+            recentItems = recentItemList.map { recentItem -> RecentItem.of(recentItem) }
+        )
+    }
+
+    @Transactional
+    override fun postRecentlyViewed(username: String, itemId: Long) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val item = itemRepository.findByIdOrNull(itemId)
+            ?: throw CustomHttp404("존재하지 않는 상품입니다.")
+        
+        user.viewItem(item)
     }
 }
