@@ -1,7 +1,7 @@
-package com.wafflestudio.toyproject.team4.core.user.database
+package com.wafflestudio.toyproject.team4.core.board.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.wafflestudio.toyproject.team4.core.user.domain.Comment
+import com.wafflestudio.toyproject.team4.core.board.domain.Comment
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 

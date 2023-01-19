@@ -2,6 +2,9 @@ package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
+import com.wafflestudio.toyproject.team4.core.board.domain.Review
+import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
