@@ -2,9 +2,12 @@ package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
+import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
+import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
@@ -28,6 +31,8 @@ interface UserService {
     
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
+    
+    fun getItemInquiries(username:String): InquiriesResponse
 }
 
 @Service
@@ -37,7 +42,8 @@ class UserServiceImpl(
     private val purchaseRepository: PurchaseRepository,
     private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val inquiryRepository: InquiryRepository,
 ) : UserService {
 
     @Transactional
@@ -144,5 +150,19 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 상품입니다.")
         
         user.viewItem(item)
+    }
+
+
+    /* **********************************************************
+    //                     Item Inquiries                      //
+    ********************************************************** */
+    
+    override fun getItemInquiries(username: String): InquiriesResponse {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        return InquiriesResponse(
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+        )
     }
 }

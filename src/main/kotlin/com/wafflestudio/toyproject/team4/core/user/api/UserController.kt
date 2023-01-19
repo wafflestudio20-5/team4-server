@@ -87,4 +87,13 @@ class UserController(
         userService.postRecentlyViewed(username, postRecentlyViewedRequest.itemId),
         HttpStatus.CREATED
     )
+
+
+    @Authenticated
+    @GetMapping("/me/item-inquiries")
+    fun getItemInquiries(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) = userService.getItemInquiries(username)
+
 }
