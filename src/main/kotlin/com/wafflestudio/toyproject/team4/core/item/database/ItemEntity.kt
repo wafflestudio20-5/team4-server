@@ -47,7 +47,7 @@ class ItemEntity(
     var options: MutableList<OptionEntity>? = null
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var inquiries: MutableList<InquiryEntity>? = null
+    var inquiries: MutableList<InquiryEntity> = mutableListOf()
 
     fun updateImages(
         imageUrlList: List<String>
