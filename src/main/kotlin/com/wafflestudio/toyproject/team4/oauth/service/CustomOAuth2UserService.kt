@@ -13,14 +13,16 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Collections
+import java.util.Locale
 
 @Service
 class CustomOAuth2UserService(
     private val userRepository: UserRepository,
 ) : DefaultOAuth2UserService() {
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
-        val oAuth2User = super.loadUser(userRequest) // OAuth 서비스(github, google, naver)에서 가져온 유저 정보를 담고있음
+        // OAuth 서비스(github, google, naver)에서 가져온 유저 정보를 담고있음
+        val oAuth2User = super.loadUser(userRequest)
 
         return try {
             this.process(userRequest, oAuth2User)
@@ -34,10 +36,14 @@ class CustomOAuth2UserService(
 
     private fun process(userRequest: OAuth2UserRequest, oAuth2User: OAuth2User): OAuth2User {
         val providerType =
-            ProviderType.valueOf(userRequest.clientRegistration.registrationId.uppercase(Locale.getDefault())) // OAuth 서비스 이름(ex. GITHUB, NAVER, GOOGLE)
+            ProviderType.valueOf(
+                userRequest.clientRegistration.registrationId.uppercase(Locale.getDefault())
+            ) // OAuth 서비스 이름(ex. GITHUB, NAVER, GOOGLE)
         val oAuth2UserId = oAuth2User.attributes["id"]
         val username = "$providerType-$oAuth2UserId" // Arbitrary username Ex) KAKAO-1294726
-        val userInfo: OAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, oAuth2User.attributes)
+        val userInfo: OAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
+            providerType, oAuth2User.attributes
+        )
         var savedUser = userRepository.findByUsername(username)
 
         if (savedUser != null) {

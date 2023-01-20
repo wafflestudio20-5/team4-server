@@ -5,8 +5,7 @@ import com.wafflestudio.toyproject.team4.core.board.domain.Comment
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
-interface CommentRepository : JpaRepository<CommentEntity, Long>, CommentRepositoryCustom {
-}
+interface CommentRepository : JpaRepository<CommentEntity, Long>, CommentRepositoryCustom
 
 interface CommentRepositoryCustom {
     fun getCommentResponses(commentEntities: MutableList<CommentEntity>): MutableList<Comment>

@@ -18,7 +18,7 @@ data class PutItemInquiriesRequest(
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("유효하지 않은 문의 유형입니다.")
         }
-        
+
         if (content.isNullOrEmpty()) {
             throw CustomHttp400("내용을 입력해주세요")
         } else if (title.isNullOrEmpty()) {

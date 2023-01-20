@@ -4,8 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
-interface ReviewImageRepository : JpaRepository<ReviewImageEntity, Long>, ReviewImageRepositoryCustom {
-}
+interface ReviewImageRepository : JpaRepository<ReviewImageEntity, Long>, ReviewImageRepositoryCustom
 
 interface ReviewImageRepositoryCustom
 

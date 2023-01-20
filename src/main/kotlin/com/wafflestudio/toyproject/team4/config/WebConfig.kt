@@ -38,7 +38,7 @@ class WebConfig(
 class AuthArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(UserContext::class.java) &&
-                parameter.parameterType == String::class.java
+            parameter.parameterType == String::class.java
     }
 
     override fun resolveArgument(

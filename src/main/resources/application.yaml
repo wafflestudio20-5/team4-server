@@ -1,67 +1,88 @@
 server:
-  port: 8080
+    port: 8080
 
 spring:
-  profiles:
-    default: local
-  datasource:
-    url: jdbc:mysql://localhost:3306/team4?serverTimezone=UTC
-    username: root
-    password: team4
-  jpa:
-    properties:
-      hibernate:
-        show_sql: true
-    hibernate:
-      ddl-auto: update
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: a45eeb64ffc135f380633f559404add2
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
-            authorization-grant-type: authorization_code
-            client-authentication-method: POST
-            client-name: Kakao
-            scope: profile_nickname, profile_image, gender
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
+    profiles:
+        default: local
+    datasource:
+        url: jdbc:mysql://localhost:3306/team4?serverTimezone=UTC
+        username: root
+        password: team4
+    jpa:
+        properties:
+            hibernate:
+                show_sql: true
+        hibernate:
+            ddl-auto: update
+    security:
+        oauth2:
+            client:
+                registration:
+                    kakao:
+                        client-id: a45eeb64ffc135f380633f559404add2
+                        redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+                        authorization-grant-type: authorization_code
+                        client-authentication-method: POST
+                        client-name: Kakao
+                        scope: profile_nickname, profile_image, gender
+                provider:
+                    kakao:
+                        authorization-uri: https://kauth.kakao.com/oauth/authorize
+                        token-uri: https://kauth.kakao.com/oauth/token
+                        user-info-uri: https://kapi.kakao.com/v2/user/me
+                        user-name-attribute: id
 
 auth.jwt:
-  issuer: WAFFLE_STUDIO
-  jwtSecret: WAFFLE_STUDIO_TOY_PROJECT_TEAM4_JSON_WEB_TOKEN_SECRET_KEY
-  jwtExpiration: 900
-  refreshExpiration: 3600
+    issuer: WAFFLE_STUDIO
+    jwtSecret: WAFFLE_STUDIO_TOY_PROJECT_TEAM4_JSON_WEB_TOKEN_SECRET_KEY
+    jwtExpiration: 900
+    refreshExpiration: 3600
 
 cloudinary:
-  apiEnvironment: ${cloudinary-key}
+    apiEnvironment: ${cloudinary-key}
 
 ---
 
 server:
-  port: 8081
+    port: 8080
 
 spring:
-  config:
-    activate:
-      on-profile: prod
-#  datasource:
-#    url: jdbc:mysql://toyproject-team4-db.cwcfnggnsjrh.ap-northeast-2.rds.amazonaws.com:3306/myseminarDB
-#    username: team4
-#    password: toyprojectteam4
-#  jpa:
-#    properties:
-#      hibernate:
-#        show_sql: false
-#    hibernate:
-#      ddl-auto: update
-#
-#auth.jwt:
-#  issuer: WAFFLE_STUDIO
-#  jwtSecret: WAFFLE_STUDIO_SPRING_AND_KOTLIN_SEMINAR_SECRET_KEY
-#  jwtExpiration: 3600
+    config:
+        activate:
+            on-profile: prod
+    datasource:
+        url: ${rds-db-url}
+        username: root
+        password: ${rds-db-password}
+    jpa:
+        properties:
+            hibernate:
+                show_sql: false
+        hibernate:
+            ddl-auto: none
+    security:
+        oauth2:
+            client:
+                registration:
+                    kakao:
+                        client-id: ${kakao-client-id}
+                        redirect-uri: ${kakao-redirect-uri}
+                        authorization-grant-type: authorization_code
+                        client-authentication-method: POST
+                        client-name: Kakao
+                        scope: profile_nickname, profile_image, gender
+                provider:
+                    kakao:
+                        authorization-uri: https://kauth.kakao.com/oauth/authorize
+                        token-uri: https://kauth.kakao.com/oauth/token
+                        user-info-uri: https://kapi.kakao.com/v2/user/me
+                        user-name-attribute: id
+
+auth.jwt:
+    issuer: ${jwt-issuer}
+    jwtSecret: ${jwt-secret-key}
+    jwtExpiration: 3600
+    refreshExpiration: 86400
+
+cloudinary:
+    apiEnvironment: ${cloudinary-key}
