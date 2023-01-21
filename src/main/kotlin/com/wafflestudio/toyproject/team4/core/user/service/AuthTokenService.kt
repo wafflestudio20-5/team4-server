@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
-import javax.servlet.http.Cookie
 
 @Service
 @EnableConfigurationProperties(AuthProperties::class)
@@ -82,15 +81,6 @@ class AuthTokenService(
             .setSigningKey(signingKey)
             .build()
             .parseClaimsJws(prefixRemoved)
-    }
-
-    fun generateCookie(token: String): Cookie {
-        val cookie = Cookie("refreshToken", token)
-        cookie.isHttpOnly = true
-        cookie.secure = true
-        cookie.path = "/"
-        cookie.maxAge = 3600
-        return cookie
     }
 
     fun generateResponseCookie(token: String): ResponseCookie {

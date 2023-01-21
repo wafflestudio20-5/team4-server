@@ -32,6 +32,12 @@ class AuthController(
         @RequestBody loginRequest: LoginRequest
     ) = authService.login(loginRequest)
 
+    @Authenticated
+    @PostMapping("/social-login")
+    fun socialLogin(
+        @UserContext username: String
+    ) = authService.socialLogin(username)
+
     @PostMapping("/refresh")
     fun refresh(
         @CookieValue(value = "refreshToken") refreshToken: String,
