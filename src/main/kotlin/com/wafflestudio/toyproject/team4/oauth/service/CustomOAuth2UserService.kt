@@ -40,7 +40,7 @@ class CustomOAuth2UserService(
                 userRequest.clientRegistration.registrationId.uppercase(Locale.getDefault())
             ) // OAuth 서비스 이름(ex. GITHUB, NAVER, GOOGLE)
         val oAuth2UserId = oAuth2User.attributes["id"]
-        val username = "$providerType-$oAuth2UserId" // Arbitrary username Ex) KAKAO-1294726
+        val username = "${providerType.toString().lowercase()}_$oAuth2UserId" // Arbitrary username Ex) kakao_1294726
         val userInfo: OAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
             providerType, oAuth2User.attributes
         )

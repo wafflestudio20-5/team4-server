@@ -7,7 +7,6 @@ object OAuth2UserInfoFactory {
     fun getOAuth2UserInfo(providerType: ProviderType?, attributes: Map<String, Any>): OAuth2UserInfo {
         return when (providerType) {
             ProviderType.KAKAO -> KakaoOAuth2UserInfo(attributes)
-//            ProviderType.APPLE -> AppleOAuth2UserInfo(attributes)
             else -> throw IllegalArgumentException("Invalid Provider Type.")
         }
     }
