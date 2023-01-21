@@ -23,6 +23,8 @@ interface AuthService {
 
     fun login(loginRequest: LoginRequest): ResponseEntity<AuthToken>
 
+    fun socialLogin(username: String): ResponseEntity<AuthToken>
+
     fun refresh(refreshToken: String): ResponseEntity<AuthToken>
 
     fun logout(username: String)
@@ -57,6 +59,19 @@ class AuthServiceImpl(
 
         val accessToken = authTokenService.generateAccessTokenByUsername(loginRequest.username).accessToken
         val refreshToken = authTokenService.generateRefreshTokenByUsername(loginRequest.username)
+        user.refreshToken = refreshToken
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, authTokenService.generateResponseCookie(refreshToken).toString())
+            .body(AuthToken(accessToken))
+    }
+
+    @Transactional
+    override fun socialLogin(username: String): ResponseEntity<AuthToken> {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+
+        val accessToken = authTokenService.generateAccessTokenByUsername(username).accessToken
+        val refreshToken = authTokenService.generateRefreshTokenByUsername(username)
         user.refreshToken = refreshToken
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, authTokenService.generateResponseCookie(refreshToken).toString())
