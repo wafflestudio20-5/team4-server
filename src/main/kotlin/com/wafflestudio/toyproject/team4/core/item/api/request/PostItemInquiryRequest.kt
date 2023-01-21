@@ -20,13 +20,13 @@ data class PostItemInquiryRequest(
         if(title == null) throw CustomHttp400("제목은 필수 입력값입니다.")
     }
 
-    fun toInquiryEntity(user: UserEntity, item: ItemEntity): InquiryEntity {
+    fun toEntity(user: UserEntity, item: ItemEntity): InquiryEntity {
         val newInquiry = InquiryEntity(
             user = user,
             item = item,
             title = title!!,
             content = content!!,
-            type = Type.valueOf(type),
+            type = Type.valueOf(type.uppercase()),
             optionName = option,
             isSecret = isSecret,
             isAnswered = false,

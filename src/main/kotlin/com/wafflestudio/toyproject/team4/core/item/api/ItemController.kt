@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.item.api
 
+import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRequest
@@ -52,6 +53,7 @@ class ItemController(
         @RequestParam count: Long?
     ) = itemService.getItemInquiries(itemId, index ?: 0L, count ?: 5L)
 
+    @Authenticated
     @PostMapping("/item/{id}/inquiry")
     fun postItemInquiry(
         @RequestHeader(value="Authorization") authorization: String,

@@ -88,20 +88,16 @@ class ItemServiceImpl(
     override fun postItemInquiry(username: String, itemId: Long, postItemInquiryRequest: PostItemInquiryRequest) {
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품입니다.")
-        val user = userRepository.findByUsername(username)
-            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val user = userRepository.findByUsername(username)!!
 
         // check whether the option that user selected is one of the option of the item
         val newOption = postItemInquiryRequest.option
-        val itemOptions =
-            if(item.options == null) { listOf() }
-            else { item.options!!.map { it.optionName } }
-
-        if(!newOption.isNullOrEmpty() && itemOptions.contains(newOption))
+        val itemOptions = item.options?.map { it.optionName } ?: listOf()
+        if(!newOption.isNullOrEmpty() && !itemOptions.contains(newOption))
             throw CustomHttp400("상품에 존재하지 않는 옵션입니다.")
 
         // make a new ItemInquiry object
-        val itemInquiry = postItemInquiryRequest.toInquiryEntity(user, item)
+        val itemInquiry = postItemInquiryRequest.toEntity(user, item)
         item.inquiries.add(itemInquiry)
     }
 
