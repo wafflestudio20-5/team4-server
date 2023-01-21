@@ -8,7 +8,7 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 
 data class PostItemInquiryRequest(
-    val type: String,      // size | delivery | restock | detail
+    val type: String,
     val option: String?,
     val isSecret: Boolean,
     val title: String?,
@@ -16,8 +16,8 @@ data class PostItemInquiryRequest(
     val images: List<String>? = mutableListOf()
 ) {
     init {
-        if(content == null) throw CustomHttp400("문의 내용을 입력해주세요.")
-        if(title == null) throw CustomHttp400("제목은 필수 입력값입니다.")
+        if (content == null) throw CustomHttp400("문의 내용을 입력해주세요.")
+        if (title == null) throw CustomHttp400("제목은 필수 입력값입니다.")
     }
 
     fun toEntity(user: UserEntity, item: ItemEntity): InquiryEntity {
@@ -31,8 +31,8 @@ data class PostItemInquiryRequest(
             isSecret = isSecret,
             isAnswered = false,
         )
-        newInquiry.images = images!!.map {
-            url -> InquiryImageEntity(newInquiry, url)
+        newInquiry.images = images!!.map { url ->
+            InquiryImageEntity(newInquiry, url)
         }.toMutableList()
         return newInquiry
     }

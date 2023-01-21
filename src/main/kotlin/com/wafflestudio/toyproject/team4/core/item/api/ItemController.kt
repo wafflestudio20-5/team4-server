@@ -56,7 +56,7 @@ class ItemController(
     @Authenticated
     @PostMapping("/item/{id}/inquiry")
     fun postItemInquiry(
-        @RequestHeader(value="Authorization") authorization: String,
+        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "id") itemId: Long,
         @RequestBody postItemInquiryRequest: PostItemInquiryRequest
@@ -64,7 +64,6 @@ class ItemController(
         itemService.postItemInquiry(username, itemId, postItemInquiryRequest),
         HttpStatus.CREATED
     )
-
 
     @GetMapping("/search")
     fun searchItemByQuery(

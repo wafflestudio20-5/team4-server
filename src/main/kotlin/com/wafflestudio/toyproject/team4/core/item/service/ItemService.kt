@@ -93,14 +93,13 @@ class ItemServiceImpl(
         // check whether the option that user selected is one of the option of the item
         val newOption = postItemInquiryRequest.option
         val itemOptions = item.options?.map { it.optionName } ?: listOf()
-        if(!newOption.isNullOrEmpty() && !itemOptions.contains(newOption))
+        if (!newOption.isNullOrEmpty() && !itemOptions.contains(newOption))
             throw CustomHttp400("상품에 존재하지 않는 옵션입니다.")
 
         // make a new ItemInquiry object
         val itemInquiry = postItemInquiryRequest.toEntity(user, item)
         item.inquiries.add(itemInquiry)
     }
-
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
         val itemList = with(itemRepository) {
