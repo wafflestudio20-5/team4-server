@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface ItemService {
-    fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
+    fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
     fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse
@@ -36,12 +36,7 @@ class ItemServiceImpl(
     private val inquiryRepository: InquiryRepository
 ) : ItemService {
     @Transactional(readOnly = true)
-    override fun getItemRankingList(
-        category: String?,
-        subCategory: String?,
-        index: Long,
-        count: Long
-    ): ItemRankingResponse {
+    override fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?) : ItemRankingResponse {
         val rankingList = with(itemRepository) {
             if (category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // all items
                 findAllByOrderByRatingDesc()
