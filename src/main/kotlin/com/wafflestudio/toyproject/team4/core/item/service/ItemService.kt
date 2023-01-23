@@ -12,6 +12,7 @@ import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRe
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.item.database.ItemRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -37,26 +38,20 @@ class ItemServiceImpl(
 ) : ItemService {
     @Transactional(readOnly = true)
     override fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?) : ItemRankingResponse {
-        val rankingList = with(itemRepository) {
-            if (category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // all items
-                findAllByOrderByRatingDesc()
-            } else if (!category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // category 전체
-                findAllByCategoryOrderByRatingDesc(
-                    Item.Category.valueOf(
-                        """([a-z])([A-Z]+)""".toRegex().replace(category, "$1_$2").uppercase()
-                    )
-                )
-            } else { // subCategory is not null
-                findAllBySubCategoryOrderByRatingDesc(
-                    Item.SubCategory.valueOf(
-                        """([a-z])([A-Z]+)""".toRegex().replace(subCategory!!, "$1_$2").uppercase()
-                    )
-                )
-            }
-        }.filterIndexed { idx, _ -> (idx / count) == index }
+        val itemCategory = category?.let { Item.Category.valueOf(camelToUpper(it)) }
+        val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
+        val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort?: "rating"))
+
+        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
+            .filterIndexed { idx, _ -> (idx / count) == index }
+
         return ItemRankingResponse(
             items = rankingList.map { entity -> Item.of(entity) }
         )
+    }
+
+    private fun camelToUpper(camelCaseWord: String): String{
+        return """([a-z])([A-Z]+)""".toRegex().replace(camelCaseWord, "$1_$2").uppercase()
     }
 
     override fun getItem(itemId: Long): ItemResponse {
