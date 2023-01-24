@@ -19,7 +19,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.math.floor
+import kotlin.math.ceil
 
 interface ItemService {
     fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?): ItemRankingResponse
@@ -50,7 +50,7 @@ class ItemServiceImpl(
             items = rankingList
                 .filterIndexed { idx, _ -> (idx / count) == index}
                 .map { entity -> RankingItem.of(entity) },
-            totalPages = floor(rankingList.size.toDouble() / count).toLong()
+            totalPages = ceil(rankingList.size.toDouble() / count).toLong()
         )
     }
 
@@ -96,20 +96,13 @@ class ItemServiceImpl(
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
-        val itemList = with(itemRepository) {
-            val itemsSearchedByName = this.findAllByNameContainingOrderByRatingDesc(query)
-            val itemSearchedByBrand = this.findAllByBrandContainingOrderByRatingDesc(query)
-
-            // to give high priority to the results searched by name(=itemsSearchedByName),
-            // simply add the results searched by brand(=itemsSearchedByBrand) afterwards
-            itemsSearchedByName + itemSearchedByBrand
-        }
+        val itemList = itemRepository.findAllByContainingOrderByRatingDesc(query)
 
         return ItemRankingResponse(
             items = itemList
                 .filterIndexed { idx, _ -> (idx / count) == index }
                 .map { entity -> RankingItem.of(entity) },
-            totalPages = floor(itemList.size.toDouble() / count).toLong()
+            totalPages = ceil(itemList.size.toDouble() / count).toLong()
         )
     }
 }
