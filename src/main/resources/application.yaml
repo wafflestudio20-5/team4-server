@@ -41,6 +41,9 @@ auth.jwt:
 cloudinary:
     apiEnvironment: ${cloudinary-key}
 
+social.login:
+    redirectUrl: ${social-login-redirect-url}
+
 ---
 
 server:
@@ -86,3 +89,6 @@ auth.jwt:
 
 cloudinary:
     apiEnvironment: ${cloudinary-key}
+
+social.login:
+    redirectUrl: ${social-login-redirect-url}
