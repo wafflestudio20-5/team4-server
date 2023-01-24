@@ -8,6 +8,8 @@ import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -26,6 +28,7 @@ class InquiryEntity(
 
     var title: String,
     var content: String,
+    @Enumerated(EnumType.STRING)
     var type: Type,
     var optionName: String? = null,
     var isSecret: Boolean,
