@@ -14,10 +14,12 @@ import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.item.domain.RankingItem
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.floor
 
 interface ItemService {
     fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?): ItemRankingResponse
@@ -43,10 +45,12 @@ class ItemServiceImpl(
         val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort?: "rating"))
 
         val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
-            .filterIndexed { idx, _ -> (idx / count) == index }
 
         return ItemRankingResponse(
-            items = rankingList.map { entity -> Item.of(entity) }
+            items = rankingList
+                .filterIndexed { idx, _ -> (idx / count) == index}
+                .map { entity -> RankingItem.of(entity) },
+            totalPages = floor(rankingList.size.toDouble() / count).toLong()
         )
     }
 
@@ -99,14 +103,13 @@ class ItemServiceImpl(
             // to give high priority to the results searched by name(=itemsSearchedByName),
             // simply add the results searched by brand(=itemsSearchedByBrand) afterwards
             itemsSearchedByName + itemSearchedByBrand
-        }.filterIndexed {
-            // and finally, filter for pagination
-            idx, _ ->
-            (idx / count) == index
         }
 
         return ItemRankingResponse(
-            items = itemList.map { entity -> Item.of(entity) }
+            items = itemList
+                .filterIndexed { idx, _ -> (idx / count) == index }
+                .map { entity -> RankingItem.of(entity) },
+            totalPages = floor(itemList.size.toDouble() / count).toLong()
         )
     }
 }

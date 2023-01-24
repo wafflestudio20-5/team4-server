@@ -2,8 +2,6 @@ package com.wafflestudio.toyproject.team4.core.item.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.item.database.QItemEntity.itemEntity
-import com.wafflestudio.toyproject.team4.core.item.database.QItemImageEntity.itemImageEntity
-import com.wafflestudio.toyproject.team4.core.item.database.QOptionEntity.optionEntity
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
@@ -34,14 +32,9 @@ class ItemRepositoryCustomImpl(
         }
 
         return queryFactory
-            .select(itemEntity)
+            .selectDistinct(itemEntity)
             .from(itemEntity)
-            .leftJoin(itemImageEntity)
-            .on(itemImageEntity.item.eq(itemEntity))
-            .fetchJoin()
-            .leftJoin(optionEntity)
-            .on(optionEntity.item.eq(itemEntity))
-            .fetchJoin()
+            .leftJoin(itemEntity.images).fetchJoin()
             .where(eqInterest)
             .orderBy(ordering)
             .fetch()
