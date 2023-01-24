@@ -30,7 +30,7 @@ class ItemController(
         @RequestParam index: Long?,
         @RequestParam count: Long?,
         @RequestParam sort: String?
-    ) = itemService.getItemRankingList(category, subcategory, index?: 0L, count?: 20L, sort)
+    ) = itemService.getItemRankingList(category, subcategory, index ?: 0L, count ?: 20L, sort)
 
     @GetMapping("/item/{id}")
     fun getItem(

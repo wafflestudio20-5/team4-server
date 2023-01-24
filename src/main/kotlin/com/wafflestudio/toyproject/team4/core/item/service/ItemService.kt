@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional
 import kotlin.math.ceil
 
 interface ItemService {
-    fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?): ItemRankingResponse
+    fun getItemRankingList(
+        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
+    ): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
     fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse
@@ -37,24 +39,26 @@ class ItemServiceImpl(
     private val itemRepository: ItemRepository,
     private val reviewRepository: ReviewRepository,
     private val inquiryRepository: InquiryRepository
-) : ItemService {
+): ItemService {
     @Transactional(readOnly = true)
-    override fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long, sort: String?) : ItemRankingResponse {
+    override fun getItemRankingList(
+        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
+    ): ItemRankingResponse {
         val itemCategory = category?.let { Item.Category.valueOf(camelToUpper(it)) }
         val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
-        val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort?: "rating"))
+        val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort ?: "rating"))
 
         val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
 
         return ItemRankingResponse(
             items = rankingList
-                .filterIndexed { idx, _ -> (idx / count) == index}
+                .filterIndexed { idx, _ -> (idx / count) == index }
                 .map { entity -> RankingItem.of(entity) },
             totalPages = ceil(rankingList.size.toDouble() / count).toLong()
         )
     }
 
-    private fun camelToUpper(camelCaseWord: String): String{
+    private fun camelToUpper(camelCaseWord: String): String {
         return """([a-z])([A-Z]+)""".toRegex().replace(camelCaseWord, "$1_$2").uppercase()
     }
 
