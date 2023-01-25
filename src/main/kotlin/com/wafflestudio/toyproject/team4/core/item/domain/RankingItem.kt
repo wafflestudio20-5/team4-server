@@ -14,6 +14,7 @@ data class RankingItem(
     val sale: Long? = null,
     val reviewCount: Long, // 후기 순 정렬 위함
     val rating: Double?,   // 별점 순 정렬 위함
+    val sex: String,
     val category: String,
     val subCategory: String,
 ) {
@@ -31,6 +32,7 @@ data class RankingItem(
                 sale = sale,
                 reviewCount = reviewCount!!,
                 rating = rating,
+                sex = sex.toString().lowercase(),
                 category = CaseUtils.toCamelCase(category.toString(), false, '_'),
                 subCategory = CaseUtils.toCamelCase(subCategory.toString(), false, '_')
             )
