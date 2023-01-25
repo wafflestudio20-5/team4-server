@@ -15,6 +15,7 @@ import org.springframework.web.method.HandlerMethod
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.web.servlet.HandlerInterceptor
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.servlet.http.HttpServletRequest
@@ -31,6 +32,18 @@ class WebConfig(
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(authArgumentResolver)
+    }
+
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry
+            .addMapping("/**")
+            .allowedOrigins(
+                "https://dllflfuvssxc9.cloudfront.net/",
+                "https://musin4.netlify.app/",
+                "http://wafflestudio-toyproject-musin4-frontend.s3-website.ap-northeast-2.amazonaws.com/",
+                "http://localhost:3000/"
+            )
+            .allowCredentials(true)
     }
 }
 
