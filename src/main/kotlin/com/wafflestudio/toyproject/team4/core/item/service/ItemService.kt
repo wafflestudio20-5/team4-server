@@ -2,11 +2,11 @@ package com.wafflestudio.toyproject.team4.core.item.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
+import com.wafflestudio.toyproject.team4.core.board.api.response.ItemInquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
+import com.wafflestudio.toyproject.team4.core.board.domain.ItemInquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRequest
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
@@ -22,7 +22,7 @@ interface ItemService {
     fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
-    fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse
+    fun getItemInquiries(itemId: Long, index: Long, count: Long): ItemInquiriesResponse
     fun postItemInquiry(username: String, itemId: Long, postItemInquiryRequest: PostItemInquiryRequest)
 
     fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse
@@ -77,10 +77,10 @@ class ItemServiceImpl(
         )
     }
 
-    override fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse {
+    override fun getItemInquiries(itemId: Long, index: Long, count: Long): ItemInquiriesResponse {
         val itemInquiries = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId)
-        return InquiriesResponse(
-            inquiries = itemInquiries.map { entity -> Inquiry.of(entity) }
+        return ItemInquiriesResponse(
+            inquiries = itemInquiries.map { entity -> ItemInquiry.of(entity) }
         )
     }
 

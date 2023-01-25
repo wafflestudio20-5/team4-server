@@ -36,7 +36,7 @@ class InquiryEntity(
     var type: Type,
     var optionName: String? = null,
     var isSecret: Boolean,
-    val isAnswered: Boolean
+    var isAnswered: Boolean,
 ) {
 
     @Id

@@ -1,14 +1,12 @@
 package com.wafflestudio.toyproject.team4.core.board.domain
 
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
-import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.user.domain.User
+import com.wafflestudio.toyproject.team4.core.item.domain.InquiryItem
 import java.time.LocalDateTime
 
-data class Inquiry(
+data class UserItemInquiry(
     val id: Long,
-    val user: User,
-    val item: Item,
+    val item: InquiryItem,
     val isAnswered: Boolean,
     val type: String,
     val title: String,
@@ -21,10 +19,9 @@ data class Inquiry(
 ) {
     companion object {
         fun of(entity: InquiryEntity) = entity.run {
-            Inquiry(
+            UserItemInquiry(
                 id = id,
-                user = User.of(this.user),
-                item = Item.of(this.item),
+                item = InquiryItem.of(this.item),
                 isAnswered = isAnswered,
                 type = type.toString().lowercase(),
                 title = title,

@@ -4,8 +4,8 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
-import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
+import com.wafflestudio.toyproject.team4.core.board.api.response.UserItemInquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.database.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
@@ -14,8 +14,8 @@ import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.database.Size
-import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
+import com.wafflestudio.toyproject.team4.core.board.domain.UserItemInquiry
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
@@ -56,7 +56,7 @@ interface UserService {
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
 
-    fun getItemInquiries(username: String): InquiriesResponse
+    fun getItemInquiries(username: String): UserItemInquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
@@ -273,12 +273,12 @@ class UserServiceImpl(
     ********************************************************** */
 
     @Transactional
-    override fun getItemInquiries(username: String): InquiriesResponse {
+    override fun getItemInquiries(username: String): UserItemInquiriesResponse {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
-        return InquiriesResponse(
-            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+        return UserItemInquiriesResponse(
+            inquiries = itemInquiryList.map { inquiry -> UserItemInquiry.of(inquiry) }
         )
     }
 
