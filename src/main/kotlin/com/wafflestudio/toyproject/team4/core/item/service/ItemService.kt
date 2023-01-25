@@ -12,14 +12,19 @@ import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRe
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.item.database.ItemRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.item.domain.RankingItem
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.ceil
 
 interface ItemService {
-    fun getItemRankingList(category: String?, subCategory: String?, index: Long, count: Long): ItemRankingResponse
+    fun getItemRankingList(
+        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
+    ): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
     fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse
@@ -34,34 +39,27 @@ class ItemServiceImpl(
     private val itemRepository: ItemRepository,
     private val reviewRepository: ReviewRepository,
     private val inquiryRepository: InquiryRepository
-) : ItemService {
+): ItemService {
     @Transactional(readOnly = true)
     override fun getItemRankingList(
-        category: String?,
-        subCategory: String?,
-        index: Long,
-        count: Long
+        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
     ): ItemRankingResponse {
-        val rankingList = with(itemRepository) {
-            if (category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // all items
-                findAllByOrderByRatingDesc()
-            } else if (!category.isNullOrEmpty() && subCategory.isNullOrEmpty()) { // category 전체
-                findAllByCategoryOrderByRatingDesc(
-                    Item.Category.valueOf(
-                        """([a-z])([A-Z]+)""".toRegex().replace(category, "$1_$2").uppercase()
-                    )
-                )
-            } else { // subCategory is not null
-                findAllBySubCategoryOrderByRatingDesc(
-                    Item.SubCategory.valueOf(
-                        """([a-z])([A-Z]+)""".toRegex().replace(subCategory!!, "$1_$2").uppercase()
-                    )
-                )
-            }
-        }.filterIndexed { idx, _ -> (idx / count) == index }
+        val itemCategory = category?.let { Item.Category.valueOf(camelToUpper(it)) }
+        val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
+        val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort ?: "rating"))
+
+        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
+
         return ItemRankingResponse(
-            items = rankingList.map { entity -> Item.of(entity) }
+            items = rankingList
+                .filterIndexed { idx, _ -> (idx / count) == index }
+                .map { entity -> RankingItem.of(entity) },
+            totalPages = ceil(rankingList.size.toDouble() / count).toLong()
         )
+    }
+
+    private fun camelToUpper(camelCaseWord: String): String {
+        return """([a-z])([A-Z]+)""".toRegex().replace(camelCaseWord, "$1_$2").uppercase()
     }
 
     override fun getItem(itemId: Long): ItemResponse {
@@ -102,21 +100,13 @@ class ItemServiceImpl(
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {
-        val itemList = with(itemRepository) {
-            val itemsSearchedByName = this.findAllByNameContainingOrderByRatingDesc(query)
-            val itemSearchedByBrand = this.findAllByBrandContainingOrderByRatingDesc(query)
-
-            // to give high priority to the results searched by name(=itemsSearchedByName),
-            // simply add the results searched by brand(=itemsSearchedByBrand) afterwards
-            itemsSearchedByName + itemSearchedByBrand
-        }.filterIndexed {
-            // and finally, filter for pagination
-            idx, _ ->
-            (idx / count) == index
-        }
+        val itemList = itemRepository.findAllByContainingOrderByRatingDesc(query)
 
         return ItemRankingResponse(
-            items = itemList.map { entity -> Item.of(entity) }
+            items = itemList
+                .filterIndexed { idx, _ -> (idx / count) == index }
+                .map { entity -> RankingItem.of(entity) },
+            totalPages = ceil(itemList.size.toDouble() / count).toLong()
         )
     }
 }
