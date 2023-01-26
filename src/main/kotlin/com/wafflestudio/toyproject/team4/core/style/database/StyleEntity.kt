@@ -26,8 +26,8 @@ class StyleEntity(
     var image4: String? = null,
     var image5: String? = null,
 
-    var content: String,
-    var hashtag: String,
+    var content: String? = null,
+    var hashtag: String? = null,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +40,15 @@ class StyleEntity(
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 
     @OneToMany(mappedBy = "style", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val styleItems: MutableList<ItemStyleEntity> = mutableListOf()
+    var styleItems: MutableList<ItemStyleEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "likedStyle", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     val likedUsers: MutableList<UserLikedStyleEntity> = mutableListOf()
     var likedUserCount: Long? = 0L
+
+    fun updateStyleItems(itemIds: List<Long>) {
+        this.styleItems = itemIds
+            .map { itemId -> ItemStyleEntity(itemId, this) }
+            .toMutableList()
+    }
 }

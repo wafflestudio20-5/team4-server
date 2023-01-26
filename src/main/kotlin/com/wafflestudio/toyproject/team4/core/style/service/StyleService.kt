@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.style.service
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
@@ -18,6 +19,7 @@ import kotlin.math.ceil
 interface StyleService {
     fun getStyles(index: Long, count: Long, sort: String?): StylesResponse
     fun getStyle(username: String?, styleId: Long): StyleResponse
+    fun postStyle(username: String, postStyleRequest: PostStyleRequest)
 }
 
 @Service
@@ -65,5 +67,13 @@ class StyleServiceImpl(
     private fun findStyleItems(style: StyleEntity): List<ItemEntity> {
         val styleItemIds = style.styleItems.map { it.itemId }
         return itemRepository.findAllByIds(styleItemIds)
+    }
+
+    @Transactional
+    override fun postStyle(username: String, postStyleRequest: PostStyleRequest) {
+        val user = userRepository.findByUsername(username)!!
+        val style = postStyleRequest.toEntity(user)
+
+        user.styles.add(style)
     }
 }

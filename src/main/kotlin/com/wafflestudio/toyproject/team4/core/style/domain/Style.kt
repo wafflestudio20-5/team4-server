@@ -11,8 +11,8 @@ data class Style(
     val user: User,
     val images: List<String>,
     val items: List<RankingItem>,
-    val content: String,
-    val hashtag: String,
+    val content: String?,
+    val hashtag: String?,
     val createdDateTime: LocalDateTime,
 ) {
     companion object {
