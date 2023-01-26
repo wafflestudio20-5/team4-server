@@ -1,10 +1,9 @@
 package com.wafflestudio.toyproject.team4.core.style.api
 
+import com.wafflestudio.toyproject.team4.common.Authenticated
+import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
@@ -18,5 +17,13 @@ class StyleController(
         @RequestParam count: Long?,
         @RequestParam sort: String?
     ) = styleService.getStyles(index ?: 0L, count ?: 4L, sort)
+
+    @Authenticated
+    @GetMapping("/style/{styleId}")
+    fun getService(
+        @RequestHeader(value = "Authorization") authorization: String?,
+        @UserContext username: String?,
+        @PathVariable(value = "styleId") styleId: Long
+    ) = styleService.getStyle(username, styleId)
 
 }
