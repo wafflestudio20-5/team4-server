@@ -30,7 +30,7 @@ class StyleServiceImpl(
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository
-): StyleService {
+) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
         val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
         val allStyles = styleRepository.findAllOrderBy(sortingMethod)
@@ -56,7 +56,7 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
 
-        val isFollow = user?.let { followRepository.findRelation(followerId = it.id, followingId = style.user.id) } ?: false
+        val isFollow = user?.let { followRepository.findRelation(it.id, style.user.id) } ?: false
         val likedUserIds = style.likedUsers.map { it.userId }
         val isLike = user?.let { likedUserIds.contains(it.id) } ?: false
 
