@@ -12,6 +12,7 @@ data class Purchase(
     val createdDateTime: LocalDateTime,
     val payment: Long,
     val quantity: Long,
+    val isReviewed: Boolean,
 ) {
     companion object {
         fun of(purchaseEntity: PurchaseEntity) = purchaseEntity.run {
@@ -23,6 +24,7 @@ data class Purchase(
                 createdDateTime = createdDateTime,
                 payment = payment,
                 quantity = quantity,
+                isReviewed = review != null,
             )
         }
     }
