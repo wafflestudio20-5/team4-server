@@ -32,4 +32,6 @@ class ItemStyleEntity(
 
     @LastModifiedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+
+    var isActive: Boolean = true
 }
