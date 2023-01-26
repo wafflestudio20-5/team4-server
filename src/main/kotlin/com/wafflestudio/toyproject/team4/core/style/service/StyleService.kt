@@ -7,6 +7,7 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
+import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepositoryCustomImpl
@@ -28,6 +29,7 @@ class StyleServiceImpl(
     private val itemRepository: ItemRepository,
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
+    private val followRepository: FollowRepository
 ): StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
         val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
@@ -54,14 +56,18 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
 
+        val isFollow = user?.let { followRepository.findRelation(followerId = it.id, followingId = style.user.id) } ?: false
+        val likedUserIds = style.likedUsers.map { it.userId }
+        val isLike = user?.let { likedUserIds.contains(it.id) } ?: false
+
         return StyleResponse(
             style = Style.of(
                 entity = style,
                 items = findStyleItems(style)
             ),
             likedCount = style.likedUserCount,
-            isFollow = false,
-            isLike = false,
+            isFollow = isFollow,
+            isLike = isLike,
         )
     }
 
