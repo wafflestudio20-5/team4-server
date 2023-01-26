@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.style.service
 
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -29,8 +30,7 @@ class StyleServiceImpl(
     private val userRepository: UserRepository,
 ): StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
-        val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort ?: "recent")
-
+        val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
         val allStyles = styleRepository.findAllOrderBy(sortingMethod)
 
         return StylesResponse(
@@ -48,7 +48,8 @@ class StyleServiceImpl(
 
     @Transactional
     override fun getStyle(username: String?, styleId: Long): StyleResponse {
-        val user = username?.let { userRepository.findByUsername(it) } // null인 경우 -> 액세스 토큰 전달 X
+        val user = username?.let { userRepository.findByUsername(it) }
+        if (username != null && user == null) throw CustomHttp400("INVALID ACCESS TOKEN")
 
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")

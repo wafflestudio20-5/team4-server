@@ -2,7 +2,9 @@ package com.wafflestudio.toyproject.team4.core.style.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
+import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 class StyleController(
+    private val authTokenService: AuthTokenService,
     private val styleService: StyleService
 ) {
 
@@ -27,13 +30,14 @@ class StyleController(
         @RequestParam sort: String?
     ) = styleService.getStyles(index ?: 0L, count ?: 4L, sort)
 
-    @Authenticated
     @GetMapping("/style/{styleId}")
     fun getService(
-        @RequestHeader(value = "Authorization") authorization: String?,
-        @UserContext username: String?,
+        @RequestHeader(value = "Authorization") authToken: String?,
         @PathVariable(value = "styleId") styleId: Long
-    ) = styleService.getStyle(username, styleId)
+    ): StyleResponse {
+        val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
+        return styleService.getStyle(username, styleId)
+    }
 
     @Authenticated
     @PostMapping("/style")

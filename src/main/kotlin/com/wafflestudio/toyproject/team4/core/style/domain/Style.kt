@@ -23,7 +23,7 @@ data class Style(
             Style(
                 id = id,
                 user = User.of(user),
-                images = listOf(image1, image2, image3, image4, image5).requireNoNulls(),
+                images = listOfNotNull(image1, image2, image3, image4, image5),
                 items = items.map { entity -> RankingItem.of(entity) },
                 content = content,
                 hashtag = hashtag,
