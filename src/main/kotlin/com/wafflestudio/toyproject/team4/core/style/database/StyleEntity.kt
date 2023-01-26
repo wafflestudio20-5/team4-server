@@ -44,4 +44,5 @@ class StyleEntity(
 
     @OneToMany(mappedBy = "likedStyle", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     val likedUsers: MutableList<UserLikedStyleEntity> = mutableListOf()
+    var likedUserCount: Long? = 0L
 }

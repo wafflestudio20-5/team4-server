@@ -15,7 +15,7 @@ import javax.persistence.UniqueConstraint
 @Entity
 @Table(
     name = "item_styles",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["item_id", "style_id"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["itemId", "style_id"])]
 )
 class ItemStyleEntity(
     val itemId: Long,

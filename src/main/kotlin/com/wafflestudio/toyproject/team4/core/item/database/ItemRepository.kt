@@ -15,6 +15,7 @@ interface ItemRepositoryCustom {
         sort: ItemRepositoryCustomImpl.Sort
     ): List<ItemEntity>
     fun findAllByContainingOrderByRatingDesc(query: String): List<ItemEntity>
+    fun findAllByIds(ids: List<Long>): List<ItemEntity>
 }
 
 @Component
@@ -70,6 +71,15 @@ class ItemRepositoryCustomImpl(
             .leftJoin(itemEntity.images).fetchJoin()
             .where(eqInterest)
             .orderBy(itemEntity.rating.desc())
+            .fetch()
+    }
+
+    override fun findAllByIds(ids: List<Long>): List<ItemEntity> {
+        return queryFactory
+            .selectDistinct(itemEntity)
+            .from(itemEntity)
+            .leftJoin(itemEntity.images).fetchJoin()
+            .where(itemEntity.id.`in`(ids))
             .fetch()
     }
 
