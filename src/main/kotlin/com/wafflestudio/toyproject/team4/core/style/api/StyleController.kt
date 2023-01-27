@@ -31,7 +31,7 @@ class StyleController(
     ) = styleService.getStyles(index ?: 0L, count ?: 4L, sort)
 
     @GetMapping("/style/{styleId}")
-    fun getService(
+    fun getStyle(
         @RequestHeader(value = "Authorization") authToken: String?,
         @PathVariable(value = "styleId") styleId: Long
     ): StyleResponse {
@@ -41,7 +41,7 @@ class StyleController(
 
     @Authenticated
     @PostMapping("/style")
-    fun postItemInquiry(
+    fun postStyle(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody postStyleRequest: PostStyleRequest

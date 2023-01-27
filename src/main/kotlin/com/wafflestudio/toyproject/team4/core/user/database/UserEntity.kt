@@ -40,7 +40,7 @@ class UserEntity(
     var height: Long? = null,
     var weight: Long? = null,
     var description: String? = null,
-    var instarUsername: String? = null,
+    var instaUsername: String? = null,
 
     @Enumerated(EnumType.STRING)
     var socialKey: ProviderType? = null,
