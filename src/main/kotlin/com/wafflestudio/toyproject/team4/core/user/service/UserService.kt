@@ -46,7 +46,7 @@ interface UserService {
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
-    fun deleteReview(username: String, request: DeleteReviewRequest)
+    fun deleteReview(username: String, reviewId: Long)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -173,8 +173,8 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun deleteReview(username: String, request: DeleteReviewRequest) {
-        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+    override fun deleteReview(username: String, reviewId: Long) {
+        val reviewEntity = reviewRepository.findByIdOrNull(reviewId)
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
