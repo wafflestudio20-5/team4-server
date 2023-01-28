@@ -188,7 +188,7 @@ class UserServiceImpl(
     override fun putComment(username: String, request: CommentRequest, commentId: Long) {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val reviewEntity = userEntity.reviews.find { it.id == request.reviewId}
+        val reviewEntity = userEntity.reviews.find { it.id == request.reviewId }
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         val commentEntity = reviewEntity.comments.find { it.id == commentId }
             ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
