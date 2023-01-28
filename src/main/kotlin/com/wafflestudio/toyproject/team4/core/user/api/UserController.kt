@@ -44,7 +44,6 @@ class UserController(
         @PathVariable(value = "userId") userId: Long
     ) = ResponseEntity(userService.getUserStyles(userId), HttpStatus.OK)
 
-    @Authenticated
     @GetMapping("/{userId}")
     fun getUser(
         @PathVariable(value = "userId") userId: Long,
