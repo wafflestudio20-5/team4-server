@@ -2,4 +2,4 @@ package com.wafflestudio.toyproject.team4.core.item.database
 
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ItemImageRepository : JpaRepository<OptionEntity, Long>
+interface ItemImageRepository : JpaRepository<ItemImageEntity, Long>

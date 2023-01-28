@@ -1,9 +1,17 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
+import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.service.StyleService
+import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
+import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.boot.context.event.ApplicationStartedEvent
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Math.round
@@ -11,7 +19,11 @@ import java.util.Random
 
 @Component
 class MemoryDB(
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val imageService: ImageService,
+    private val styleService: StyleService,
+    private val userRepository: UserRepository
 ) {
     /**
      * 서버가 시작하면, 크롤링을 통해 무신사에서 실시간 랭킹 긁어와서 아이템 repository에 저장
@@ -181,5 +193,49 @@ class MemoryDB(
             "007005" to Item.SubCategory.BEANIE,
         )
         return subCategoryDict[subCategoryId] ?: Item.SubCategory.SNEAKERS
+    }
+
+//    @EventListener
+    @Transactional
+    fun makeMockStyles(event: ApplicationStartedEvent) {
+        val userNum = 10L
+        val styleNum = 15L
+
+        val registerRequests = (1..userNum).map { RegisterRequest("mockuser$it", "12345678*", "mocknick$it") }
+        val users = registerRequests.map {
+            val encodedPassword = passwordEncoder.encode(it.password)
+            UserEntity(username = it.username,encodedPassword = encodedPassword, nickname = it.nickname)
+        }
+        users.forEach {
+            it.image = imageService.getDefaultImage(it.username)
+            it.sex = if ((0..1).random() == 0) User.Sex.MALE else User.Sex.FEMALE
+            it.height = (155..187).random().toLong()
+            it.weight = (40..110).random().toLong()
+            it.description = "안녕하세요. ${it.nickname}입니다!"
+            it.instaUsername = it.username
+
+            userRepository.save(it)
+
+            val postStyleRequests = (1..styleNum).map {
+                val itemNum = 3
+                val itemIds = mutableListOf<Long>()
+                while (itemIds.size <= itemNum) {
+                    val itemId = (1..250).random().toLong()
+                    if (!itemIds.contains(itemId))
+                        itemIds.add(itemId)
+                }
+                val images = itemIds.map {
+                    val item = itemRepository.findById(it).get()
+                    item.images[0].imageUrl
+                }
+                val content = if ((0..1).random() == 0) null else "내 style"
+                val hashtag = if ((0..1).random() == 0) null else "#무신4 #맞팔 #선팔"
+                PostStyleRequest(images, itemIds, content, hashtag)
+            }
+            val username = it.username
+            postStyleRequests.forEach {
+                styleService.postStyle(username, it)
+            }
+        }
     }
 }

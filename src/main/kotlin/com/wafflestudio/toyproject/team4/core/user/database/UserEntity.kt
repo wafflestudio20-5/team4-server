@@ -36,7 +36,7 @@ class UserEntity(
     var reviewCount: Long? = 0L,
 
     @Enumerated(EnumType.STRING)
-    val sex: User.Sex? = null,
+    var sex: User.Sex? = null,
     var height: Long? = null,
     var weight: Long? = null,
     var description: String? = null,
