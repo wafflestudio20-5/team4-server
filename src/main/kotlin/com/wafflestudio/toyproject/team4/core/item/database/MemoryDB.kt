@@ -211,7 +211,7 @@ class MemoryDB(
         val registerRequests = (1..userNum).map { RegisterRequest("mockuser$it", "12345678*", "mocknick$it") }
         val users = registerRequests.map {
             val encodedPassword = passwordEncoder.encode(it.password)
-            UserEntity(username = it.username,encodedPassword = encodedPassword, nickname = it.nickname)
+            UserEntity(username = it.username, encodedPassword = encodedPassword, nickname = it.nickname)
         }
         users.forEach {
             it.image = imageService.getDefaultImage(it.username)
@@ -258,10 +258,12 @@ class MemoryDB(
             userRepository.save(UserEntity(username, encodedPassword, username))
         }
         users.forEach {
-            val purchase = purchaseRepository.save(PurchaseEntity(
-                it, item, item.options?.get(0)?.optionName,  item.newPrice!!, 1L
-            ))
-            val images = item.images.slice(0..2).map{it.imageUrl}
+            val purchase = purchaseRepository.save(
+                PurchaseEntity(
+                    it, item, item.options?.get(0)?.optionName, item.newPrice!!, 1L
+                )
+            )
+            val images = item.images.slice(0..2).map { it.imageUrl }
             val reviewRequest = ReviewRequest(
                 purchase.id,
                 (0..10).random().toLong(),
