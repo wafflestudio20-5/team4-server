@@ -36,6 +36,7 @@ class MemoryDB(
      * 각 대분류 - 소분류별로 10개씩
      */
 
+//    @EventListener
     fun makeMockData(event: ApplicationStartedEvent) {
 
         /** mainCategory - subCategory

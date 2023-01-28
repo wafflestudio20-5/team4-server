@@ -23,7 +23,7 @@ class ItemEntity(
     val label: Item.Label? = null,
     @Enumerated(EnumType.STRING)
     val sex: Item.Sex,
-    var reviewCount: Long? = 0,
+    var reviewCount: Long = 0,
     var rating: Double? = 0.0,
 
     val oldPrice: Long,
