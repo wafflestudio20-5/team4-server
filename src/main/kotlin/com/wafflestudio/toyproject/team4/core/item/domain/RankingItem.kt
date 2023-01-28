@@ -30,7 +30,7 @@ data class RankingItem(
                 oldPrice = oldPrice,
                 newPrice = newPrice,
                 sale = sale,
-                reviewCount = reviewCount!!,
+                reviewCount = reviewCount,
                 rating = rating,
                 sex = sex.toString().lowercase(),
                 category = CaseUtils.toCamelCase(category.toString(), false, '_'),
