@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
@@ -32,12 +33,14 @@ class UserEntity(
     @Column(unique = true)
     var nickname: String,
     var image: String? = null,
-    var reviewCount: Long? = 0L,
+    var reviewCount: Long = 0L,
 
     @Enumerated(EnumType.STRING)
-    val sex: User.Sex? = null,
+    var sex: User.Sex? = null,
     var height: Long? = null,
     var weight: Long? = null,
+    var description: String? = null,
+    var instaUsername: String? = null,
 
     @Enumerated(EnumType.STRING)
     var socialKey: ProviderType? = null,
@@ -69,6 +72,9 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var itemInquiries: MutableList<InquiryEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var styles: MutableList<StyleEntity> = mutableListOf()
 
     fun viewItem(
         item: ItemEntity

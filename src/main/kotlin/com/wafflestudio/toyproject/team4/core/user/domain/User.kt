@@ -6,13 +6,15 @@ import java.time.LocalDateTime
 data class User(
     val id: Long,
     val username: String,
-    val nickname: String,
-    var image: String? = null,
-    var reviewCount: Long?,
-    var registrationDate: LocalDateTime,
+    var nickname: String,
+    var image: String?,
+    var reviewCount: Long,
+    val registrationDate: LocalDateTime,
     var height: Long? = null,
     var weight: Long? = null,
-    val sex: String? = null,
+    var sex: String? = null,
+    var description: String? = null,
+    var instaUsername: String? = null,
 ) {
     enum class Sex {
         MALE, FEMALE
@@ -34,6 +36,8 @@ data class User(
                 height = height,
                 weight = weight,
                 sex = sex.toString().lowercase(),
+                description = description,
+                instaUsername = instaUsername
             )
         }
     }

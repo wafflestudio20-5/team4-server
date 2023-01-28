@@ -1,9 +1,21 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
+import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.service.StyleService
+import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
+import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
+import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import com.wafflestudio.toyproject.team4.core.user.domain.User
+import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.boot.context.event.ApplicationStartedEvent
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Math.round
@@ -11,13 +23,20 @@ import java.util.Random
 
 @Component
 class MemoryDB(
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val imageService: ImageService,
+    private val styleService: StyleService,
+    private val userService: UserService,
+    private val userRepository: UserRepository,
+    private val purchaseRepository: PurchaseRepository
 ) {
     /**
      * 서버가 시작하면, 크롤링을 통해 무신사에서 실시간 랭킹 긁어와서 아이템 repository에 저장
      * 각 대분류 - 소분류별로 10개씩
      */
 
+//    @EventListener
     fun makeMockData(event: ApplicationStartedEvent) {
 
         /** mainCategory - subCategory
@@ -181,5 +200,79 @@ class MemoryDB(
             "007005" to Item.SubCategory.BEANIE,
         )
         return subCategoryDict[subCategoryId] ?: Item.SubCategory.SNEAKERS
+    }
+
+//    @EventListener
+    @Transactional
+    fun makeMockStyles(event: ApplicationStartedEvent) {
+        val userNum = 10L
+        val styleNum = 15L
+
+        val registerRequests = (1..userNum).map { RegisterRequest("mockuser$it", "12345678*", "mocknick$it") }
+        val users = registerRequests.map {
+            val encodedPassword = passwordEncoder.encode(it.password)
+            UserEntity(username = it.username, encodedPassword = encodedPassword, nickname = it.nickname)
+        }
+        users.forEach {
+            it.image = imageService.getDefaultImage(it.username)
+            it.sex = if ((0..1).random() == 0) User.Sex.MALE else User.Sex.FEMALE
+            it.height = (155..187).random().toLong()
+            it.weight = (40..110).random().toLong()
+            it.description = "안녕하세요. ${it.nickname}입니다!"
+            it.instaUsername = it.username
+
+            userRepository.save(it)
+
+            val postStyleRequests = (1..styleNum).map {
+                val itemNum = 3
+                val itemIds = mutableListOf<Long>()
+                while (itemIds.size <= itemNum) {
+                    val itemId = (1..250).random().toLong()
+                    if (!itemIds.contains(itemId))
+                        itemIds.add(itemId)
+                }
+                val images = itemIds.map {
+                    val item = itemRepository.findById(it).get()
+                    item.images[0].imageUrl
+                }
+                val content = if ((0..1).random() == 0) null else "내 style"
+                val hashtag = if ((0..1).random() == 0) null else "#무신4 #맞팔 #선팔"
+                PostStyleRequest(images, itemIds, content, hashtag)
+            }
+            val username = it.username
+            postStyleRequests.forEach {
+                styleService.postStyle(username, it)
+            }
+        }
+    }
+
+//    @EventListener
+    @Transactional
+    fun makeMockReviews(event: ApplicationStartedEvent) {
+        val itemId = 205L
+        val item = itemRepository.findById(itemId).get()
+        val userNum = 20L
+        val users = (1..userNum).map {
+            val username = "reviewuser$it"
+            val encodedPassword = passwordEncoder.encode("12345678*")
+            userRepository.save(UserEntity(username, encodedPassword, username))
+        }
+        users.forEach {
+            val purchase = purchaseRepository.save(
+                PurchaseEntity(
+                    it, item, item.options?.get(0)?.optionName, item.newPrice!!, 1L
+                )
+            )
+            val images = item.images.slice(0..2).map { it.imageUrl }
+            val reviewRequest = ReviewRequest(
+                purchase.id,
+                (0..10).random().toLong(),
+                "맘에 들어요",
+                "large",
+                "mid",
+                images
+            )
+            userService.postReview(it.username, reviewRequest)
+        }
     }
 }

@@ -23,7 +23,11 @@ import kotlin.math.ceil
 
 interface ItemService {
     fun getItemRankingList(
-        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
+        category: String?,
+        subCategory: String?,
+        index: Long,
+        count: Long,
+        sort: String?
     ): ItemRankingResponse
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
@@ -39,10 +43,14 @@ class ItemServiceImpl(
     private val itemRepository: ItemRepository,
     private val reviewRepository: ReviewRepository,
     private val inquiryRepository: InquiryRepository
-): ItemService {
+) : ItemService {
     @Transactional(readOnly = true)
     override fun getItemRankingList(
-        category: String?, subCategory: String?, index: Long, count: Long, sort: String?
+        category: String?,
+        subCategory: String?,
+        index: Long,
+        count: Long,
+        sort: String?
     ): ItemRankingResponse {
         val itemCategory = category?.let { Item.Category.valueOf(camelToUpper(it)) }
         val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
@@ -71,7 +79,9 @@ class ItemServiceImpl(
     override fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse {
         val itemReviews = reviewRepository.findAllByItemIdOrderByRatingDesc(itemId)
         return ReviewsResponse(
-            reviews = itemReviews.map { entity -> Review.of(entity) }
+            reviews = itemReviews
+                .filterIndexed { idx, _ -> (idx / count) == index }
+                .map { entity -> Review.of(entity) }
         )
     }
 

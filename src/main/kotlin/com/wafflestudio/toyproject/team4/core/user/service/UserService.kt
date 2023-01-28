@@ -115,6 +115,7 @@ class UserServiceImpl(
         )
         request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
+        purchaseEntity.item.reviewCount++
     }
 
     @Transactional

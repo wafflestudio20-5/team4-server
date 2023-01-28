@@ -7,13 +7,13 @@ data class RankingItem(
     val id: Long,
     val name: String,
     val brand: String,
-    val image: String,
+    val images: List<String>,
     val label: String? = null,
     val oldPrice: Long,
     val newPrice: Long? = null,
     val sale: Long? = null,
     val reviewCount: Long, // 후기 순 정렬 위함
-    val rating: Double?,   // 별점 순 정렬 위함
+    val rating: Double?, // 별점 순 정렬 위함
     val sex: String,
     val category: String,
     val subCategory: String,
@@ -25,7 +25,7 @@ data class RankingItem(
                 id = id,
                 name = name,
                 brand = brand,
-                image = images[0].imageUrl,
+                images = images.map { it.imageUrl },
                 label = label?.toString()?.lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,
