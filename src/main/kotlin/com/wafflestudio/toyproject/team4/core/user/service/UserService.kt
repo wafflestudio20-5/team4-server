@@ -85,8 +85,7 @@ class UserServiceImpl(
     override fun getReviews(username: String): ReviewsResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val reviewEntities = reviewRepository.findAllByUser(userEntity)
-        return ReviewsResponse(reviewEntities.map { reviewEntity -> Review.of(reviewEntity) })
+        return ReviewsResponse(userEntity.reviews.map { reviewEntity -> Review.of(reviewEntity) })
     }
 
     @Transactional
