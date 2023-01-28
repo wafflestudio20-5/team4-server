@@ -2,7 +2,6 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
-import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
