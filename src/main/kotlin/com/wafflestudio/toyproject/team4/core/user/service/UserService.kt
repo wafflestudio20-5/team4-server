@@ -72,9 +72,7 @@ class UserServiceImpl(
     private val inquiryRepository: InquiryRepository,
     private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
-
-    ) : UserService {
-
+) : UserService {
     @Transactional
     override fun getMe(username: String): UserMeResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -89,10 +87,9 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
         val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
-        val styleCount: Long = 1        //수정 필요
-        val followerCount: Long = 1     //수정 필요
-        val followingCount: Long = 1    //수정 필요
-
+        val styleCount: Long = 1
+        val followerCount: Long = 1
+        val followingCount: Long = 1
         return UserResponse(
             user = User.of(followingUser),
             count = Count(styleCount, followerCount, followingCount),

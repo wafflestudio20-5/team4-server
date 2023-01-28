@@ -44,7 +44,7 @@ class UserController(
     fun getUser(
         @PathVariable(value = "userId") userId: Long,
         @RequestHeader(value = "Authorization") authToken: String?,
-    ) : UserResponse {
+    ): UserResponse {
         val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
         return userService.getUser(username, userId)
     }
