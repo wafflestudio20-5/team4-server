@@ -9,6 +9,8 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
+import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/user")
 class UserController(
+    private val authTokenService: AuthTokenService,
     private val userService: UserService
 ) {
 
@@ -35,6 +38,16 @@ class UserController(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
+
+    @Authenticated
+    @GetMapping("/{userId}")
+    fun getUser(
+        @PathVariable(value = "userId") userId: Long,
+        @RequestHeader(value = "Authorization") authToken: String?,
+    ) : UserResponse {
+        val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
+        return userService.getUser(username, userId)
+    }
 
     @Authenticated
     @GetMapping("/me/reviews")

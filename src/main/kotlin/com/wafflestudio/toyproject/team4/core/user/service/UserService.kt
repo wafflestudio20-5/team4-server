@@ -17,16 +17,14 @@ import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.api.response.CartItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.PurchaseItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.RecentItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
+import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
@@ -42,7 +40,8 @@ import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 interface UserService {
-    fun getMe(username: String): UserResponse
+    fun getMe(username: String): UserMeResponse
+    fun getUser(username: String?, userId: Long): UserResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -71,14 +70,34 @@ class UserServiceImpl(
     private val itemRepository: ItemRepository,
     private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRepository: InquiryImageRepository
-) : UserService {
+    private val inquiryImageRepository: InquiryImageRepository,
+    private val followRepository: FollowRepository,
+
+    ) : UserService {
 
     @Transactional
-    override fun getMe(username: String): UserResponse {
+    override fun getMe(username: String): UserMeResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        return UserResponse(User.of(userEntity))
+        return UserMeResponse(User.of(userEntity))
+    }
+
+    @Transactional
+    override fun getUser(username: String?, userId: Long): UserResponse {
+        val followerUser = username?.let { userRepository.findByUsername(it) }
+        val followingUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
+
+        val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
+        val styleCount: Long = 1        //수정 필요
+        val followerCount: Long = 1     //수정 필요
+        val followingCount: Long = 1    //수정 필요
+
+        return UserResponse(
+            user = User.of(followingUser),
+            count = Count(styleCount, followerCount, followingCount),
+            isFollow = isFollow,
+        )
     }
 
     @Transactional
