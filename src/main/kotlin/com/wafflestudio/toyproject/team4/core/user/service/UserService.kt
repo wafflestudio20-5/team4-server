@@ -1,29 +1,14 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.common.CustomHttp400
-import com.wafflestudio.toyproject.team4.common.CustomHttp403
-import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.common.CustomHttp409
+import com.wafflestudio.toyproject.team4.common.*
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.Color
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.database.Size
+import com.wafflestudio.toyproject.team4.core.board.database.*
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
-import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.*
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
@@ -47,6 +32,7 @@ interface UserService {
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
     fun deleteReview(username: String, reviewId: Long)
+    fun postComment(username: String, request: CommentRequest)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -73,6 +59,7 @@ class UserServiceImpl(
     private val inquiryRepository: InquiryRepository,
     private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
+    private val commentRepository: CommentRepository,
 ) : UserService {
     @Transactional
     override fun getMe(username: String): UserMeResponse {
@@ -179,6 +166,20 @@ class UserServiceImpl(
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
         reviewRepository.delete(reviewEntity)
+    }
+
+    @Transactional
+    override fun postComment(username: String, request: CommentRequest) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        val commentEntity = CommentEntity(
+            review = reviewEntity,
+            user = userEntity,
+            content = request.content,
+        )
+        commentRepository.save(commentEntity)
     }
 
     @Transactional

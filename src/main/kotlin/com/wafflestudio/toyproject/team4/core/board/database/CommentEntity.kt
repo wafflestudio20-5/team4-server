@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.board.database
 
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
@@ -21,6 +22,10 @@ class CommentEntity(
     @JoinColumn(name = "itemId")
     val review: ReviewEntity,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    val user: UserEntity,
+
     var content: String,
 ) {
     @Id
@@ -29,4 +34,7 @@ class CommentEntity(
 
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
+
+    @CreatedDate
+    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 }
