@@ -61,7 +61,7 @@ class UserController(
     ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
 
     @Authenticated
-    @PostMapping("/me/reviews")
+    @PostMapping("/me/review")
     fun postReview(
         @RequestBody request: ReviewRequest,
         @RequestHeader(value = "Authorization") authorization: String,
@@ -71,7 +71,7 @@ class UserController(
     }
 
     @Authenticated
-    @PutMapping("/me/reviews")
+    @PutMapping("/me/review")
     fun putReview(
         @RequestBody request: ReviewRequest,
         @RequestHeader(value = "Authorization") authorization: String,
@@ -81,13 +81,13 @@ class UserController(
     }
 
     @Authenticated
-    @DeleteMapping("/me/reviews")
+    @DeleteMapping("/me/review/{reviewId}")
     fun deleteReview(
-        @RequestBody request: DeleteReviewRequest,
+        @PathVariable(value = "reviewId") reviewId: Long,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) {
-        userService.deleteReview(username, request)
+        userService.deleteReview(username, reviewId)
     }
 
     @Authenticated
