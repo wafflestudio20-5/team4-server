@@ -60,7 +60,6 @@ class UserServiceImpl(
     private val inquiryRepository: InquiryRepository,
     private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
-    private val commentRepository: CommentRepository,
 ) : UserService {
     @Transactional
     override fun getMe(username: String): UserMeResponse {
@@ -175,20 +174,23 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        val commentEntity = CommentEntity(
-            review = reviewEntity,
-            user = userEntity,
-            content = request.content,
+        reviewEntity.comments.add(
+            CommentEntity(
+                review = reviewEntity,
+                user = userEntity,
+                content = request.content,
+            )
         )
-        commentRepository.save(commentEntity)
     }
 
     @Transactional
     override fun putComment(username: String, request: CommentRequest, commentId: Long) {
-        val commentEntity = commentRepository.findByIdOrNull(commentId)
+        val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        val commentEntity = reviewEntity.comments.find { it.id == commentId }
             ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
-        if (commentEntity.review.id != request.reviewId)
-            throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (commentEntity.user.username != username)
+            throw CustomHttp403(" 댓글이 아닙니다.")
         commentEntity.update(request.content)
     }
 

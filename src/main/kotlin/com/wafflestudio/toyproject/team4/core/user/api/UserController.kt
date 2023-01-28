@@ -60,9 +60,7 @@ class UserController(
         @RequestBody request: ReviewRequest,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-    ) {
-        userService.postReview(username, request)
-    }
+    ) = ResponseEntity(userService.postReview(username, request), HttpStatus.CREATED)
 
     @Authenticated
     @PutMapping("/me/review")
@@ -70,9 +68,7 @@ class UserController(
         @RequestBody request: ReviewRequest,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-    ) {
-        userService.putReview(username, request)
-    }
+    ) = ResponseEntity(userService.putReview(username, request), HttpStatus.OK)
 
     @Authenticated
     @DeleteMapping("/me/review/{reviewId}")
@@ -80,9 +76,7 @@ class UserController(
         @PathVariable(value = "reviewId") reviewId: Long,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-    ) {
-        userService.deleteReview(username, reviewId)
-    }
+    ) = ResponseEntity(userService.deleteReview(username, reviewId), HttpStatus.OK)
 
     @Authenticated
     @PostMapping("/me/comment")
