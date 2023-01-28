@@ -54,7 +54,7 @@ data class Item(
                 newPrice = newPrice,
                 sale = sale,
                 sex = sex.toString().lowercase(),
-                reviewCount = reviewCount!!,
+                reviewCount = reviewCount,
                 rating = rating,
                 options = if (options.isNullOrEmpty()) null else options?.map { it.optionName },
                 category = CaseUtils.toCamelCase(category.toString(), false, '_'),

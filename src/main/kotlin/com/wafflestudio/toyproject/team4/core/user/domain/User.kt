@@ -35,7 +35,7 @@ data class User(
                 registrationDate = registrationDate,
                 height = height,
                 weight = weight,
-                sex = sex.toString().lowercase(),
+                sex = sex?.toString()?.lowercase(),
                 description = description,
                 instaUsername = instaUsername
             )
