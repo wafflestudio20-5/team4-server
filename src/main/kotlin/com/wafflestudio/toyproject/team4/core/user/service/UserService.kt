@@ -23,10 +23,7 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartR
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.api.response.CartItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.PurchaseItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.RecentItemsResponse
-import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
+import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
@@ -43,6 +40,7 @@ import javax.transaction.Transactional
 
 interface UserService {
     fun getMe(username: String): UserResponse
+    fun getUserStyles(userId: Long): StylesResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -79,6 +77,13 @@ class UserServiceImpl(
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         return UserResponse(User.of(userEntity))
+    }
+
+    @Transactional
+    override fun getUserStyles(userId: Long): StylesResponse {
+        val userEntity = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
+        return StylesResponse(userEntity.styles.map { styleEntity -> Style.of(styleEntity) })
     }
 
     @Transactional
