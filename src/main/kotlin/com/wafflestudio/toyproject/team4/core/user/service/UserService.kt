@@ -102,7 +102,7 @@ class UserServiceImpl(
     override fun getUserStyles(userId: Long): StylesResponse {
         val userEntity = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-        return StylesResponse(userEntity.styles.map { styleEntity -> Style.of(styleEntity) })
+        return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
     }
 
     @Transactional
