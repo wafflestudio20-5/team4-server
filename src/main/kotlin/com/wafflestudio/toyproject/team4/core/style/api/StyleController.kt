@@ -2,6 +2,7 @@ package com.wafflestudio.toyproject.team4.core.style.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
@@ -47,6 +48,17 @@ class StyleController(
         @RequestBody postStyleRequest: PostStyleRequest
     ) = ResponseEntity(
         styleService.postStyle(username, postStyleRequest),
+        HttpStatus.CREATED
+    )
+
+    @Authenticated
+    @PostMapping("/style/{styleId}/like")
+    fun postLike(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "styleId") styleId: Long,
+    ) = ResponseEntity(
+        styleService.postLike(username, styleId),
         HttpStatus.CREATED
     )
 }
