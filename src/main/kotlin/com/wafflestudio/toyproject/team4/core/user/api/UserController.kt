@@ -65,16 +65,6 @@ class UserController(
     }
 
     @Authenticated
-    @PostMapping("/me/comment")
-    fun postComment(
-        @RequestBody request: CommentRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-    ) {
-        userService.postComment(username, request)
-    }
-
-    @Authenticated
     @PutMapping("/me/review")
     fun putReview(
         @RequestBody request: ReviewRequest,
@@ -92,6 +82,27 @@ class UserController(
         @UserContext username: String,
     ) {
         userService.deleteReview(username, reviewId)
+    }
+
+    @Authenticated
+    @PostMapping("/me/comment")
+    fun postComment(
+        @RequestBody request: CommentRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.postComment(username, request)
+    }
+
+    @Authenticated
+    @PutMapping("/me/comment/{commentId}")
+    fun putComment(
+        @PathVariable(value = "commentId") commentId: Long,
+        @RequestBody request: CommentRequest,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) {
+        userService.putComment(username, request, commentId)
     }
 
     @Authenticated

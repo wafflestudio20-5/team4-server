@@ -19,7 +19,7 @@ import javax.persistence.Table
 @EntityListeners(AuditingEntityListener::class)
 class CommentEntity(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId")
+    @JoinColumn(name = "reviewId")
     val review: ReviewEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,4 +37,9 @@ class CommentEntity(
 
     @CreatedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+
+    fun update(content: String) {
+        this.content = content
+        this.modifiedDateTime = LocalDateTime.now()
+    }
 }
