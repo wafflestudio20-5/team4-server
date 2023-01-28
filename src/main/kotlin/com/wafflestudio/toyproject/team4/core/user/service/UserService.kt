@@ -42,6 +42,7 @@ import javax.transaction.Transactional
 interface UserService {
     fun getMe(username: String): UserMeResponse
     fun getUser(username: String?, userId: Long): UserResponse
+    fun getUserStyles(userId: Long): StylesResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -95,6 +96,13 @@ class UserServiceImpl(
             count = Count(styleCount, followerCount, followingCount),
             isFollow = isFollow,
         )
+    }
+
+    @Transactional
+    override fun getUserStyles(userId: Long): StylesResponse {
+        val userEntity = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
+        return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
     }
 
     @Transactional
