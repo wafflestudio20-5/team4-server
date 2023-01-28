@@ -18,7 +18,6 @@ import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
-import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
@@ -185,9 +184,8 @@ class UserServiceImpl(
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val purchaseEntities = purchaseRepository.findAllByUser(userEntity)
         return PurchaseItemsResponse(
-            purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) }
+            userEntity.purchases.map { purchaseEntity -> Purchase.of(purchaseEntity) }
         )
     }
 
@@ -202,7 +200,7 @@ class UserServiceImpl(
         request.purchaseItems.forEach {
             val itemEntity = itemRepository.findByIdOrNull(it.id)
                 ?: throw CustomHttp404("아이템 정보가 올바르지 않습니다.")
-            purchaseRepository.save(
+            userEntity.purchases.add(
                 PurchaseEntity(
                     user = userEntity,
                     item = itemEntity,
@@ -218,8 +216,7 @@ class UserServiceImpl(
     override fun getShoppingCart(username: String): CartItemsResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val cartItemEntities = cartItemRepository.findAllByUser(userEntity)
-        return CartItemsResponse(cartItemEntities.map { cartItemEntity -> CartItem.of(cartItemEntity) })
+        return CartItemsResponse(userEntity.cartItems.map { cartItemEntity -> CartItem.of(cartItemEntity) })
     }
 
     @Transactional
