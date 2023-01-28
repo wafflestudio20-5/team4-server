@@ -34,6 +34,7 @@ interface UserService {
     fun deleteReview(username: String, reviewId: Long)
     fun postComment(username: String, request: CommentRequest)
     fun putComment(username: String, request: CommentRequest, commentId: Long)
+    fun deleteComment(username: String, commentId: Long)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -190,8 +191,17 @@ class UserServiceImpl(
         val commentEntity = reviewEntity.comments.find { it.id == commentId }
             ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
         if (commentEntity.user.username != username)
-            throw CustomHttp403(" 댓글이 아닙니다.")
+            throw CustomHttp403("내 댓글이 아닙니다.")
         commentEntity.update(request.content)
+    }
+
+    @Transactional
+    override fun deleteComment(username: String, commentId: Long) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val commentEntity = userEntity.comments.find { it.id == commentId }
+            ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
+        userEntity.comments.remove(commentEntity)
     }
 
     @Transactional

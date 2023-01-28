@@ -96,6 +96,14 @@ class UserController(
     ) = ResponseEntity(userService.putComment(username, request, commentId), HttpStatus.OK)
 
     @Authenticated
+    @DeleteMapping("/me/comment/{commentId}")
+    fun deleteComment(
+        @PathVariable(value = "commentId") commentId: Long,
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.deleteComment(username, commentId), HttpStatus.OK)
+
+    @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(
         @RequestHeader(value = "Authorization") authorization: String,
