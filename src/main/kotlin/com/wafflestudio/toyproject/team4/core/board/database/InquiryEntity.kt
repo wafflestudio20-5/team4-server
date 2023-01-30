@@ -58,11 +58,9 @@ class InquiryEntity(
         this.type = Type.valueOf(request.type.uppercase())
         this.isSecret = request.isSecret
 
-        if (request.images != null) {
-            this.image1 = request.images.getOrNull(0)
-            this.image2 = request.images.getOrNull(1)
-            this.image3 = request.images.getOrNull(2)
-        }
+        this.image1 = request.images?.getOrNull(0)
+        this.image2 = request.images?.getOrNull(1)
+        this.image3 = request.images?.getOrNull(2)
     }
 
     enum class Type {
