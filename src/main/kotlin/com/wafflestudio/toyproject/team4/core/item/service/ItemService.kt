@@ -85,9 +85,12 @@ class ItemServiceImpl(
     }
 
     override fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse {
-        val itemInquiries = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId)
+        val itemInquiryList = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId, index, count)
+        val itemTotalInquiryCount = inquiryRepository.getItemTotalInquiryCount(itemId)
+
         return InquiriesResponse(
-            inquiries = itemInquiries.map { entity -> Inquiry.of(entity) }
+            inquiries = itemInquiryList.map { entity -> Inquiry.of(entity) },
+            totalPages = ceil(itemTotalInquiryCount.toDouble() / count).toLong()
         )
     }
 
