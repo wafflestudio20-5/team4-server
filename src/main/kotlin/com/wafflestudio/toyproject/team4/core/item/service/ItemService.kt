@@ -56,13 +56,12 @@ class ItemServiceImpl(
         val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
         val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort ?: "rating"))
 
-        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
+        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, index, count, sortingMethod)
+        val totalCount = itemRepository.getTotalCount(itemCategory, itemSubCategory)
 
         return ItemRankingResponse(
-            items = rankingList
-                .filterIndexed { idx, _ -> (idx / count) == index }
-                .map { entity -> RankingItem.of(entity) },
-            totalPages = ceil(rankingList.size.toDouble() / count).toLong()
+            items = rankingList.map { entity -> RankingItem.of(entity) },
+            totalPages = ceil(totalCount.toDouble() / count).toLong()
         )
     }
 
