@@ -5,7 +5,6 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -40,7 +39,6 @@ class InquiryEntity(
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
 
-    @LastModifiedDate
     var modifiedDateTime: LocalDateTime? = null
 
     fun update(
@@ -59,6 +57,8 @@ class InquiryEntity(
         this.image1 = request.images?.getOrNull(0)
         this.image2 = request.images?.getOrNull(1)
         this.image3 = request.images?.getOrNull(2)
+
+        this.modifiedDateTime = LocalDateTime.now()
     }
 
     enum class Type {
