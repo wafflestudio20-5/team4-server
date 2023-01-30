@@ -30,7 +30,7 @@ data class Inquiry(
                 title = title,
                 content = content,
                 option = optionName,
-                images = images.map { it.imageUrl },
+                images = listOfNotNull(image1, image2, image3),
                 isSecret = isSecret,
                 createdDateTime = createdDateTime,
                 modifiedDateTime = modifiedDateTime

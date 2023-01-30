@@ -6,14 +6,12 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesR
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import java.time.LocalDateTime
-import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
@@ -28,6 +26,11 @@ class InquiryEntity(
     var content: String,
     var type: Type,
     var optionName: String? = null,
+
+    var image1: String? = null,
+    var image2: String? = null,
+    var image3: String? = null,
+
     var isSecret: Boolean,
     val isAnswered: Boolean
 ) {
@@ -42,9 +45,6 @@ class InquiryEntity(
     @CreatedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 
-    @OneToMany(mappedBy = "inquiry", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var images: MutableList<InquiryImageEntity> = mutableListOf()
-
     fun update(
         request: PutItemInquiriesRequest
     ) {
@@ -57,10 +57,11 @@ class InquiryEntity(
         this.optionName = request.option
         this.type = Type.valueOf(request.type.uppercase())
         this.isSecret = request.isSecret
+
         if (request.images != null) {
-            this.images = request.images.map { url ->
-                InquiryImageEntity(this, url)
-            }.toMutableList()
+            this.image1 = request.images.getOrNull(0)
+            this.image2 = request.images.getOrNull(1)
+            this.image3 = request.images.getOrNull(2)
         }
     }
 

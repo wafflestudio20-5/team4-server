@@ -7,7 +7,6 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.Color
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
@@ -71,7 +70,6 @@ class UserServiceImpl(
     private val itemRepository: ItemRepository,
     private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
 ) : UserService {
     @Transactional
@@ -315,13 +313,7 @@ class UserServiceImpl(
         if (targetItemInquiry.user.username != username)
             throw CustomHttp403("수정 권한이 없습니다.")
 
-        with(putItemInquiriesRequest) {
-            if (!this.images.isNullOrEmpty()) {
-                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
-                inquiryImageRepository.deleteAll(deletedImages)
-            }
-            targetItemInquiry.update(this)
-        }
+        targetItemInquiry.update(putItemInquiriesRequest)
     }
 
     @Transactional
