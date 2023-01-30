@@ -17,7 +17,7 @@ data class Inquiry(
     val images: List<String>,
     val isSecret: Boolean,
     val createdDateTime: LocalDateTime,
-    val modifiedDateTime: LocalDateTime,
+    val modifiedDateTime: LocalDateTime?,
 ) {
     companion object {
         fun of(entity: InquiryEntity) = entity.run {

@@ -5,8 +5,11 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import javax.persistence.Entity
+import javax.persistence.EntityListeners
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -16,6 +19,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "inquiries")
+@EntityListeners(AuditingEntityListener::class)
 class InquiryEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     val user: UserEntity,
@@ -42,8 +46,8 @@ class InquiryEntity(
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
 
-    @CreatedDate
-    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+    @LastModifiedDate
+    var modifiedDateTime: LocalDateTime? = null
 
     fun update(
         request: PutItemInquiriesRequest
