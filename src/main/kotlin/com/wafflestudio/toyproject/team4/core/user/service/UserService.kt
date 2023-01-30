@@ -9,15 +9,12 @@ import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
-import com.wafflestudio.toyproject.team4.core.user.api.request.DeleteReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
@@ -68,7 +65,6 @@ class UserServiceImpl(
     private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
-    private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
     private val followRepository: FollowRepository,
 ) : UserService {
@@ -131,10 +127,12 @@ class UserServiceImpl(
             purchase = purchaseEntity,
             rating = request.rating,
             content = request.content,
+            image1 = request.images.getOrNull(0),
+            image2 = request.images.getOrNull(1),
+            image3 = request.images.getOrNull(2),
             size = Size.valueOf(request.size.uppercase()),
             color = Color.valueOf(request.color.uppercase()),
         )
-        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
     }
@@ -160,12 +158,11 @@ class UserServiceImpl(
         reviewEntity.run {
             rating = request.rating
             content = request.content
+            image1 = request.images.getOrNull(0)
+            image2 = request.images.getOrNull(1)
+            image3 = request.images.getOrNull(2)
             size = Size.valueOf(request.size.uppercase())
             color = Color.valueOf(request.color.uppercase())
-        }
-        reviewImageRepository.deleteAll(reviewEntity.images)
-        request.images.forEach {
-            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
         }
         reviewRepository.save(reviewEntity)
     }

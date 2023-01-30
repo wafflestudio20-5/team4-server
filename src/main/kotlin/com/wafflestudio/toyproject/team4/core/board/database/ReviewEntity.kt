@@ -32,6 +32,11 @@ class ReviewEntity(
 
     var rating: Long,
     var content: String,
+
+    var image1: String? = null,
+    var image2: String? = null,
+    var image3: String? = null,
+
     var size: Size,
     var color: Color,
 ) {
@@ -44,9 +49,6 @@ class ReviewEntity(
 
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentEntity> = mutableListOf()
-
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var images: MutableList<ReviewImageEntity> = mutableListOf()
 }
 
 enum class Size {
