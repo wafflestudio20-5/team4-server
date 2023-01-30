@@ -34,6 +34,7 @@ import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
+import kotlin.math.ceil
 
 interface UserService {
     fun getMe(username: String): UserMeResponse
@@ -52,7 +53,7 @@ interface UserService {
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
 
-    fun getItemInquiries(username: String): InquiriesResponse
+    fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
@@ -292,12 +293,13 @@ class UserServiceImpl(
     ********************************************************** */
 
     @Transactional
-    override fun getItemInquiries(username: String): InquiriesResponse {
+    override fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user, index, count)
         return InquiriesResponse(
-            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) },
+            totalPages = ceil(user.itemInquiries.size.toDouble() / count).toLong()
         )
     }
 
