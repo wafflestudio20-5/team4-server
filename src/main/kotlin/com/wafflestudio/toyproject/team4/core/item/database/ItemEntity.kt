@@ -24,7 +24,7 @@ class ItemEntity(
     @Enumerated(EnumType.STRING)
     val sex: Item.Sex,
     var reviewCount: Long = 0,
-    var rating: Double? = 0.0,
+    var rating: Double = 0.0,
 
     val oldPrice: Long,
     var newPrice: Long? = null,

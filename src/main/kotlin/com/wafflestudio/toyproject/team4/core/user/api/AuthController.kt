@@ -4,6 +4,7 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PasswordRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
 import com.wafflestudio.toyproject.team4.core.user.service.AuthService
@@ -58,4 +59,11 @@ class AuthController(
     fun checkDuplicatedNickname(
         @RequestBody nicknameRequest: NicknameRequest
     ) = authService.checkDuplicatedNickname(nicknameRequest)
+
+    @Authenticated
+    @PostMapping("/password")
+    fun checkCurrentPassword(
+        @RequestBody passwordRequest: PasswordRequest,
+        @UserContext username: String
+    ) = authService.checkCurrentPassword(username, passwordRequest)
 }
