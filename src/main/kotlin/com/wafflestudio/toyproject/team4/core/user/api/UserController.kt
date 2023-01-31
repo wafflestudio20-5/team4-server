@@ -81,7 +81,7 @@ class UserController(
     @Authenticated
     @PostMapping("/me/comment")
     fun postComment(
-        @RequestBody request: CommentRequest,
+        @RequestBody request: PostCommentRequest,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.postComment(username, request), HttpStatus.CREATED)
@@ -90,7 +90,7 @@ class UserController(
     @PutMapping("/me/comment/{commentId}")
     fun putComment(
         @PathVariable(value = "commentId") commentId: Long,
-        @RequestBody request: CommentRequest,
+        @RequestBody request: PutCommentRequest,
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.putComment(username, request, commentId), HttpStatus.OK)

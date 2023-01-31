@@ -32,8 +32,8 @@ interface UserService {
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
     fun deleteReview(username: String, reviewId: Long)
-    fun postComment(username: String, request: CommentRequest)
-    fun putComment(username: String, request: CommentRequest, commentId: Long)
+    fun postComment(username: String, request: PostCommentRequest)
+    fun putComment(username: String, request: PutCommentRequest, commentId: Long)
     fun deleteComment(username: String, commentId: Long)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
@@ -170,7 +170,7 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun postComment(username: String, request: CommentRequest) {
+    override fun postComment(username: String, request: PostCommentRequest) {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
@@ -185,7 +185,7 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun putComment(username: String, request: CommentRequest, commentId: Long) {
+    override fun putComment(username: String, request: PutCommentRequest, commentId: Long) {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = userEntity.reviews.find { it.id == request.reviewId }
