@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.style.api
+package com.wafflestudio.toyproject.team4.core.style.api.request
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity

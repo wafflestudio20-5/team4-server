@@ -2,12 +2,15 @@ package com.wafflestudio.toyproject.team4.core.style.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -48,5 +51,17 @@ class StyleController(
     ) = ResponseEntity(
         styleService.postStyle(username, postStyleRequest),
         HttpStatus.CREATED
+    )
+
+    @Authenticated
+    @PatchMapping("/style/{styleId}")
+    fun patchStyle(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "styleId") styleId: Long,
+        @RequestBody patchStyleRequest: PatchStyleRequest
+    ) = ResponseEntity(
+        styleService.patchStyle(username, styleId, patchStyleRequest),
+        HttpStatus.OK
     )
 }

@@ -4,7 +4,8 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
@@ -22,6 +23,7 @@ interface StyleService {
     fun getStyles(index: Long, count: Long, sort: String?): StylesResponse
     fun getStyle(username: String?, styleId: Long): StyleResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
+    fun patchStyle(username: String, styleId: Long, patchStyleRequest: PatchStyleRequest)
 }
 
 @Service
@@ -82,5 +84,15 @@ class StyleServiceImpl(
         val style = postStyleRequest.toEntity(user)
 
         user.styles.add(style)
+    }
+
+    override fun patchStyle(username: String, styleId: Long, patchStyleRequest: PatchStyleRequest) {
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        if (username != style.user.username) {
+            throw CustomHttp400("수정 권한이 없습니다.")
+        }
+
+        style.update(patchStyleRequest)
     }
 }

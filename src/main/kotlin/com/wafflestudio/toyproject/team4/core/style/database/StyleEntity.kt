@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.style.database
 
+import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -50,5 +51,21 @@ class StyleEntity(
         this.styleItems = itemIds
             .map { itemId -> ItemStyleEntity(itemId, this) }
             .toMutableList()
+    }
+
+    fun update(request: PatchStyleRequest) {
+        if (request.images != null) {
+            this.image1 = request.images.first()
+            this.image2 = request.images.getOrNull(1)
+            this.image3 = request.images.getOrNull(2)
+            this.image4 = request.images.getOrNull(3)
+            this.image5 = request.images.getOrNull(4)
+        }
+        this.styleItems = request.itemIds
+            ?.map { itemId -> ItemStyleEntity(itemId, this) }
+            ?.toMutableList()
+            ?: this.styleItems
+        this.content = request.content ?: this.content
+        this.hashtag = request.hashtag ?: this.hashtag
     }
 }
