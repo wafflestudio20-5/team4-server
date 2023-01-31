@@ -24,7 +24,8 @@ class UserRepositoryCustomImpl(
             .selectDistinct(userEntity)
             .from(userEntity)
             .leftJoin(userEntity.purchases).fetchJoin()
-            .fetchOne()
+            .where(userEntity.username.eq(username))
+            .fetchFirst()
     }
 
     override fun findByUsernameFetchJoinCartItems(username: String): UserEntity? {
@@ -32,6 +33,7 @@ class UserRepositoryCustomImpl(
             .selectDistinct(userEntity)
             .from(userEntity)
             .leftJoin(userEntity.cartItems).fetchJoin()
-            .fetchOne()
+            .where(userEntity.username.eq(username))
+            .fetchFirst()
     }
 }
