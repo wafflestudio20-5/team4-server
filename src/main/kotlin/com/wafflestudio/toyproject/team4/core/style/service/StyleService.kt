@@ -1,6 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.style.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
+import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -92,7 +93,7 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
         if (username != style.user.username) {
-            throw CustomHttp400("수정 권한이 없습니다.")
+            throw CustomHttp403("수정 권한이 없습니다.")
         }
 
         style.update(patchStyleRequest)
@@ -103,7 +104,7 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
         if (username != style.user.username) {
-            throw CustomHttp400("삭제 권한이 없습니다.")
+            throw CustomHttp403("삭제 권한이 없습니다.")
         }
 
         styleRepository.delete(style)
