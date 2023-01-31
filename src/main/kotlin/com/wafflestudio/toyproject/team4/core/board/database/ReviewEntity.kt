@@ -33,6 +33,11 @@ class ReviewEntity(
 
     var rating: Long,
     var content: String,
+
+    var image1: String? = null,
+    var image2: String? = null,
+    var image3: String? = null,
+
     var size: Size,
     var color: Color,
 ) {
@@ -46,29 +51,17 @@ class ReviewEntity(
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentEntity> = mutableListOf()
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var images: MutableList<ReviewImageEntity> = mutableListOf()
-
     fun update(
         request: ReviewRequest
     ) {
         this.rating = request.rating
         this.content = request.content
+        this.image1 = request.images.getOrNull(0)
+        this.image2 = request.images.getOrNull(1)
+        this.image3 = request.images.getOrNull(2)
         this.size = Size.valueOf(request.size.uppercase())
         this.color = Color.valueOf(request.color.uppercase())
-        addImages(request.images)
     }
-
-    fun addImages(
-        images: List<String>
-    ) {
-        this.images.addAll(
-            images.map { url ->
-                ReviewImageEntity(this, url)
-            }.toMutableList()
-        )
-    }
-}
 
 enum class Size {
     LARGE, MID, SMALL,

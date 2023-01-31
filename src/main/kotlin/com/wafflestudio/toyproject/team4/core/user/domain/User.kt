@@ -15,6 +15,7 @@ data class User(
     var sex: String? = null,
     var description: String? = null,
     var instaUsername: String? = null,
+    val socialKey: String? = null,
 ) {
     enum class Sex {
         MALE, FEMALE
@@ -37,7 +38,8 @@ data class User(
                 weight = weight,
                 sex = sex?.toString()?.lowercase(),
                 description = description,
-                instaUsername = instaUsername
+                instaUsername = instaUsername,
+                socialKey = socialKey?.toString()?.lowercase()
             )
         }
     }

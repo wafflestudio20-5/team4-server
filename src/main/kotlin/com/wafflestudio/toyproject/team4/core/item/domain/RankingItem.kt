@@ -13,7 +13,7 @@ data class RankingItem(
     val newPrice: Long? = null,
     val sale: Long? = null,
     val reviewCount: Long, // 후기 순 정렬 위함
-    val rating: Double?, // 별점 순 정렬 위함
+    val rating: Double, // 별점 순 정렬 위함
     val sex: String,
     val category: String,
     val subCategory: String,
