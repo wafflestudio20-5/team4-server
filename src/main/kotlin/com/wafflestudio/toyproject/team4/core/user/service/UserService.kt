@@ -5,11 +5,11 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.Color
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.database.Size
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -133,7 +133,6 @@ class UserServiceImpl(
             color = Color.valueOf(request.color.uppercase()),
         )
         reviewRepository.save(reviewEntity)
-        reviewEntity.addImages(request.images)
         purchaseEntity.item.reviewCount++
     }
 

@@ -1,8 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.user.api.request
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
-import com.wafflestudio.toyproject.team4.core.board.database.Color
-import com.wafflestudio.toyproject.team4.core.board.database.Size
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Size
 
 data class ReviewRequest(
     val id: Long, //Post에서는 purchaseId, Put에서는 reviewId

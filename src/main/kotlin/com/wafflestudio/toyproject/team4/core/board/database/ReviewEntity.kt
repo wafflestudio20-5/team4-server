@@ -63,10 +63,12 @@ class ReviewEntity(
         this.color = Color.valueOf(request.color.uppercase())
     }
 
-enum class Size {
-    LARGE, MID, SMALL,
-}
+    enum class Size {
+        LARGE, MID, SMALL,
+    }
 
-enum class Color {
-    BRIGHT, MID, DIM,
+    enum class Color {
+        BRIGHT, MID, DIM,
+    }
+
 }
