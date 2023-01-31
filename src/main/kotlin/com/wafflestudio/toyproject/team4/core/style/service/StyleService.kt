@@ -20,6 +20,7 @@ interface StyleService {
     fun getStyle(username: String?, styleId: Long): StyleResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
     fun postLike(username: String, styleId: Long)
+    fun deleteLike(username: String, styleId: Long)
 }
 
 @Service
@@ -92,8 +93,19 @@ class StyleServiceImpl(
             style.addLikedUser(user.id)
             return
         }
-        if (!likedUser.isActive)
+        if (likedUser.isActive)
             throw CustomHttp400("이미 좋아요를 눌렀습니다.")
+        likedUser.changeActive()
+    }
+
+    @Transactional
+    override fun deleteLike(username: String, styleId: Long) {
+        val user = userRepository.findByUsername(username)!!
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        val likedUser = style.likedUsers.find { it.userId == user.id }
+        if (likedUser == null || !likedUser.isActive)
+            throw CustomHttp400("좋아요를 누른 스타일이 아닙니다.")
         likedUser.changeActive()
     }
 }
