@@ -4,7 +4,6 @@ import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
-import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
@@ -207,11 +206,9 @@ class MemoryDB(
     fun makeMockStyles(event: ApplicationStartedEvent) {
         val userNum = 10L
         val styleNum = 15L
-
-        val registerRequests = (1..userNum).map { RegisterRequest("mockuser$it", "12345678*", "mocknick$it") }
-        val users = registerRequests.map {
-            val encodedPassword = passwordEncoder.encode(it.password)
-            UserEntity(username = it.username, encodedPassword = encodedPassword, nickname = it.nickname)
+        val users = (1..userNum).map {
+            val encodedPassword = passwordEncoder.encode("12345678*")
+            UserEntity(username = "mockuser$it", encodedPassword = encodedPassword, nickname = "mocknick$it")
         }
         users.forEach {
             it.image = imageService.getDefaultImage(it.username)
@@ -258,6 +255,7 @@ class MemoryDB(
             userRepository.save(UserEntity(username, encodedPassword, username))
         }
         users.forEach {
+            it.image = imageService.getDefaultImage(it.username)
             val purchase = purchaseRepository.save(
                 PurchaseEntity(
                     it, item, item.options?.get(0)?.optionName, item.newPrice!!, 1L
