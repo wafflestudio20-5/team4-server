@@ -12,7 +12,7 @@ interface UserRepository : JpaRepository<UserEntity, Long>, UserRepositoryCustom
 
 interface UserRepositoryCustom {
     fun findByUsernameFetchJoinPurchases(username: String): UserEntity?
-
+    fun findByUsernameFetchJoinCartItems(username: String): UserEntity?
 }
 
 @Component
@@ -24,6 +24,14 @@ class UserRepositoryCustomImpl(
             .selectDistinct(userEntity)
             .from(userEntity)
             .leftJoin(userEntity.purchases).fetchJoin()
+            .fetchOne()
+    }
+
+    override fun findByUsernameFetchJoinCartItems(username: String): UserEntity? {
+        return queryFactory
+            .selectDistinct(userEntity)
+            .from(userEntity)
+            .leftJoin(userEntity.cartItems).fetchJoin()
             .fetchOne()
     }
 }

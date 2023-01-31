@@ -25,7 +25,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesR
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
-import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
@@ -65,7 +64,6 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
     private val purchaseRepository: PurchaseRepository,
-    private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
     private val reviewImageRepository: ReviewImageRepository,
@@ -182,7 +180,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinPurchases(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         return PurchaseItemsResponse(
             userEntity.purchases.map { purchaseEntity -> Purchase.of(purchaseEntity) }
@@ -214,7 +212,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinCartItems(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         return CartItemsResponse(userEntity.cartItems.map { cartItemEntity -> CartItem.of(cartItemEntity) })
     }
