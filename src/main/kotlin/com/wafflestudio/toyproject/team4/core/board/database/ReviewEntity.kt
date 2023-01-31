@@ -70,5 +70,4 @@ class ReviewEntity(
     enum class Color {
         BRIGHT, MID, DIM,
     }
-
 }
