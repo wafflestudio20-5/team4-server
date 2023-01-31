@@ -14,7 +14,7 @@ data class Item(
     val sale: Long? = null,
     val sex: String,
     val reviewCount: Long,
-    val rating: Double?,
+    val rating: Double,
     val options: List<String>? = null,
     val category: String,
     val subCategory: String,
