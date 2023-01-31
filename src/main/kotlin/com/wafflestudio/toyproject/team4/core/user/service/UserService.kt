@@ -15,6 +15,7 @@ import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
@@ -32,12 +33,14 @@ import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
 import com.wafflestudio.toyproject.team4.core.user.domain.RecentItem
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 import kotlin.math.ceil
 
 interface UserService {
     fun getMe(username: String): UserMeResponse
+    fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
     fun getUserStyles(userId: Long): StylesResponse
     fun getReviews(username: String): ReviewsResponse
@@ -68,12 +71,21 @@ class UserServiceImpl(
     private val itemRepository: ItemRepository,
     private val inquiryRepository: InquiryRepository,
     private val followRepository: FollowRepository,
+    private val passwordEncoder: PasswordEncoder
 ) : UserService {
     @Transactional
     override fun getMe(username: String): UserMeResponse {
         val userEntity = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         return UserMeResponse(User.of(userEntity))
+    }
+
+    @Transactional
+    override fun patchMe(username: String, patchMeRequest: PatchMeRequest) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val newEncodedPassword = patchMeRequest.password?.let { passwordEncoder.encode(it) }
+        user.update(patchMeRequest, newEncodedPassword)
     }
 
     @Transactional
