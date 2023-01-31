@@ -88,9 +88,7 @@ class UserServiceImpl(
     override fun patchMe(username: String, patchMeRequest: PatchMeRequest) {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val newEncodedPassword =
-            if (patchMeRequest.password != null) passwordEncoder.encode(patchMeRequest.password)
-            else null
+        val newEncodedPassword = patchMeRequest.password?.let { passwordEncoder.encode(it) }
         user.update(patchMeRequest, newEncodedPassword)
     }
 
