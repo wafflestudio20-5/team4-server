@@ -24,6 +24,7 @@ interface StyleService {
     fun getStyle(username: String?, styleId: Long): StyleResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
     fun patchStyle(username: String, styleId: Long, patchStyleRequest: PatchStyleRequest)
+    fun deleteStyle(username: String, styleId: Long)
 }
 
 @Service
@@ -86,6 +87,7 @@ class StyleServiceImpl(
         user.styles.add(style)
     }
 
+    @Transactional
     override fun patchStyle(username: String, styleId: Long, patchStyleRequest: PatchStyleRequest) {
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
@@ -94,5 +96,16 @@ class StyleServiceImpl(
         }
 
         style.update(patchStyleRequest)
+    }
+
+    @Transactional
+    override fun deleteStyle(username: String, styleId: Long) {
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        if (username != style.user.username) {
+            throw CustomHttp400("삭제 권한이 없습니다.")
+        }
+
+        styleRepository.delete(style)
     }
 }
