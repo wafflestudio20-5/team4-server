@@ -152,6 +152,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = userEntity.reviews.find { it.id == reviewId }
             ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
+        reviewEntity.purchase.item.reviewCount--
         userEntity.reviews.remove(reviewEntity)
     }
 
