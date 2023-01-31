@@ -26,7 +26,7 @@ data class Review(
                 size = size.toString().lowercase(),
                 color = color.toString().lowercase(),
                 comments = comments.map { commentEntity -> Comment.of(commentEntity) },
-                images = images.map { it.cloudinaryUrl },
+                images = listOfNotNull(image1, image2, image3),
             )
         }
     }

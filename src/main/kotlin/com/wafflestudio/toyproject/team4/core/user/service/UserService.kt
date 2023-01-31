@@ -7,11 +7,8 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.Color
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
@@ -39,6 +36,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
+import kotlin.math.ceil
 
 interface UserService {
     fun getMe(username: String): UserMeResponse
@@ -58,7 +56,7 @@ interface UserService {
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
 
-    fun getItemInquiries(username: String): InquiriesResponse
+    fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
@@ -71,9 +69,7 @@ class UserServiceImpl(
     private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
-    private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
@@ -144,10 +140,12 @@ class UserServiceImpl(
             purchase = purchaseEntity,
             rating = request.rating,
             content = request.content,
+            image1 = request.images.getOrNull(0),
+            image2 = request.images.getOrNull(1),
+            image3 = request.images.getOrNull(2),
             size = Size.valueOf(request.size.uppercase()),
             color = Color.valueOf(request.color.uppercase()),
         )
-        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
     }
@@ -173,12 +171,11 @@ class UserServiceImpl(
         reviewEntity.run {
             rating = request.rating
             content = request.content
+            image1 = request.images.getOrNull(0)
+            image2 = request.images.getOrNull(1)
+            image3 = request.images.getOrNull(2)
             size = Size.valueOf(request.size.uppercase())
             color = Color.valueOf(request.color.uppercase())
-        }
-        reviewImageRepository.deleteAll(reviewEntity.images)
-        request.images.forEach {
-            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
         }
         reviewRepository.save(reviewEntity)
     }
@@ -308,12 +305,13 @@ class UserServiceImpl(
     ********************************************************** */
 
     @Transactional
-    override fun getItemInquiries(username: String): InquiriesResponse {
+    override fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user, index, count)
         return InquiriesResponse(
-            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) },
+            totalPages = ceil(user.itemInquiries.size.toDouble() / count).toLong()
         )
     }
 
@@ -326,13 +324,7 @@ class UserServiceImpl(
         if (targetItemInquiry.user.username != username)
             throw CustomHttp403("수정 권한이 없습니다.")
 
-        with(putItemInquiriesRequest) {
-            if (!this.images.isNullOrEmpty()) {
-                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
-                inquiryImageRepository.deleteAll(deletedImages)
-            }
-            targetItemInquiry.update(this)
-        }
+        targetItemInquiry.update(putItemInquiriesRequest)
     }
 
     @Transactional
