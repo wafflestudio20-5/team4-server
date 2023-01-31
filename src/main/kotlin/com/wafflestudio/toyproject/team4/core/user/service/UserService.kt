@@ -142,15 +142,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = userEntity.reviews.find { it.id == request.id }
             ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
-        reviewEntity.run {
-            rating = request.rating
-            content = request.content
-            image1 = request.images.getOrNull(0)
-            image2 = request.images.getOrNull(1)
-            image3 = request.images.getOrNull(2)
-            size = Size.valueOf(request.size.uppercase())
-            color = Color.valueOf(request.color.uppercase())
-        }
+        reviewEntity.update(request)
         reviewRepository.save(reviewEntity)
     }
 
