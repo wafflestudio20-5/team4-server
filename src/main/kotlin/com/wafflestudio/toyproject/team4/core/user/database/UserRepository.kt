@@ -19,6 +19,8 @@ interface UserRepositoryCustom {
     fun findByIdOrNullWithFollowingsWithUsers(userId: Long): UserEntity?
     fun findByUsernameOrNullWithFollows(username: String): UserEntity?
     fun searchByQuery(query: String, index: Long, count: Long): List<UserEntity>
+    fun findByUsernameFetchJoinPurchases(username: String): UserEntity?
+    fun findByUsernameFetchJoinCartItems(username: String): UserEntity?
 }
 
 @Component
@@ -83,5 +85,22 @@ class UserRepositoryCustomImpl(
             .offset(count * index)
             .limit(count)
             .fetch()
+            
+    override fun findByUsernameFetchJoinPurchases(username: String): UserEntity? {
+        return queryFactory
+            .selectDistinct(userEntity)
+            .from(userEntity)
+            .leftJoin(userEntity.purchases).fetchJoin()
+            .where(userEntity.username.eq(username))
+            .fetchFirst()
+    }
+
+    override fun findByUsernameFetchJoinCartItems(username: String): UserEntity? {
+        return queryFactory
+            .selectDistinct(userEntity)
+            .from(userEntity)
+            .leftJoin(userEntity.cartItems).fetchJoin()
+            .where(userEntity.username.eq(username))
+            .fetchFirst()
     }
 }

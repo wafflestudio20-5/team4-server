@@ -12,8 +12,11 @@ interface ItemRepositoryCustom {
     fun findAllByOrderBy(
         category: Item.Category?,
         subCategory: Item.SubCategory?,
+        index: Long,
+        count: Long,
         sort: ItemRepositoryCustomImpl.Sort
     ): List<ItemEntity>
+    fun getTotalCount(category: Item.Category?, subCategory: Item.SubCategory?): Long
     fun findAllByContainingOrderByRatingDesc(query: String): List<ItemEntity>
     fun findAllByIds(ids: List<Long>): List<ItemEntity>
 }
@@ -25,6 +28,8 @@ class ItemRepositoryCustomImpl(
     override fun findAllByOrderBy(
         category: Item.Category?,
         subCategory: Item.SubCategory?,
+        index: Long,
+        count: Long,
         sort: Sort
     ): List<ItemEntity> {
         val eqInterest =
@@ -42,13 +47,40 @@ class ItemRepositoryCustomImpl(
             else -> itemEntity.rating.desc()
         }
 
+        val itemIds = queryFactory
+            .select(itemEntity.id)
+            .from(itemEntity)
+            .where(eqInterest)
+            .orderBy(ordering)
+            .offset(count*index)
+            .limit(count)
+            .fetch()
+
         return queryFactory
             .selectDistinct(itemEntity)
             .from(itemEntity)
             .leftJoin(itemEntity.images).fetchJoin()
-            .where(eqInterest)
-            .orderBy(ordering)
+            .where(itemEntity.id.`in`(itemIds))
             .fetch()
+    }
+
+    override fun getTotalCount(
+        category: Item.Category?,
+        subCategory: Item.SubCategory?
+    ): Long {
+        val eqInterest =
+            if (category == null && subCategory == null)
+                null
+            else if (category != null && subCategory == null)
+                itemEntity.category.eq(category)
+            else
+                itemEntity.subCategory.eq(subCategory)
+
+        return queryFactory
+            .select(itemEntity.count())
+            .from(itemEntity)
+            .where(eqInterest)
+            .fetchOne()!!
     }
 
     override fun findAllByContainingOrderByRatingDesc(query: String): List<ItemEntity> {

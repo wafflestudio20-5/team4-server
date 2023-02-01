@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+
 @RestController
 @RequestMapping("/api/user")
 class UserController(
@@ -193,7 +194,9 @@ class UserController(
     fun getItemInquiries(
         @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
-    ) = userService.getItemInquiries(username)
+        @RequestParam index: Long?,
+        @RequestParam count: Long?
+    ) = userService.getItemInquiries(username, index ?: 0L, count ?: 5L)
 
     @Authenticated
     @PutMapping("/me/item-inquiries")

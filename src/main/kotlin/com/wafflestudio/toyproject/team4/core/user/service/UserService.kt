@@ -7,11 +7,8 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.Color
-import com.wafflestudio.toyproject.team4.core.board.database.InquiryImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageEntity
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewImageRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
@@ -27,7 +24,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesR
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
-import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
@@ -41,6 +37,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
+import kotlin.math.ceil
 
 interface UserService {
     fun getMe(username: String): UserMeResponse
@@ -66,7 +63,7 @@ interface UserService {
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
-    fun getItemInquiries(username: String): InquiriesResponse
+    fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
@@ -76,12 +73,9 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
     private val purchaseRepository: PurchaseRepository,
-    private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
-    private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
@@ -211,10 +205,12 @@ class UserServiceImpl(
             purchase = purchaseEntity,
             rating = request.rating,
             content = request.content,
+            image1 = request.images.getOrNull(0),
+            image2 = request.images.getOrNull(1),
+            image3 = request.images.getOrNull(2),
             size = Size.valueOf(request.size.uppercase()),
             color = Color.valueOf(request.color.uppercase()),
         )
-        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
     }
@@ -240,12 +236,11 @@ class UserServiceImpl(
         reviewEntity.run {
             rating = request.rating
             content = request.content
+            image1 = request.images.getOrNull(0)
+            image2 = request.images.getOrNull(1)
+            image3 = request.images.getOrNull(2)
             size = Size.valueOf(request.size.uppercase())
             color = Color.valueOf(request.color.uppercase())
-        }
-        reviewImageRepository.deleteAll(reviewEntity.images)
-        request.images.forEach {
-            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
         }
         reviewRepository.save(reviewEntity)
     }
@@ -265,11 +260,10 @@ class UserServiceImpl(
 
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinPurchases(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val purchaseEntities = purchaseRepository.findAllByUser(userEntity)
         return PurchaseItemsResponse(
-            purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) }
+            userEntity.purchases.map { purchaseEntity -> Purchase.of(purchaseEntity) }
         )
     }
 
@@ -280,7 +274,7 @@ class UserServiceImpl(
         request.purchaseItems.forEach {
             val itemEntity = itemRepository.findByIdOrNull(it.id)
                 ?: throw CustomHttp404("아이템 정보가 올바르지 않습니다.")
-            purchaseRepository.save(
+            userEntity.purchases.add(
                 PurchaseEntity(
                     user = userEntity,
                     item = itemEntity,
@@ -298,10 +292,9 @@ class UserServiceImpl(
 
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinCartItems(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val cartItemEntities = cartItemRepository.findAllByUser(userEntity)
-        return CartItemsResponse(cartItemEntities.map { cartItemEntity -> CartItem.of(cartItemEntity) })
+        return CartItemsResponse(userEntity.cartItems.map { cartItemEntity -> CartItem.of(cartItemEntity) })
     }
 
     @Transactional
@@ -379,12 +372,13 @@ class UserServiceImpl(
     ********************************************************** */
 
     @Transactional
-    override fun getItemInquiries(username: String): InquiriesResponse {
+    override fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user, index, count)
         return InquiriesResponse(
-            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) },
+            totalPages = ceil(user.itemInquiries.size.toDouble() / count).toLong()
         )
     }
 
@@ -397,13 +391,7 @@ class UserServiceImpl(
         if (targetItemInquiry.user.username != username)
             throw CustomHttp403("수정 권한이 없습니다.")
 
-        with(putItemInquiriesRequest) {
-            if (!this.images.isNullOrEmpty()) {
-                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
-                inquiryImageRepository.deleteAll(deletedImages)
-            }
-            targetItemInquiry.update(this)
-        }
+        targetItemInquiry.update(putItemInquiriesRequest)
     }
 
     @Transactional
