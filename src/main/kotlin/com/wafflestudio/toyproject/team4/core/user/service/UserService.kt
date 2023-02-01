@@ -144,9 +144,9 @@ class UserServiceImpl(
 
     @Transactional
     override fun getUserStyles(userId: Long): StylesResponse {
-        val userEntity = userRepository.findByIdOrNull(userId)
+        val userEntity = userRepository.findByIdOrNullWithStylesOrderByRecentDesc(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-        return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
+        return StylesResponse(userEntity.styles.map { StylePreview.of(it) })
     }
 
     @Transactional
