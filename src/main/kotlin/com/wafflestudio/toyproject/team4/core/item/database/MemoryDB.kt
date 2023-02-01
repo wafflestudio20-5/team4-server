@@ -14,6 +14,7 @@ import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.boot.context.event.ApplicationStartedEvent
+import org.springframework.context.event.EventListener
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -30,49 +31,55 @@ class MemoryDB(
     private val userRepository: UserRepository,
     private val purchaseRepository: PurchaseRepository
 ) {
+    private val doMakeMockAll = false // 일괄적으로 Mock Data를 만들려면 true로 설정
+
+    private val doMakeMockItems = false // Mock 아이템을 만들려면 true로 설정
+    private val doMakeMockStyles = false // Mock 스타일을 만들려면 true로 설정
+    private val doMakeMockReviews = false // Mock 리뷰를 만들려면 true로 설정
+
     /**
      * 서버가 시작하면, 크롤링을 통해 무신사에서 실시간 랭킹 긁어와서 아이템 repository에 저장
      * 각 대분류 - 소분류별로 10개씩
      */
-
-//    @EventListener
+    @EventListener
     fun makeMockData(event: ApplicationStartedEvent) {
+        if (doMakeMockItems || doMakeMockAll) {
+            /** mainCategory - subCategory
+             * TOP   : 001       - SWEATER(001006), HOODIE(001004), SWEAT_SHIRT(001005), SHIRT(001002)
+             * OUTER : 002       - COAT(002007), JACKET(002002), PADDING(002016), CARDIGAN(002020)
+             * PANTS : 003       - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
+             * SKIRT : 022       - MINISKIRT(022001), MEDI_SKIRT(022002), LONG_SKIRT(022003)
+             * BAG   : 004       - BACKPACK(004001), CROSS_BAG(004002), ECHO_BAG(004014)
+             * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
+             * HEAD_WEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
+             **/
 
-        /** mainCategory - subCategory
-         * TOP   : 001       - SWEATER(001006), HOODIE(001004), SWEAT_SHIRT(001005), SHIRT(001002)
-         * OUTER : 002       - COAT(002007), JACKET(002002), PADDING(002016), CARDIGAN(002020)
-         * PANTS : 003       - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
-         * SKIRT : 022       - MINISKIRT(022001), MEDI_SKIRT(022002), LONG_SKIRT(022003)
-         * BAG   : 004       - BACKPACK(004001), CROSS_BAG(004002), ECHO_BAG(004014)
-         * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
-         * HEAD_WEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
-         **/
-
-        crawling("001", "001006")
-        crawling("001", "001004")
-        crawling("001", "001005")
-        crawling("001", "001002")
-        crawling("002", "002007")
-        crawling("002", "002002")
-        crawling("002", "002016")
-        crawling("002", "002020")
-        crawling("003", "003002")
-        crawling("003", "003008")
-        crawling("003", "003004")
-        crawling("003", "003005")
-        crawling("022", "022001")
-        crawling("022", "022002")
-        crawling("022", "022003")
-        crawling("004", "004001")
-        crawling("004", "004002")
-        crawling("004", "004014")
-        crawling("005", "005014")
-        crawling("005", "005004")
-        crawling("005", "005018")
-        crawling("018", "")
-        crawling("007", "007001")
-        crawling("007", "007004")
-        crawling("007", "007005")
+            crawling("001", "001006")
+            crawling("001", "001004")
+            crawling("001", "001005")
+            crawling("001", "001002")
+            crawling("002", "002007")
+            crawling("002", "002002")
+            crawling("002", "002016")
+            crawling("002", "002020")
+            crawling("003", "003002")
+            crawling("003", "003008")
+            crawling("003", "003004")
+            crawling("003", "003005")
+            crawling("022", "022001")
+            crawling("022", "022002")
+            crawling("022", "022003")
+            crawling("004", "004001")
+            crawling("004", "004002")
+            crawling("004", "004014")
+            crawling("005", "005014")
+            crawling("005", "005004")
+            crawling("005", "005018")
+            crawling("018", "")
+            crawling("007", "007001")
+            crawling("007", "007004")
+            crawling("007", "007005")
+        }
     }
 
     @Transactional
@@ -201,76 +208,80 @@ class MemoryDB(
         return subCategoryDict[subCategoryId] ?: Item.SubCategory.SNEAKERS
     }
 
-//    @EventListener
+    @EventListener
     @Transactional
     fun makeMockStyles(event: ApplicationStartedEvent) {
-        val userNum = 10L
-        val styleNum = 15L
-        val users = (1..userNum).map {
-            val encodedPassword = passwordEncoder.encode("12345678*")
-            UserEntity(username = "mockuser$it", encodedPassword = encodedPassword, nickname = "mocknick$it")
-        }
-        users.forEach {
-            it.image = imageService.getDefaultImage(it.username)
-            it.sex = if ((0..1).random() == 0) User.Sex.MALE else User.Sex.FEMALE
-            it.height = (155..187).random().toLong()
-            it.weight = (40..110).random().toLong()
-            it.description = "안녕하세요. ${it.nickname}입니다!"
-            it.instaUsername = it.username
-
-            userRepository.save(it)
-
-            val postStyleRequests = (1..styleNum).map {
-                val itemNum = 3
-                val itemIds = mutableListOf<Long>()
-                while (itemIds.size <= itemNum) {
-                    val itemId = (1..250).random().toLong()
-                    if (!itemIds.contains(itemId))
-                        itemIds.add(itemId)
-                }
-                val images = itemIds.map {
-                    val item = itemRepository.findById(it).get()
-                    item.images[0].imageUrl
-                }
-                val content = if ((0..1).random() == 0) null else "내 style"
-                val hashtag = if ((0..1).random() == 0) null else "#무신4 #맞팔 #선팔"
-                PostStyleRequest(images, itemIds, content, hashtag)
+        if (doMakeMockStyles || doMakeMockAll) {
+            val userNum = 10L
+            val styleNum = 15L
+            val users = (1..userNum).map {
+                val encodedPassword = passwordEncoder.encode("12345678*")
+                UserEntity(username = "mockuser$it", encodedPassword = encodedPassword, nickname = "mocknick$it")
             }
-            val username = it.username
-            postStyleRequests.forEach {
-                styleService.postStyle(username, it)
+            users.forEach {
+                it.image = imageService.getDefaultImage(it.username)
+                it.sex = if ((0..1).random() == 0) User.Sex.MALE else User.Sex.FEMALE
+                it.height = (155..187).random().toLong()
+                it.weight = (40..110).random().toLong()
+                it.description = "안녕하세요. ${it.nickname}입니다!"
+                it.instaUsername = it.username
+
+                userRepository.save(it)
+
+                val postStyleRequests = (1..styleNum).map {
+                    val itemNum = 3
+                    val itemIds = mutableListOf<Long>()
+                    while (itemIds.size <= itemNum) {
+                        val itemId = (1..250).random().toLong()
+                        if (!itemIds.contains(itemId))
+                            itemIds.add(itemId)
+                    }
+                    val images = itemIds.map {
+                        val item = itemRepository.findById(it).get()
+                        item.images[0].imageUrl
+                    }
+                    val content = if ((0..1).random() == 0) null else "내 style"
+                    val hashtag = if ((0..1).random() == 0) null else "#무신4 #맞팔 #선팔"
+                    PostStyleRequest(images, itemIds, content, hashtag)
+                }
+                val username = it.username
+                postStyleRequests.forEach {
+                    styleService.postStyle(username, it)
+                }
             }
         }
     }
 
-//    @EventListener
+    @EventListener
     @Transactional
     fun makeMockReviews(event: ApplicationStartedEvent) {
-        val itemId = 205L
-        val item = itemRepository.findById(itemId).get()
-        val userNum = 20L
-        val users = (1..userNum).map {
-            val username = "reviewuser$it"
-            val encodedPassword = passwordEncoder.encode("12345678*")
-            userRepository.save(UserEntity(username, encodedPassword, username))
-        }
-        users.forEach {
-            it.image = imageService.getDefaultImage(it.username)
-            val purchase = purchaseRepository.save(
-                PurchaseEntity(
-                    it, item, item.options?.get(0)?.optionName, item.newPrice!!, 1L
+        if (doMakeMockReviews || doMakeMockAll) {
+            val itemId = 205L
+            val item = itemRepository.findById(itemId).get()
+            val userNum = 20L
+            val users = (1..userNum).map {
+                val username = "reviewuser$it"
+                val encodedPassword = passwordEncoder.encode("12345678*")
+                userRepository.save(UserEntity(username, encodedPassword, username))
+            }
+            users.forEach {
+                it.image = imageService.getDefaultImage(it.username)
+                val purchase = purchaseRepository.save(
+                    PurchaseEntity(
+                        it, item, item.options?.get(0)?.optionName, item.newPrice!!, 1L
+                    )
                 )
-            )
-            val images = item.images.slice(0..2).map { it.imageUrl }
-            val reviewRequest = ReviewRequest(
-                purchase.id,
-                (0..10).random().toLong(),
-                "맘에 들어요",
-                "large",
-                "mid",
-                images
-            )
-            userService.postReview(it.username, reviewRequest)
+                val images = item.images.slice(0..2).map { it.imageUrl }
+                val reviewRequest = ReviewRequest(
+                    purchase.id,
+                    (0..10).random().toLong(),
+                    "맘에 들어요",
+                    "large",
+                    "mid",
+                    images
+                )
+                userService.postReview(it.username, reviewRequest)
+            }
         }
     }
 }
