@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -213,6 +214,16 @@ class UserController(
         @PathVariable(value = "id") itemInquiryId: Long
     ) = ResponseEntity(
         userService.deleteItemInquiry(username, itemInquiryId),
+        HttpStatus.OK
+    )
+
+    @GetMapping("/search")
+    fun searchUsers(
+        @RequestParam query: String?,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = ResponseEntity(
+        userService.searchUsers(query, index ?: 0L, count ?: 10L),
         HttpStatus.OK
     )
 }

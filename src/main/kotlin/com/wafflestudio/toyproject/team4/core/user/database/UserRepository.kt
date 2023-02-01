@@ -20,6 +20,8 @@ interface UserRepositoryCustom {
     fun findByIdOrNullWithFollowingsWithUsers(userId: Long): UserEntity?
 
     fun findByUsernameOrNullWithFollows(username: String): UserEntity?
+
+    fun searchByQuery(query: String, index: Long, count: Long): List<UserEntity>
 }
 
 @Component
@@ -65,5 +67,15 @@ class UserRepositoryCustomImpl(
             .leftJoin(userEntity.followers).fetchJoin()
             .where(userEntity.username.eq(username))
             .fetchOne()
+    }
+
+    override fun searchByQuery(query: String, index: Long, count: Long): List<UserEntity> {
+        return queryFactory
+            .selectDistinct(userEntity)
+            .from(userEntity)
+            .where(userEntity.nickname.contains(query))
+            .offset(count * index)
+            .limit(count)
+            .fetch()
     }
 }

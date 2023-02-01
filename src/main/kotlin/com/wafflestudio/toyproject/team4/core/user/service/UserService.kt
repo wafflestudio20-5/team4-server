@@ -52,6 +52,8 @@ interface UserService {
     fun getUserStyles(userId: Long): StylesResponse
     fun follow(username: String, userId: Long)
     fun unfollow(username: String, userId: Long)
+
+    fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -170,6 +172,17 @@ class UserServiceImpl(
         follow.deactivate()
     }
 
+    override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
+        query ?: throw CustomHttp400("검색어를 입력하세요.")
+        val users = userRepository.searchByQuery(query, index, count)
+
+        return UserSearchResponse(users.map { User.simplify(it) })
+    }
+
+    /* **********************************************************
+    //                         Reviews                         //
+    ********************************************************** */
+
     @Transactional
     override fun getReviews(username: String): ReviewsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -246,6 +259,10 @@ class UserServiceImpl(
         reviewRepository.delete(reviewEntity)
     }
 
+    /* **********************************************************
+    //                        Purchases                       //
+    ********************************************************** */
+
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
         val userEntity = userRepository.findByUsername(username)
@@ -255,10 +272,6 @@ class UserServiceImpl(
             purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) }
         )
     }
-
-    /* **********************************************************
-    //                      Shopping Cart                      //
-    ********************************************************** */
 
     @Transactional
     override fun postPurchases(username: String, request: PurchasesRequest) {
@@ -278,6 +291,10 @@ class UserServiceImpl(
             )
         }
     }
+
+    /* **********************************************************
+   //                      Shopping Cart                      //
+   ********************************************************** */
 
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
