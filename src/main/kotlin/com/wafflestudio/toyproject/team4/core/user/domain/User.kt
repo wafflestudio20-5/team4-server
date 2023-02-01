@@ -25,6 +25,13 @@ data class User(
         ROLE_USER, ROLE_ADMIN
     }
 
+    data class Simplified(
+        val id: Long,
+        val username: String,
+        val nickname: String,
+        val image: String,
+    )
+
     companion object {
         fun of(entity: UserEntity): User = entity.run {
             User(
@@ -40,6 +47,15 @@ data class User(
                 description = description,
                 instaUsername = instaUsername,
                 socialKey = socialKey?.toString()?.lowercase()
+            )
+        }
+
+        fun simplify(entity: UserEntity): Simplified = entity.run {
+            Simplified(
+                id = id,
+                username = username,
+                nickname = nickname,
+                image = image ?: ""
             )
         }
     }

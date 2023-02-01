@@ -1,16 +1,11 @@
 package com.wafflestudio.toyproject.team4.core.user.api.response
 
+import com.wafflestudio.toyproject.team4.core.user.domain.User
+
 data class FollowersResponse(
-    val followers: List<UserFollow>
+    val followers: List<User.Simplified>
 )
 
 data class FollowingsResponse(
-    val followings: List<UserFollow>
-)
-
-data class UserFollow(
-    val id: Long,
-    val username: String,
-    val nickname: String,
-    val image: String,
+    val followings: List<User.Simplified>
 )
