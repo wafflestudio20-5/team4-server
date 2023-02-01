@@ -13,7 +13,7 @@ interface UserRepository : JpaRepository<UserEntity, Long>, UserRepositoryCustom
 }
 
 interface UserRepositoryCustom {
-    fun findByIdOrNullWithStylesAndFollows(userId: Long): UserEntity?
+    fun findByIdOrNullWithFollows(userId: Long): UserEntity?
 
     fun findByIdOrNullWithFollowersWithUsers(userId: Long): UserEntity?
 
@@ -28,11 +28,10 @@ interface UserRepositoryCustom {
 class UserRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : UserRepositoryCustom {
-    override fun findByIdOrNullWithStylesAndFollows(userId: Long): UserEntity? {
+    override fun findByIdOrNullWithFollows(userId: Long): UserEntity? {
         return queryFactory
             .selectDistinct(userEntity)
             .from(userEntity)
-            .leftJoin(userEntity.styles).fetchJoin()
             .leftJoin(userEntity.followings).fetchJoin()
             .leftJoin(userEntity.followers).fetchJoin()
             .where(userEntity.id.eq(userId))

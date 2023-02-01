@@ -76,7 +76,7 @@ class UserEntity(
     var itemInquiries: MutableList<InquiryEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var styles: MutableSet<StyleEntity> = mutableSetOf()
+    var styles: MutableList<StyleEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var followings: MutableSet<FollowEntity> = mutableSetOf()

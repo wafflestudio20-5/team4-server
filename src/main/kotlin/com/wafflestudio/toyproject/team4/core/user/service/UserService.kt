@@ -103,7 +103,7 @@ class UserServiceImpl(
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
         val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
-        val closetOwner = userRepository.findByIdOrNullWithStylesAndFollows(userId)
+        val closetOwner = userRepository.findByIdOrNullWithFollows(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
         val styleCount: Long = closetOwner.styles.size.toLong()
