@@ -17,6 +17,7 @@ import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
@@ -30,6 +31,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.CartItem
 import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
@@ -44,7 +46,10 @@ interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
+    fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun getUserStyles(userId: Long): StylesResponse
+    fun follow(username: String, userId: Long)
+    fun unfollow(username: String, userId: Long)
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -57,7 +62,6 @@ interface UserService {
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
-
     fun getItemInquiries(username: String): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
@@ -94,19 +98,28 @@ class UserServiceImpl(
 
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
-        val followerUser = username?.let { userRepository.findByUsername(it) }
-        val followingUser = userRepository.findByIdOrNull(userId)
+        val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
+        val closetOwner = userRepository.findByIdOrNullWithStylesAndFollows(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
-        val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
-        val styleCount: Long = 1
-        val followerCount: Long = 1
-        val followingCount: Long = 1
+        val styleCount: Long = closetOwner.styles.size.toLong()
+        val followerCount: Long = closetOwner.followers.count { it.isActive }.toLong()
+        val followingCount: Long = closetOwner.followings.count { it.isActive }.toLong()
+        val isFollow = getIsFollow(currentUser, closetOwner)
+
         return UserResponse(
-            user = User.of(followingUser),
+            user = User.of(closetOwner),
             count = Count(styleCount, followerCount, followingCount),
             isFollow = isFollow,
         )
+    }
+
+    override fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean {
+        return currentUser?.let {
+            currentUser.followings.find {
+                it.followed == closetOwner
+            }?.isActive ?: false
+        } ?: false
     }
 
     @Transactional
@@ -114,6 +127,29 @@ class UserServiceImpl(
         val userEntity = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
         return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
+    }
+
+    @Transactional
+    override fun follow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+
+        follow?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
+    }
+
+    @Transactional
+    override fun unfollow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+            ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
+
+        follow.deactivate()
     }
 
     @Transactional

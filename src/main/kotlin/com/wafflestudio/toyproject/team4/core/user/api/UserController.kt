@@ -54,6 +54,20 @@ class UserController(
     }
 
     @Authenticated
+    @PostMapping("/{userId}/follow")
+    fun follow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.follow(username, userId), HttpStatus.CREATED)
+
+    @Authenticated
+    @DeleteMapping("/{userId}/follow")
+    fun unfollow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.unfollow(username, userId), HttpStatus.OK)
+
+    @Authenticated
     @PatchMapping("/me")
     fun patchMe(
         @UserContext username: String,

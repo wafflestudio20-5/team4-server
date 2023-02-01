@@ -7,12 +7,12 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
-import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.style.domain.Style
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +29,7 @@ class StyleServiceImpl(
     private val itemRepository: ItemRepository,
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
-    private val followRepository: FollowRepository
+    private val userService: UserService
 ) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
         val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
@@ -56,7 +56,7 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
 
-        val isFollow = user?.let { followRepository.findRelation(it.id, style.user.id) } ?: false
+        val isFollow = userService.getIsFollow(user, style.user)
         val likedUserIds = style.likedUsers.map { it.userId }
         val isLike = user?.let { likedUserIds.contains(it.id) } ?: false
 
