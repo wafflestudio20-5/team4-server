@@ -53,6 +53,16 @@ class UserController(
         return userService.getUser(username, userId)
     }
 
+    @GetMapping("/{userId}/followers")
+    fun getFollowers(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowers(userId), HttpStatus.OK)
+
+    @GetMapping("/{userId}/followings")
+    fun getFollowings(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowings(userId), HttpStatus.OK)
+
     @Authenticated
     @PostMapping("/{userId}/follow")
     fun follow(

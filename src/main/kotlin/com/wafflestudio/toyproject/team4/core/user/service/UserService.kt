@@ -46,6 +46,8 @@ interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
+    fun getFollowers(userId: Long): FollowersResponse
+    fun getFollowings(userId: Long): FollowingsResponse
     fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun getUserStyles(userId: Long): StylesResponse
     fun follow(username: String, userId: Long)
@@ -120,6 +122,22 @@ class UserServiceImpl(
                 it.followed == closetOwner
             }?.isActive ?: false
         } ?: false
+    }
+
+    override fun getFollowers(userId: Long): FollowersResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followers = closetOwner.followers.map { it.followerToUserFollow() }
+
+        return FollowersResponse(followers)
+    }
+
+    override fun getFollowings(userId: Long): FollowingsResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followings = closetOwner.followings.map { it.followingToUserFollow() }
+
+        return FollowingsResponse(followings)
     }
 
     @Transactional

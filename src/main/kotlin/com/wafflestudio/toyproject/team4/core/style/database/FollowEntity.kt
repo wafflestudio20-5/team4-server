@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.style.database
 
+import com.wafflestudio.toyproject.team4.core.user.api.response.UserFollow
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -40,4 +41,8 @@ class FollowEntity(
     fun deactivate() {
         this.isActive = false
     }
+
+    fun followerToUserFollow() = following.run { UserFollow(id, username, nickname, image ?: "") }
+
+    fun followingToUserFollow() = followed.run { UserFollow(id, username, nickname, image ?: "") }
 }
