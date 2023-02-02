@@ -65,6 +65,7 @@ class ItemRepositoryCustomImpl(
             .from(itemEntity)
             .leftJoin(itemEntity.images).fetchJoin()
             .where(itemEntity.id.`in`(itemIds))
+            .orderBy(ordering)
             .fetch()
     }
 
