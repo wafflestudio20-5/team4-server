@@ -46,7 +46,7 @@ class ItemEntity(
     var images: MutableList<ItemImageEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var options: MutableList<OptionEntity>? = null
+    var options: MutableList<ItemOptionEntity>? = null
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var inquiries: MutableList<InquiryEntity> = mutableListOf()
@@ -59,7 +59,7 @@ class ItemEntity(
 
     fun updateOptionList(optionList: List<String>) {
         this.options = optionList.map { option ->
-            OptionEntity(this, option)
+            ItemOptionEntity(this, option)
         }.toMutableList()
     }
 

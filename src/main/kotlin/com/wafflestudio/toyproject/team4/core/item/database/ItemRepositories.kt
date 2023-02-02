@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
 interface ItemRepository : JpaRepository<ItemEntity, Long>, ItemRepositoryCustom
+interface ItemImageRepository : JpaRepository<ItemImageEntity, Long>
+interface ItemOptionRepository : JpaRepository<ItemOptionEntity, Long>
+
 
 interface ItemRepositoryCustom {
     fun findAllByOrderBy(
