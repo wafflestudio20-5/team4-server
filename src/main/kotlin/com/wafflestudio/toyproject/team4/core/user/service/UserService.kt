@@ -95,12 +95,12 @@ class UserServiceImpl(
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
         val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
-        val closetOwner = userRepository.findByIdOrNullWithFollows(userId)
+        val closetOwner = userRepository.findByIdOrNullWithStyles(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
         val styleCount: Long = closetOwner.styles.size.toLong()
-        val followerCount: Long = closetOwner.followers.count { it.isActive }.toLong()
-        val followingCount: Long = closetOwner.followings.count { it.isActive }.toLong()
+        val followerCount: Long = closetOwner.followerCount
+        val followingCount: Long = closetOwner.followingCount
         val isFollow = getIsFollow(currentUser, closetOwner)
 
         return UserResponse(
@@ -150,6 +150,8 @@ class UserServiceImpl(
         val follow = followRepository.findRelation(followingUser, followedUser)
 
         follow?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
+        followingUser.followingCount++
+        followedUser.followerCount++
     }
 
     @Transactional
@@ -162,13 +164,13 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
 
         follow.deactivate()
+        followingUser.followingCount--
+        followedUser.followerCount--
     }
 
     override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
         query ?: throw CustomHttp400("검색어를 입력하세요.")
-        if (query == "") return UserSearchResponse(mutableListOf())
-
-        val users = userRepository.searchByQuery(query, index, count)
+        val users = userRepository.searchByQueryOrderByFollowers(query, index, count)
         return UserSearchResponse(users.map { User.simplify(it) })
     }
 
