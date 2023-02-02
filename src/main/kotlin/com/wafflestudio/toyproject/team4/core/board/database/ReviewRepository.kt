@@ -2,7 +2,7 @@ package com.wafflestudio.toyproject.team4.core.board.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.board.database.QReviewEntity.reviewEntity
-import com.wafflestudio.toyproject.team4.core.user.database.QPurchaseEntity.purchaseEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.QPurchaseEntity.purchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component

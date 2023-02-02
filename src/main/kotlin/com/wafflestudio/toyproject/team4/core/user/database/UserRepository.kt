@@ -3,7 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.user.database.QUserEntity.userEntity
 import com.wafflestudio.toyproject.team4.core.style.database.QStyleEntity.styleEntity
-import com.wafflestudio.toyproject.team4.core.style.database.QFollowEntity.followEntity
+import com.wafflestudio.toyproject.team4.core.user.database.QFollowEntity.followEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
