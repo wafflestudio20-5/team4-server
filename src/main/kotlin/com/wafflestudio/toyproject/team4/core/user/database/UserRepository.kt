@@ -85,7 +85,8 @@ class UserRepositoryCustomImpl(
             .offset(count * index)
             .limit(count)
             .fetch()
-            
+    }
+
     override fun findByUsernameFetchJoinPurchases(username: String): UserEntity? {
         return queryFactory
             .selectDistinct(userEntity)

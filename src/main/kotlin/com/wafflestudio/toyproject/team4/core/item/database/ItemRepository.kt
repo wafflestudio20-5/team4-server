@@ -52,7 +52,7 @@ class ItemRepositoryCustomImpl(
             .from(itemEntity)
             .where(eqInterest)
             .orderBy(ordering)
-            .offset(count*index)
+            .offset(count * index)
             .limit(count)
             .fetch()
 
