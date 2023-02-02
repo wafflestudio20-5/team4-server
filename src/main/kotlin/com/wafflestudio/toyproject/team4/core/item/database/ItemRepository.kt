@@ -16,6 +16,7 @@ interface ItemRepositoryCustom {
         count: Long,
         sort: ItemRepositoryCustomImpl.Sort
     ): List<ItemEntity>
+
     fun getTotalCount(category: Item.Category?, subCategory: Item.SubCategory?): Long
     fun findAllByContainingOrderByRatingDesc(query: String): List<ItemEntity>
     fun findAllByIds(ids: List<Long>): List<ItemEntity>

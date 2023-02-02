@@ -6,11 +6,9 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.database.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -191,12 +189,12 @@ class UserServiceImpl(
         if (request.rating < 0 || request.rating > 10)
             throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
         try {
-            Size.valueOf(request.size.uppercase())
+            ReviewEntity.Size.valueOf(request.size.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("사이즈가 적절하지 않습니다.")
         }
         try {
-            Color.valueOf(request.color.uppercase())
+            ReviewEntity.Color.valueOf(request.color.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("색감이 적절하지 않습니다.")
         }
@@ -208,8 +206,8 @@ class UserServiceImpl(
             image1 = request.images.getOrNull(0),
             image2 = request.images.getOrNull(1),
             image3 = request.images.getOrNull(2),
-            size = Size.valueOf(request.size.uppercase()),
-            color = Color.valueOf(request.color.uppercase()),
+            size = ReviewEntity.Size.valueOf(request.size.uppercase()),
+            color = ReviewEntity.Color.valueOf(request.color.uppercase()),
         )
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
@@ -220,12 +218,12 @@ class UserServiceImpl(
         if (request.rating < 0 || request.rating > 10)
             throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
         try {
-            Size.valueOf(request.size.uppercase())
+            ReviewEntity.Size.valueOf(request.size.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("사이즈가 적절하지 않습니다.")
         }
         try {
-            Color.valueOf(request.color.uppercase())
+            ReviewEntity.Color.valueOf(request.color.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("색감이 적절하지 않습니다.")
         }
@@ -239,8 +237,8 @@ class UserServiceImpl(
             image1 = request.images.getOrNull(0)
             image2 = request.images.getOrNull(1)
             image3 = request.images.getOrNull(2)
-            size = Size.valueOf(request.size.uppercase())
-            color = Color.valueOf(request.color.uppercase())
+            size = ReviewEntity.Size.valueOf(request.size.uppercase())
+            color = ReviewEntity.Color.valueOf(request.color.uppercase())
         }
         reviewRepository.save(reviewEntity)
     }
