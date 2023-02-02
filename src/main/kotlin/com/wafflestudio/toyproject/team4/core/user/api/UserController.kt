@@ -14,7 +14,17 @@ import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/user")
@@ -43,6 +53,30 @@ class UserController(
         val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
         return userService.getUser(username, userId)
     }
+
+    @GetMapping("/{userId}/followers")
+    fun getFollowers(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowers(userId), HttpStatus.OK)
+
+    @GetMapping("/{userId}/followings")
+    fun getFollowings(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowings(userId), HttpStatus.OK)
+
+    @Authenticated
+    @PostMapping("/{userId}/follow")
+    fun follow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.follow(username, userId), HttpStatus.CREATED)
+
+    @Authenticated
+    @DeleteMapping("/{userId}/follow")
+    fun unfollow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.unfollow(username, userId), HttpStatus.OK)
 
     @Authenticated
     @PatchMapping("/me")
@@ -176,6 +210,16 @@ class UserController(
         @PathVariable(value = "id") itemInquiryId: Long
     ) = ResponseEntity(
         userService.deleteItemInquiry(username, itemInquiryId),
+        HttpStatus.OK
+    )
+
+    @GetMapping("/search")
+    fun searchUsers(
+        @RequestParam query: String?,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = ResponseEntity(
+        userService.searchUsers(query, index ?: 0L, count ?: 10L),
         HttpStatus.OK
     )
 }

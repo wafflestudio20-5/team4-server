@@ -1,18 +1,18 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
+import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
@@ -25,6 +25,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.CartItem
 import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
@@ -40,7 +41,14 @@ interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
+    fun getFollowers(userId: Long): FollowersResponse
+    fun getFollowings(userId: Long): FollowingsResponse
+    fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun getUserStyles(userId: Long): StylesResponse
+    fun follow(username: String, userId: Long)
+    fun unfollow(username: String, userId: Long)
+
+    fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -53,7 +61,6 @@ interface UserService {
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
-
     fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
@@ -87,26 +94,86 @@ class UserServiceImpl(
 
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
-        val followerUser = username?.let { userRepository.findByUsername(it) }
-        val followingUser = userRepository.findByIdOrNull(userId)
+        val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
+        val closetOwner = userRepository.findByIdOrNullWithFollows(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-        val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
-        val styleCount: Long = 1
-        val followerCount: Long = 1
-        val followingCount: Long = 1
+
+        val styleCount: Long = closetOwner.styles.size.toLong()
+        val followerCount: Long = closetOwner.followers.count { it.isActive }.toLong()
+        val followingCount: Long = closetOwner.followings.count { it.isActive }.toLong()
+        val isFollow = getIsFollow(currentUser, closetOwner)
+
         return UserResponse(
-            user = User.of(followingUser),
+            user = User.of(closetOwner),
             count = Count(styleCount, followerCount, followingCount),
             isFollow = isFollow,
         )
     }
 
+    override fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean {
+        return currentUser?.let {
+            currentUser.followings.find {
+                it.followed == closetOwner
+            }?.isActive ?: false
+        } ?: false
+    }
+
+    override fun getFollowers(userId: Long): FollowersResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followers = closetOwner.followers.map { User.simplify(it.following) }
+
+        return FollowersResponse(followers)
+    }
+
+    override fun getFollowings(userId: Long): FollowingsResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followings = closetOwner.followings.map { User.simplify(it.followed) }
+
+        return FollowingsResponse(followings)
+    }
+
     @Transactional
     override fun getUserStyles(userId: Long): StylesResponse {
-        val userEntity = userRepository.findByIdOrNull(userId)
+        val userEntity = userRepository.findByIdOrNullWithStylesOrderByRecentDesc(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-        return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
+        return StylesResponse(userEntity.styles.map { StylePreview.of(it) })
     }
+
+    @Transactional
+    override fun follow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+
+        follow?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
+    }
+
+    @Transactional
+    override fun unfollow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+            ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
+
+        follow.deactivate()
+    }
+
+    override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
+        if (query == "" || query == null) throw CustomHttp400("검색어를 입력하세요.")
+        val users = userRepository.searchByQuery(query, index, count)
+
+        return UserSearchResponse(users.map { User.simplify(it) })
+    }
+
+    /* **********************************************************
+    //                         Reviews                         //
+    ********************************************************** */
 
     @Transactional
     override fun getReviews(username: String): ReviewsResponse {
@@ -119,6 +186,18 @@ class UserServiceImpl(
     override fun postReview(username: String, request: ReviewRequest) {
         val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
+        if (request.rating < 0 || request.rating > 10)
+            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
+        try {
+            ReviewEntity.Size.valueOf(request.size.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("사이즈가 적절하지 않습니다.")
+        }
+        try {
+            ReviewEntity.Color.valueOf(request.color.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("색감이 적절하지 않습니다.")
+        }
         val reviewEntity = ReviewEntity(
             user = purchaseEntity.user,
             purchase = purchaseEntity,
@@ -127,8 +206,8 @@ class UserServiceImpl(
             image1 = request.images.getOrNull(0),
             image2 = request.images.getOrNull(1),
             image3 = request.images.getOrNull(2),
-            size = Size.valueOf(request.size.uppercase()),
-            color = Color.valueOf(request.color.uppercase()),
+            size = ReviewEntity.Size.valueOf(request.size.uppercase()),
+            color = ReviewEntity.Color.valueOf(request.color.uppercase()),
         )
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
@@ -136,23 +215,46 @@ class UserServiceImpl(
 
     @Transactional
     override fun putReview(username: String, request: ReviewRequest) {
-        val userEntity = userRepository.findByUsername(username)
-            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val reviewEntity = userEntity.reviews.find { it.id == request.id }
-            ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
-        reviewEntity.update(request)
+        if (request.rating < 0 || request.rating > 10)
+            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
+        try {
+            ReviewEntity.Size.valueOf(request.size.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("사이즈가 적절하지 않습니다.")
+        }
+        try {
+            ReviewEntity.Color.valueOf(request.color.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw CustomHttp400("색감이 적절하지 않습니다.")
+        }
+        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewEntity.run {
+            rating = request.rating
+            content = request.content
+            image1 = request.images.getOrNull(0)
+            image2 = request.images.getOrNull(1)
+            image3 = request.images.getOrNull(2)
+            size = ReviewEntity.Size.valueOf(request.size.uppercase())
+            color = ReviewEntity.Color.valueOf(request.color.uppercase())
+        }
         reviewRepository.save(reviewEntity)
     }
 
     @Transactional
     override fun deleteReview(username: String, reviewId: Long) {
-        val userEntity = userRepository.findByUsername(username)
-            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val reviewEntity = userEntity.reviews.find { it.id == reviewId }
-            ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
-        reviewEntity.purchase.item.reviewCount--
-        userEntity.reviews.remove(reviewEntity)
+        val reviewEntity = reviewRepository.findByIdOrNull(reviewId)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        if (reviewEntity.user.username != username)
+            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewRepository.delete(reviewEntity)
     }
+
+    /* **********************************************************
+    //                        Purchases                       //
+    ********************************************************** */
 
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
@@ -162,10 +264,6 @@ class UserServiceImpl(
             userEntity.purchases.map { purchaseEntity -> Purchase.of(purchaseEntity) }
         )
     }
-
-    /* **********************************************************
-    //                      Shopping Cart                      //
-    ********************************************************** */
 
     @Transactional
     override fun postPurchases(username: String, request: PurchasesRequest) {
@@ -185,6 +283,10 @@ class UserServiceImpl(
             )
         }
     }
+
+    /* **********************************************************
+   //                      Shopping Cart                      //
+   ********************************************************** */
 
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {

@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.domain.User
@@ -76,6 +77,12 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var styles: MutableList<StyleEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var followings: MutableSet<FollowEntity> = mutableSetOf()
+
+    @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var followers: MutableSet<FollowEntity> = mutableSetOf()
 
     fun viewItem(
         item: ItemEntity
