@@ -5,11 +5,8 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
-import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
-import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
@@ -19,9 +16,7 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCart
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
-import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
@@ -47,10 +42,6 @@ interface UserService {
     fun unfollow(username: String, userId: Long)
 
     fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
-    fun getReviews(username: String): ReviewsResponse
-    fun postReview(username: String, request: ReviewRequest)
-    fun putReview(username: String, request: ReviewRequest)
-    fun deleteReview(username: String, reviewId: Long)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -67,8 +58,6 @@ interface UserService {
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val reviewRepository: ReviewRepository,
-    private val purchaseRepository: PurchaseRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
     private val inquiryRepository: InquiryRepository,
@@ -169,48 +158,6 @@ class UserServiceImpl(
         val users = userRepository.searchByQuery(query, index, count)
 
         return UserSearchResponse(users.map { User.simplify(it) })
-    }
-
-    /* **********************************************************
-    //                         Reviews                         //
-    ********************************************************** */
-
-    @Transactional
-    override fun getReviews(username: String): ReviewsResponse {
-        val user = userRepository.findByUsername(username)
-            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-
-        return ReviewsResponse(
-            reviews = user.reviews.map { entity -> Review.of(entity) }
-        )
-    }
-
-    @Transactional
-    override fun postReview(username: String, request: ReviewRequest) {
-        val purchaseItem = purchaseRepository.findByIdOrNull(request.id)
-            ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
-
-        purchaseItem.writeReview(request)
-    }
-
-    @Transactional
-    override fun putReview(username: String, request: ReviewRequest) {
-        val review = reviewRepository.findByIdOrNull(request.id)
-            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        if (review.user.username != username)
-            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
-
-        review.update(request)
-    }
-
-    @Transactional
-    override fun deleteReview(username: String, reviewId: Long) {
-        val review = reviewRepository.findByIdOrNull(reviewId)
-            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        if (review.user.username != username)
-            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
-
-        reviewRepository.delete(review)
     }
 
     /* **********************************************************

@@ -1,6 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.board.database
 
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.board.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate

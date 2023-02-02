@@ -8,7 +8,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartR
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
@@ -84,37 +83,6 @@ class UserController(
         @UserContext username: String,
         @RequestBody patchMeRequest: PatchMeRequest
     ) = ResponseEntity(userService.patchMe(username, patchMeRequest), HttpStatus.OK)
-
-    @Authenticated
-    @GetMapping("/me/reviews")
-    fun getReviews(
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-    ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
-
-    @Authenticated
-    @PostMapping("/me/review")
-    fun postReview(
-        @RequestBody request: ReviewRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-    ) = ResponseEntity(userService.postReview(username, request), HttpStatus.CREATED)
-
-    @Authenticated
-    @PutMapping("/me/review")
-    fun putReview(
-        @RequestBody request: ReviewRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-    ) = ResponseEntity(userService.putReview(username, request), HttpStatus.OK)
-
-    @Authenticated
-    @DeleteMapping("/me/review/{reviewId}")
-    fun deleteReview(
-        @PathVariable(value = "reviewId") reviewId: Long,
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-    ) = ResponseEntity(userService.deleteReview(username, reviewId), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/purchases")

@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.user.api.request
+package com.wafflestudio.toyproject.team4.core.board.api.request
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
