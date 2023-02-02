@@ -165,9 +165,10 @@ class UserServiceImpl(
     }
 
     override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
-        if (query == "" || query == null) throw CustomHttp400("검색어를 입력하세요.")
-        val users = userRepository.searchByQuery(query, index, count)
+        query ?: throw CustomHttp400("검색어를 입력하세요.")
+        if (query == "") return UserSearchResponse(mutableListOf())
 
+        val users = userRepository.searchByQuery(query, index, count)
         return UserSearchResponse(users.map { User.simplify(it) })
     }
 
