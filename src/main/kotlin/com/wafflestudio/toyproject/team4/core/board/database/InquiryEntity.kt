@@ -20,6 +20,7 @@ class InquiryEntity(
 
     var title: String,
     var content: String,
+    var comment: String? = null,
     @Enumerated(EnumType.STRING)
     var type: Type,
     var optionName: String? = null,
