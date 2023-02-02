@@ -186,18 +186,6 @@ class UserServiceImpl(
     override fun postReview(username: String, request: ReviewRequest) {
         val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
-        if (request.rating < 0 || request.rating > 10)
-            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
-        try {
-            ReviewEntity.Size.valueOf(request.size.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("사이즈가 적절하지 않습니다.")
-        }
-        try {
-            ReviewEntity.Color.valueOf(request.color.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("색감이 적절하지 않습니다.")
-        }
         val reviewEntity = ReviewEntity(
             user = purchaseEntity.user,
             purchase = purchaseEntity,
@@ -215,31 +203,12 @@ class UserServiceImpl(
 
     @Transactional
     override fun putReview(username: String, request: ReviewRequest) {
-        if (request.rating < 0 || request.rating > 10)
-            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
-        try {
-            ReviewEntity.Size.valueOf(request.size.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("사이즈가 적절하지 않습니다.")
-        }
-        try {
-            ReviewEntity.Color.valueOf(request.color.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("색감이 적절하지 않습니다.")
-        }
         val reviewEntity = reviewRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
-        reviewEntity.run {
-            rating = request.rating
-            content = request.content
-            image1 = request.images.getOrNull(0)
-            image2 = request.images.getOrNull(1)
-            image3 = request.images.getOrNull(2)
-            size = ReviewEntity.Size.valueOf(request.size.uppercase())
-            color = ReviewEntity.Color.valueOf(request.color.uppercase())
-        }
+
+        reviewEntity.update(request)
         reviewRepository.save(reviewEntity)
     }
 
@@ -249,6 +218,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+
         reviewRepository.delete(reviewEntity)
     }
 
