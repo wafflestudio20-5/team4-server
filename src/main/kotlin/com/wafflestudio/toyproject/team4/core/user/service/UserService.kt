@@ -41,14 +41,14 @@ interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
-    fun getFollowers(userId: Long): FollowersResponse
-    fun getFollowings(userId: Long): FollowingsResponse
+    fun getFollowers(userId: Long): UsersResponse
+    fun getFollowings(userId: Long): UsersResponse
     fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun getUserStyles(userId: Long): StylesResponse
     fun follow(username: String, userId: Long)
     fun unfollow(username: String, userId: Long)
 
-    fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
+    fun searchUsers(query: String?, index: Long, count: Long): UsersResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -118,20 +118,20 @@ class UserServiceImpl(
         } ?: false
     }
 
-    override fun getFollowers(userId: Long): FollowersResponse {
+    override fun getFollowers(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val followers = closetOwner.followers.map { User.simplify(it.following) }
 
-        return FollowersResponse(followers)
+        return UsersResponse(followers)
     }
 
-    override fun getFollowings(userId: Long): FollowingsResponse {
+    override fun getFollowings(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val followings = closetOwner.followings.map { User.simplify(it.followed) }
 
-        return FollowingsResponse(followings)
+        return UsersResponse(followings)
     }
 
     @Transactional
@@ -168,10 +168,10 @@ class UserServiceImpl(
         followedUser.followerCount--
     }
 
-    override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
+    override fun searchUsers(query: String?, index: Long, count: Long): UsersResponse {
         query ?: throw CustomHttp400("검색어를 입력하세요.")
         val users = userRepository.searchByQueryOrderByFollowers(query, index, count)
-        return UserSearchResponse(users.map { User.simplify(it) })
+        return UsersResponse(users.map { User.simplify(it) })
     }
 
     /* **********************************************************
