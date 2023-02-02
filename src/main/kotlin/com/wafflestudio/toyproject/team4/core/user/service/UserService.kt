@@ -7,7 +7,6 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
-import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
@@ -186,19 +185,8 @@ class UserServiceImpl(
     override fun postReview(username: String, request: ReviewRequest) {
         val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
-        val reviewEntity = ReviewEntity(
-            user = purchaseEntity.user,
-            purchase = purchaseEntity,
-            rating = request.rating,
-            content = request.content,
-            image1 = request.images.getOrNull(0),
-            image2 = request.images.getOrNull(1),
-            image3 = request.images.getOrNull(2),
-            size = ReviewEntity.Size.valueOf(request.size.uppercase()),
-            color = ReviewEntity.Color.valueOf(request.color.uppercase()),
-        )
-        reviewRepository.save(reviewEntity)
-        purchaseEntity.item.reviewCount++
+
+        purchaseEntity.writeReview(request)
     }
 
     @Transactional
