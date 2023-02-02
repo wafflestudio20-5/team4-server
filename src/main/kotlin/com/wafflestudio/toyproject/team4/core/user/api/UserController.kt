@@ -6,7 +6,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -159,27 +157,6 @@ class UserController(
         @RequestParam count: Long?
     ) = userService.getItemInquiries(username, index ?: 0L, count ?: 5L)
 
-    @Authenticated
-    @PutMapping("/me/item-inquiries")
-    fun putItemInquiries(
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-        @RequestBody putItemInquiriesRequest: PutItemInquiriesRequest
-    ) = ResponseEntity(
-        userService.putItemInquiries(username, putItemInquiriesRequest),
-        HttpStatus.OK
-    )
-
-    @Authenticated
-    @DeleteMapping("/me/item-inquiry/{id}")
-    fun deleteItemInquiry(
-        @RequestHeader(value = "Authorization") authorization: String,
-        @UserContext username: String,
-        @PathVariable(value = "id") itemInquiryId: Long
-    ) = ResponseEntity(
-        userService.deleteItemInquiry(username, itemInquiryId),
-        HttpStatus.OK
-    )
 
     @GetMapping("/search")
     fun searchUsers(

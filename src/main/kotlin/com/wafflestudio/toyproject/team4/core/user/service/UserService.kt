@@ -1,7 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
-import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
@@ -15,7 +14,6 @@ import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
@@ -51,8 +49,6 @@ interface UserService {
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
     fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
-    fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
-    fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
 
 @Service
@@ -281,25 +277,5 @@ class UserServiceImpl(
             inquiries = itemInquiries.map { entity -> Inquiry.of(entity) },
             totalPages = ceil(user.itemInquiries.size.toDouble() / count).toLong()
         )
-    }
-
-    @Transactional
-    override fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest) {
-        val targetItemInquiry = inquiryRepository.findByIdOrNull(putItemInquiriesRequest.id)
-            ?: throw CustomHttp404("작성한 상품 문의가 없습니다.")
-        if (targetItemInquiry.user.username != username)
-            throw CustomHttp403("수정 권한이 없습니다.")
-
-        targetItemInquiry.update(putItemInquiriesRequest)
-    }
-
-    @Transactional
-    override fun deleteItemInquiry(username: String, itemInquiryId: Long) {
-        val user = userRepository.findByUsername(username)
-            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val itemInquiry = user.itemInquiries.find { it.id == itemInquiryId }
-            ?: throw CustomHttp404("작성한 상품 문의가 없습니다.")
-
-        user.itemInquiries.remove(itemInquiry)
     }
 }

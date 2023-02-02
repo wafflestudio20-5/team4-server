@@ -1,6 +1,5 @@
 package com.wafflestudio.toyproject.team4.core.item.service
 
-import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
@@ -8,14 +7,12 @@ import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
-import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRequest
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemRankingResponse
 import com.wafflestudio.toyproject.team4.core.item.api.response.ItemResponse
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
 import com.wafflestudio.toyproject.team4.core.item.domain.RankingItem
-import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,14 +29,11 @@ interface ItemService {
     fun getItem(itemId: Long): ItemResponse
     fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse
     fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse
-    fun postItemInquiry(username: String, itemId: Long, postItemInquiryRequest: PostItemInquiryRequest)
-
     fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse
 }
 
 @Service
 class ItemServiceImpl(
-    private val userRepository: UserRepository,
     private val itemRepository: ItemRepository,
     private val reviewRepository: ReviewRepository,
     private val inquiryRepository: InquiryRepository
@@ -94,22 +88,6 @@ class ItemServiceImpl(
             inquiries = itemInquiries.map { entity -> Inquiry.of(entity) },
             totalPages = ceil(itemTotalInquiryCount.toDouble() / count).toLong()
         )
-    }
-
-    @Transactional
-    override fun postItemInquiry(username: String, itemId: Long, postItemInquiryRequest: PostItemInquiryRequest) {
-        val item = itemRepository.findByIdOrNull(itemId)
-            ?: throw CustomHttp404("존재하지 않는 상품입니다.")
-        val user = userRepository.findByUsername(username)!!
-
-        // check whether the option that user selected is one of the option of the item
-        val newOption = postItemInquiryRequest.option
-        val itemOptions = item.options?.map { it.optionName } ?: listOf()
-        if (!newOption.isNullOrEmpty() && !itemOptions.contains(newOption))
-            throw CustomHttp400("상품에 존재하지 않는 옵션입니다.")
-
-        // make a new ItemInquiry object
-        item.writeInquiry(user, postItemInquiryRequest)
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {

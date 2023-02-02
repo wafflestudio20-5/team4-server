@@ -2,7 +2,7 @@ package com.wafflestudio.toyproject.team4.core.board.database
 
 import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
-import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
+import com.wafflestudio.toyproject.team4.core.board.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
