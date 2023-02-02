@@ -1,16 +1,15 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.common.CustomHttp409
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.Color
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
-import com.wafflestudio.toyproject.team4.core.board.database.Size
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Size
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
@@ -91,7 +90,6 @@ class UserServiceImpl(
         val followerUser = username?.let { userRepository.findByUsername(it) }
         val followingUser = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-
         val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
         val styleCount: Long = 1
         val followerCount: Long = 1
@@ -121,18 +119,6 @@ class UserServiceImpl(
     override fun postReview(username: String, request: ReviewRequest) {
         val purchaseEntity = purchaseRepository.findByIdOrNull(request.id)
             ?: throw CustomHttp404("구매한 상품이 올바르지 않습니다.")
-        if (request.rating < 0 || request.rating > 10)
-            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
-        try {
-            Size.valueOf(request.size.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("사이즈가 적절하지 않습니다.")
-        }
-        try {
-            Color.valueOf(request.color.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("색감이 적절하지 않습니다.")
-        }
         val reviewEntity = ReviewEntity(
             user = purchaseEntity.user,
             purchase = purchaseEntity,
@@ -150,41 +136,22 @@ class UserServiceImpl(
 
     @Transactional
     override fun putReview(username: String, request: ReviewRequest) {
-        if (request.rating < 0 || request.rating > 10)
-            throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
-        try {
-            Size.valueOf(request.size.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("사이즈가 적절하지 않습니다.")
-        }
-        try {
-            Color.valueOf(request.color.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw CustomHttp400("색감이 적절하지 않습니다.")
-        }
-        val reviewEntity = reviewRepository.findByIdOrNull(request.id)
-            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        if (reviewEntity.user.username != username)
-            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
-        reviewEntity.run {
-            rating = request.rating
-            content = request.content
-            image1 = request.images.getOrNull(0)
-            image2 = request.images.getOrNull(1)
-            image3 = request.images.getOrNull(2)
-            size = Size.valueOf(request.size.uppercase())
-            color = Color.valueOf(request.color.uppercase())
-        }
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val reviewEntity = userEntity.reviews.find { it.id == request.id }
+            ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
+        reviewEntity.update(request)
         reviewRepository.save(reviewEntity)
     }
 
     @Transactional
     override fun deleteReview(username: String, reviewId: Long) {
-        val reviewEntity = reviewRepository.findByIdOrNull(reviewId)
-            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        if (reviewEntity.user.username != username)
-            throw CustomHttp403("사용자의 구매후기가 아닙니다.")
-        reviewRepository.delete(reviewEntity)
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val reviewEntity = userEntity.reviews.find { it.id == reviewId }
+            ?: throw CustomHttp404("작성한 구매후기가 없습니다.")
+        reviewEntity.purchase.item.reviewCount--
+        userEntity.reviews.remove(reviewEntity)
     }
 
     @Transactional

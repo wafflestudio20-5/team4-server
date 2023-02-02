@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.board.database
 
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
@@ -49,12 +50,24 @@ class ReviewEntity(
 
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentEntity> = mutableListOf()
-}
 
-enum class Size {
-    LARGE, MID, SMALL,
-}
+    fun update(
+        request: ReviewRequest
+    ) {
+        this.rating = request.rating
+        this.content = request.content
+        this.image1 = request.images.getOrNull(0)
+        this.image2 = request.images.getOrNull(1)
+        this.image3 = request.images.getOrNull(2)
+        this.size = Size.valueOf(request.size.uppercase())
+        this.color = Color.valueOf(request.color.uppercase())
+    }
 
-enum class Color {
-    BRIGHT, MID, DIM,
+    enum class Size {
+        LARGE, MID, SMALL,
+    }
+
+    enum class Color {
+        BRIGHT, MID, DIM,
+    }
 }

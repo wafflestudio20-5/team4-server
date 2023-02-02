@@ -18,24 +18,32 @@ interface InquiryRepositoryCustom {
 class InquiryRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : InquiryRepositoryCustom {
-    override fun findAllByUserOrderByCreatedDateTimeDesc(user: UserEntity, index: Long, count: Long): List<InquiryEntity> {
+    override fun findAllByUserOrderByCreatedDateTimeDesc(
+        user: UserEntity,
+        index: Long,
+        count: Long
+    ): List<InquiryEntity> {
         return queryFactory
             .select(inquiryEntity)
             .from(inquiryEntity)
             .where(inquiryEntity.user.eq(user))
             .orderBy(inquiryEntity.createdDateTime.desc())
-            .offset(count*index)
+            .offset(count * index)
             .limit(count)
             .fetch()
     }
 
-    override fun findAllByItem_IdOrderByCreatedDateTimeDesc(itemId: Long, index: Long, count: Long): List<InquiryEntity> {
+    override fun findAllByItem_IdOrderByCreatedDateTimeDesc(
+        itemId: Long,
+        index: Long,
+        count: Long
+    ): List<InquiryEntity> {
         return queryFactory
             .select(inquiryEntity)
             .from(inquiryEntity)
             .where(inquiryEntity.item.id.eq(itemId))
             .orderBy(inquiryEntity.createdDateTime.desc())
-            .offset(count*index)
+            .offset(count * index)
             .limit(count)
             .fetch()
     }
