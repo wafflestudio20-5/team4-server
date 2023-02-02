@@ -121,7 +121,10 @@ class UserServiceImpl(
     override fun getFollowers(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val followers = closetOwner.followers.map { User.simplify(it.following) }
+        val followers = closetOwner.followers.mapNotNull {
+            if (it.isActive) User.simplify(it.following)
+            else null
+        }
 
         return UsersResponse(followers)
     }
@@ -129,7 +132,10 @@ class UserServiceImpl(
     override fun getFollowings(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val followings = closetOwner.followings.map { User.simplify(it.followed) }
+        val followings = closetOwner.followings.mapNotNull {
+            if (it.isActive) User.simplify(it.followed)
+            else null
+        }
 
         return UsersResponse(followings)
     }

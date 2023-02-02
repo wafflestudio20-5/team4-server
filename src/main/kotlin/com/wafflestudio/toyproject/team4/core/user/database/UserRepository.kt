@@ -52,7 +52,7 @@ class UserRepositoryCustomImpl(
             .from(userEntity)
             .leftJoin(userEntity.followers, followEntity).fetchJoin()
             .leftJoin(followEntity.following).fetchJoin()
-            .where(userEntity.id.eq(userId), followEntity.isActive.eq(true))
+            .where(userEntity.id.eq(userId))
             .fetchOne()
     }
 
@@ -62,7 +62,7 @@ class UserRepositoryCustomImpl(
             .from(userEntity)
             .leftJoin(userEntity.followings, followEntity).fetchJoin()
             .leftJoin(followEntity.followed).fetchJoin()
-            .where(userEntity.id.eq(userId), followEntity.isActive.eq(true))
+            .where(userEntity.id.eq(userId))
             .fetchOne()
     }
 
