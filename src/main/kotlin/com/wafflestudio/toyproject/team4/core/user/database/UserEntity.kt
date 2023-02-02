@@ -6,6 +6,8 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchaseRequest
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
@@ -84,9 +86,7 @@ class UserEntity(
     @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var followers: MutableSet<FollowEntity> = mutableSetOf()
 
-    fun viewItem(
-        item: ItemEntity
-    ) {
+    fun viewItem(item: ItemEntity) {
         val recentItem = RecentItemEntity(this, item)
         recentItems.add(recentItem)
     }
@@ -106,5 +106,26 @@ class UserEntity(
         this.weight = request.weight ?: this.weight
         this.description = request.description ?: this.description
         this.instaUsername = request.instaUsername ?: this.instaUsername
+    }
+
+    fun addToCart(orderItem: ItemEntity, cartRequestInfo: PostShoppingCartRequest) {
+        val cartItem = CartItemEntity(
+            user = this,
+            item = orderItem,
+            optionName = cartRequestInfo.option,
+            quantity = cartRequestInfo.quantity
+        )
+        this.cartItems.add(cartItem)
+    }
+
+    fun purchase(orderItem: ItemEntity, purchaseRequestInfo: PurchaseRequest) {
+        val newPurchase = PurchaseEntity(
+            user = this,
+            item = orderItem,
+            optionName = purchaseRequestInfo.option,
+            payment = purchaseRequestInfo.payment,
+            quantity = purchaseRequestInfo.quantity
+        )
+        this.purchases.add(newPurchase)
     }
 }

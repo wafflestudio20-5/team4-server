@@ -73,6 +73,7 @@ class StyleServiceImpl(
 
     private fun findStyleItems(style: StyleEntity): List<ItemEntity> {
         val styleItemIds = style.styleItems.map { it.itemId }
+
         return itemRepository.findAllByIds(styleItemIds)
     }
 

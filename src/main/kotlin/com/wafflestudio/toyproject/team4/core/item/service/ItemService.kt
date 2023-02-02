@@ -72,11 +72,13 @@ class ItemServiceImpl(
     override fun getItem(itemId: Long): ItemResponse {
         val item = itemRepository.findByIdOrNull(itemId)
             ?: throw CustomHttp404("존재하지 않는 상품 아이디입니다.")
+
         return ItemResponse(Item.of(item))
     }
 
     override fun getItemReviews(itemId: Long, index: Long, count: Long): ReviewsResponse {
         val itemReviews = reviewRepository.findAllByItemIdOrderByRatingDesc(itemId)
+
         return ReviewsResponse(
             reviews = itemReviews
                 .filterIndexed { idx, _ -> (idx / count) == index }
@@ -85,11 +87,11 @@ class ItemServiceImpl(
     }
 
     override fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse {
-        val itemInquiryList = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId, index, count)
+        val itemInquiries = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId, index, count)
         val itemTotalInquiryCount = inquiryRepository.getItemTotalInquiryCount(itemId)
 
         return InquiriesResponse(
-            inquiries = itemInquiryList.map { entity -> Inquiry.of(entity) },
+            inquiries = itemInquiries.map { entity -> Inquiry.of(entity) },
             totalPages = ceil(itemTotalInquiryCount.toDouble() / count).toLong()
         )
     }
@@ -107,8 +109,7 @@ class ItemServiceImpl(
             throw CustomHttp400("상품에 존재하지 않는 옵션입니다.")
 
         // make a new ItemInquiry object
-        val itemInquiry = postItemInquiryRequest.toEntity(user, item)
-        item.inquiries.add(itemInquiry)
+        item.writeInquiry(user, postItemInquiryRequest)
     }
 
     override fun searchItemByQuery(query: String, index: Long, count: Long): ItemRankingResponse {

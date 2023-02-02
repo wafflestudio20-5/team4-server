@@ -1,7 +1,9 @@
 package com.wafflestudio.toyproject.team4.core.item.database
 
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
+import com.wafflestudio.toyproject.team4.core.item.api.request.PostItemInquiryRequest
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.EnumType
@@ -49,19 +51,20 @@ class ItemEntity(
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var inquiries: MutableList<InquiryEntity> = mutableListOf()
 
-    fun updateImages(
-        imageUrlList: List<String>
-    ) {
+    fun updateImages(imageUrlList: List<String>) {
         this.images = imageUrlList.map { url ->
             ItemImageEntity(this, url)
         }.toMutableList()
     }
 
-    fun updateOptionList(
-        optionList: List<String>
-    ) {
+    fun updateOptionList(optionList: List<String>) {
         this.options = optionList.map { option ->
             OptionEntity(this, option)
         }.toMutableList()
+    }
+
+    fun writeInquiry(writer: UserEntity, request: PostItemInquiryRequest) {
+        val newInquiry = request.toEntity(writer, this)
+        this.inquiries.add(newInquiry)
     }
 }
