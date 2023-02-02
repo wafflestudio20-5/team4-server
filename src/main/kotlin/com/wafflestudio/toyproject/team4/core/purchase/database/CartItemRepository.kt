@@ -1,6 +1,7 @@
-package com.wafflestudio.toyproject.team4.core.user.database
+package com.wafflestudio.toyproject.team4.core.purchase.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 

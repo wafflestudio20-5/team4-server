@@ -1,6 +1,7 @@
-package com.wafflestudio.toyproject.team4.core.user.database
+package com.wafflestudio.toyproject.team4.core.purchase.database
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import javax.persistence.Entity
 import javax.persistence.EntityListeners

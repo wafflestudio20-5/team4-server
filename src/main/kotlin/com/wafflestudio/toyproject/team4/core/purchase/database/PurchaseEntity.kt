@@ -1,10 +1,11 @@
-package com.wafflestudio.toyproject.team4.core.user.database
+package com.wafflestudio.toyproject.team4.core.purchase.database
 
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Size
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity.Color
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.board.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime

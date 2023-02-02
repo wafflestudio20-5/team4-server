@@ -1,7 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.board.domain
 
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
-import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
+import com.wafflestudio.toyproject.team4.core.purchase.domain.Purchase
 import java.time.LocalDateTime
 
 data class Review(

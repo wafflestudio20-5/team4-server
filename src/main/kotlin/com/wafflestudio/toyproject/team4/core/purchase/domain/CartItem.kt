@@ -1,7 +1,7 @@
-package com.wafflestudio.toyproject.team4.core.user.domain
+package com.wafflestudio.toyproject.team4.core.purchase.domain
 
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.CartItemEntity
 
 data class CartItem(
     val id: Long,

@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.user.api.request
+package com.wafflestudio.toyproject.team4.core.purchase.api.request
 
 data class PostShoppingCartRequest(
     val id: Long,

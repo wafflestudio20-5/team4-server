@@ -6,8 +6,10 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
-import com.wafflestudio.toyproject.team4.core.user.api.request.PurchaseRequest
+import com.wafflestudio.toyproject.team4.core.purchase.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.purchase.api.request.PurchaseRequest
+import com.wafflestudio.toyproject.team4.core.purchase.database.CartItemEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate

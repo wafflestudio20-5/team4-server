@@ -6,7 +6,7 @@ import com.wafflestudio.toyproject.team4.core.board.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
-import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
+import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
