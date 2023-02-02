@@ -2,15 +2,15 @@ package com.wafflestudio.toyproject.team4.core.item.database
 
 import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
-import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
-import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
-import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
+import com.wafflestudio.toyproject.team4.core.board.api.request.ReviewRequest
+import com.wafflestudio.toyproject.team4.core.board.service.ReviewService
+import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.User
-import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.boot.context.event.ApplicationStartedEvent
@@ -27,7 +27,7 @@ class MemoryDB(
     private val passwordEncoder: PasswordEncoder,
     private val imageService: ImageService,
     private val styleService: StyleService,
-    private val userService: UserService,
+    private val reviewService: ReviewService,
     private val userRepository: UserRepository,
     private val purchaseRepository: PurchaseRepository
 ) {
@@ -280,7 +280,7 @@ class MemoryDB(
                     "mid",
                     images
                 )
-                userService.postReview(it.username, reviewRequest)
+                reviewService.postReview(it.username, reviewRequest)
             }
         }
     }

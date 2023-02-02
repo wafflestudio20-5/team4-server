@@ -34,11 +34,6 @@ class UserController(
         @UserContext username: String,
     ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
 
-    @GetMapping("/{userId}/styles")
-    fun getUserStyles(
-        @PathVariable(value = "userId") userId: Long
-    ) = ResponseEntity(userService.getUserStyles(userId), HttpStatus.OK)
-
     @GetMapping("/{userId}")
     fun getUser(
         @PathVariable(value = "userId") userId: Long,

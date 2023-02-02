@@ -6,9 +6,8 @@ import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesRespon
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
-import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
-import com.wafflestudio.toyproject.team4.core.style.domain.Style
+import com.wafflestudio.toyproject.team4.core.user.database.FollowEntity
+import com.wafflestudio.toyproject.team4.core.user.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
@@ -25,17 +24,20 @@ import kotlin.math.ceil
 interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
+
     fun getUser(username: String?, userId: Long): UserResponse
+
     fun getFollowers(userId: Long): FollowersResponse
     fun getFollowings(userId: Long): FollowingsResponse
     fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
-    fun getUserStyles(userId: Long): StylesResponse
     fun follow(username: String, userId: Long)
     fun unfollow(username: String, userId: Long)
 
     fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
+
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
+
     fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
 }
 
@@ -65,6 +67,10 @@ class UserServiceImpl(
         user.update(patchMeRequest, newEncodedPassword)
     }
 
+    /* **********************************************************
+    //                       My Closet                         //
+    ********************************************************** */
+
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
         val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
@@ -82,6 +88,10 @@ class UserServiceImpl(
             isFollow = isFollow,
         )
     }
+
+    /* **********************************************************
+    //                         Follow                          //
+    ********************************************************** */
 
     override fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean {
         val relationHistory = currentUser?.followings?.find { it.followed == closetOwner }
@@ -103,14 +113,6 @@ class UserServiceImpl(
         val followings = closetOwner.followings.map { User.simplify(it.followed) }
 
         return FollowingsResponse(followings)
-    }
-
-    @Transactional
-    override fun getUserStyles(userId: Long): StylesResponse {
-        val user = userRepository.findByIdOrNullWithStylesOrderByRecentDesc(userId)
-            ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-
-        return StylesResponse(user.styles.map { Style.preview(it) })
     }
 
     @Transactional
@@ -136,6 +138,10 @@ class UserServiceImpl(
 
         follow.deactivate()
     }
+
+    /* **********************************************************
+    //                      Search User                        //
+    ********************************************************** */
 
     override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
         if (query == "" || query == null) throw CustomHttp400("검색어를 입력하세요.")

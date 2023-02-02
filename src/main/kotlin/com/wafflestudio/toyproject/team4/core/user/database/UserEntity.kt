@@ -3,7 +3,6 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
-import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.purchase.api.request.PostShoppingCartRequest

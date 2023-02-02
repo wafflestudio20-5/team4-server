@@ -1,6 +1,5 @@
-package com.wafflestudio.toyproject.team4.core.style.database
+package com.wafflestudio.toyproject.team4.core.user.database
 
-import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
