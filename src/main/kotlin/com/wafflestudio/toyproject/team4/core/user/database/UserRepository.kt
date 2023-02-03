@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.board.database.QReviewEntity.reviewEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QUserEntity.userEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.QPurchaseEntity.purchaseEntity
 import com.wafflestudio.toyproject.team4.core.style.database.QStyleEntity.styleEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QFollowEntity.followEntity
 import org.springframework.data.jpa.repository.JpaRepository
@@ -91,9 +92,13 @@ class UserRepositoryCustomImpl(
 
     override fun findByUsernameFetchJoinPurchases(username: String): UserEntity? {
         return queryFactory
-            .selectDistinct(userEntity)
+            .select(userEntity)
             .from(userEntity)
-            .leftJoin(userEntity.purchases).fetchJoin()
+            .leftJoin(userEntity.purchases, purchaseEntity).fetchJoin()
+            .orderBy(
+                purchaseEntity.review.createdDateTime.desc().nullsFirst(),
+                purchaseEntity.createdDateTime.desc()
+            )
             .where(userEntity.username.eq(username))
             .fetchFirst()
     }
