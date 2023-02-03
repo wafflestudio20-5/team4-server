@@ -47,6 +47,11 @@ class ReviewEntity(
 
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var images: MutableList<ReviewImageEntity> = mutableListOf()
+
+    fun addComment(user: UserEntity, content: String) {
+        val comment = CommentEntity(this, user, content)
+        this.comments.add(comment)
+    }
 }
 
 enum class Size {

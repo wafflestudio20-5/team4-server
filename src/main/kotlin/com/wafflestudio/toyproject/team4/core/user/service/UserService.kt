@@ -175,13 +175,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
-        reviewEntity.comments.add(
-            CommentEntity(
-                review = reviewEntity,
-                user = userEntity,
-                content = request.content,
-            )
-        )
+        reviewEntity.addComment(userEntity, request.content)
     }
 
     @Transactional
