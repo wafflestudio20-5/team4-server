@@ -21,7 +21,7 @@ class CommentController(
     val commentService: CommentService
 ) {
     @Authenticated
-    @PostMapping("/")
+    @PostMapping
     fun postComment(
         @RequestBody request: PostCommentRequest,
         @UserContext username: String,
