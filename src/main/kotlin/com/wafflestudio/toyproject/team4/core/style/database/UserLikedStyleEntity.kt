@@ -8,12 +8,13 @@ import javax.persistence.*
 @Entity
 @Table(
     name = "user_liked_styles",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "liked_style_id"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "styleId"])]
 )
 class UserLikedStyleEntity(
     val userId: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "styleId")
     val likedStyle: StyleEntity,
 ) {
     @Id
@@ -25,4 +26,11 @@ class UserLikedStyleEntity(
 
     @LastModifiedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+
+    var isActive: Boolean = true
+
+    fun changeActive() {
+        this.isActive = !this.isActive
+        this.likedStyle.likedUserCount += if (this.isActive) 1 else -1
+    }
 }

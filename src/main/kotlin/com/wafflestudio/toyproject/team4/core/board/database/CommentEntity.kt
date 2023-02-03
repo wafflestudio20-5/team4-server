@@ -1,6 +1,8 @@
 package com.wafflestudio.toyproject.team4.core.board.database
 
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import javax.persistence.Entity
@@ -18,8 +20,12 @@ import javax.persistence.Table
 @EntityListeners(AuditingEntityListener::class)
 class CommentEntity(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId")
+    @JoinColumn(name = "reviewId")
     val review: ReviewEntity,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    val user: UserEntity,
 
     var content: String,
 ) {
@@ -29,4 +35,11 @@ class CommentEntity(
 
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
+
+    @LastModifiedDate
+    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+
+    fun update(content: String) {
+        this.content = content
+    }
 }

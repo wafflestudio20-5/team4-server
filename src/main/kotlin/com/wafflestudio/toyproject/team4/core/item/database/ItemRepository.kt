@@ -16,6 +16,7 @@ interface ItemRepositoryCustom {
         count: Long,
         sort: ItemRepositoryCustomImpl.Sort
     ): List<ItemEntity>
+
     fun getTotalCount(category: Item.Category?, subCategory: Item.SubCategory?): Long
     fun findAllByContainingOrderByRatingDesc(query: String): List<ItemEntity>
     fun findAllByIds(ids: List<Long>): List<ItemEntity>
@@ -52,7 +53,7 @@ class ItemRepositoryCustomImpl(
             .from(itemEntity)
             .where(eqInterest)
             .orderBy(ordering)
-            .offset(count*index)
+            .offset(count * index)
             .limit(count)
             .fetch()
 
