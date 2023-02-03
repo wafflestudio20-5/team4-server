@@ -341,11 +341,11 @@ class MemoryDB(
         val weightRange = 15L // 몸무게 변동폭
 
         val users = (1..userNum).map { // 사용자 생성
-            val encodedPassword = passwordEncoder.encode("12345678*")  // 비밀번호는 "12345678*"로 통일
+            val encodedPassword = passwordEncoder.encode("12345678*") // 비밀번호는 "12345678*"로 통일
             UserEntity(
-                username = "${prefix}user${it}", // 아이디는 "{prefix}user{1~userNum}"로 통일
+                username = "${prefix}user$it", // 아이디는 "{prefix}user{1~userNum}"로 통일
                 encodedPassword = encodedPassword,
-                nickname = "${prefix}nick${it}" // 닉네임은 "{prefix}nick{1~userNum}"로 통일
+                nickname = "${prefix}nick$it" // 닉네임은 "{prefix}nick{1~userNum}"로 통일
             )
         }
         val userEntities = users.map {
