@@ -67,6 +67,7 @@ class StyleEntity(
             ?: this.styleItems
         this.content = request.content ?: this.content
         this.hashtag = request.hashtag ?: this.hashtag
+    }
 
     fun addLikedUser(userId: Long): UserLikedStyleEntity {
         val userLikedStyle = UserLikedStyleEntity(
