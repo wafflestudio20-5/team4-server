@@ -61,7 +61,6 @@ class StyleController(
     @Authenticated
     @PatchMapping("/style/{styleId}")
     fun patchStyle(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "styleId") styleId: Long,
         @RequestBody patchStyleRequest: PatchStyleRequest
@@ -73,7 +72,6 @@ class StyleController(
     @Authenticated
     @DeleteMapping("/style/{styleId}")
     fun deleteStyle(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "styleId") styleId: Long,
     ) = ResponseEntity(
@@ -81,9 +79,9 @@ class StyleController(
         HttpStatus.OK
     )
 
+    @Authenticated
     @PostMapping("/style/{styleId}/like")
     fun postLike(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "styleId") styleId: Long,
     ) = ResponseEntity(
@@ -94,7 +92,6 @@ class StyleController(
     @Authenticated
     @DeleteMapping("/style/{styleId}/like")
     fun deleteLike(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "styleId") styleId: Long,
     ) = ResponseEntity(
