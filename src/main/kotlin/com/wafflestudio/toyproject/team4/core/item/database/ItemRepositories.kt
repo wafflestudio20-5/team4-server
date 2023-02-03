@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component
 interface ItemRepository : JpaRepository<ItemEntity, Long>, ItemRepositoryCustom
 interface ItemImageRepository : JpaRepository<ItemImageEntity, Long>
 interface ItemOptionRepository : JpaRepository<ItemOptionEntity, Long>
-
-
 interface ItemRepositoryCustom {
     fun findAllByOrderBy(
         category: Item.Category?,
@@ -55,7 +53,7 @@ class ItemRepositoryCustomImpl(
             .select(itemEntity.id)
             .from(itemEntity)
             .where(eqInterest)
-            .orderBy(ordering)
+            .orderBy(ordering, itemEntity.name.asc())
             .offset(count * index)
             .limit(count)
             .fetch()
@@ -65,7 +63,7 @@ class ItemRepositoryCustomImpl(
             .from(itemEntity)
             .leftJoin(itemEntity.images).fetchJoin()
             .where(itemEntity.id.`in`(itemIds))
-            .orderBy(ordering)
+            .orderBy(ordering, itemEntity.name.asc())
             .fetch()
     }
 
@@ -107,7 +105,7 @@ class ItemRepositoryCustomImpl(
             .from(itemEntity)
             .leftJoin(itemEntity.images).fetchJoin()
             .where(eqInterest)
-            .orderBy(itemEntity.rating.desc())
+            .orderBy(itemEntity.rating.desc(), itemEntity.name.asc())
             .fetch()
     }
 

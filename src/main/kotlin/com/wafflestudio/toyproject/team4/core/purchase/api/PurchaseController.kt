@@ -38,7 +38,6 @@ class PurchaseController(
         @UserContext username: String,
     ) = ResponseEntity(purchaseService.getShoppingCart(username), HttpStatus.OK)
 
-
     @Authenticated
     @PostMapping("/shopping-cart")
     fun postShoppingCart(
@@ -62,5 +61,4 @@ class PurchaseController(
         @UserContext username: String,
         @PathVariable(value = "id") cartItemId: Long
     ) = ResponseEntity(purchaseService.deleteShoppingCart(username, cartItemId), HttpStatus.OK)
-
 }

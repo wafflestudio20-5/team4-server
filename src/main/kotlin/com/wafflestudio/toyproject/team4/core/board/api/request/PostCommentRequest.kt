@@ -1,4 +1,4 @@
-package com.wafflestudio.toyproject.team4.core.user.api.request
+package com.wafflestudio.toyproject.team4.core.board.api.request
 
 data class PostCommentRequest(
     val reviewId: Long,

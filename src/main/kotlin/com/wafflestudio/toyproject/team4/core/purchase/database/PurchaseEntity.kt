@@ -44,7 +44,7 @@ class PurchaseEntity(
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
 
-    @OneToOne(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "purchase", cascade = [CascadeType.ALL], orphanRemoval = true)
     var review: ReviewEntity? = null
 
     fun writeReview(request: ReviewRequest) {
@@ -60,6 +60,13 @@ class PurchaseEntity(
             color = Color.valueOf(request.color.uppercase()),
         )
         this.item.reviewCount++
+        this.item.addRating(request.rating)
         this.user.reviewCount++
+    }
+
+    fun deleteReview(rating: Long) {
+        this.item.reviewCount--
+        this.item.deleteRating(rating)
+        this.user.reviewCount--
     }
 }

@@ -51,14 +51,10 @@ class ReviewEntity(
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentEntity> = mutableListOf()
 
-    fun addComment(user: UserEntity, content: String) {
-        val comment = CommentEntity(this, user, content)
-        this.comments.add(comment)
-    }
-
     fun update(
         request: ReviewRequest
     ) {
+        this.purchase.item.changeRating(this.rating, request.rating)
         this.rating = request.rating
         this.content = request.content
         this.image1 = request.images.getOrNull(0)
@@ -66,6 +62,11 @@ class ReviewEntity(
         this.image3 = request.images.getOrNull(2)
         this.size = Size.valueOf(request.size.uppercase())
         this.color = Color.valueOf(request.color.uppercase())
+    }
+
+    fun addComment(user: UserEntity, content: String) {
+        val comment = CommentEntity(this, user, content)
+        this.comments.add(comment)
     }
 
     enum class Size {
