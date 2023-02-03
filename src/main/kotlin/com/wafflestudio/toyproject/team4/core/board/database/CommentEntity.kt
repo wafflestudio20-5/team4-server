@@ -2,6 +2,7 @@ package com.wafflestudio.toyproject.team4.core.board.database
 
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import javax.persistence.Entity
@@ -35,11 +36,10 @@ class CommentEntity(
     @CreatedDate
     var createdDateTime: LocalDateTime = LocalDateTime.now()
 
-    @CreatedDate
+    @LastModifiedDate
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 
     fun update(content: String) {
         this.content = content
-        this.modifiedDateTime = LocalDateTime.now()
     }
 }
