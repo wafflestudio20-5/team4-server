@@ -4,7 +4,7 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
@@ -22,6 +22,8 @@ interface StyleService {
     fun getStyles(index: Long, count: Long, sort: String?): StylesResponse
     fun getStyle(username: String?, styleId: Long): StyleResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
+    fun postLike(username: String, styleId: Long)
+    fun deleteLike(username: String, styleId: Long)
 }
 
 @Service
@@ -29,6 +31,7 @@ class StyleServiceImpl(
     private val itemRepository: ItemRepository,
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
+    private val followRepository: FollowRepository,
     private val userService: UserService
 ) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
@@ -82,5 +85,31 @@ class StyleServiceImpl(
         val style = postStyleRequest.toEntity(user)
 
         user.styles.add(style)
+    }
+
+    @Transactional
+    override fun postLike(username: String, styleId: Long) {
+        val user = userRepository.findByUsername(username)!!
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        val likedUser = style.likedUsers.find { it.userId == user.id }
+        if (likedUser == null) {
+            style.addLikedUser(user.id)
+            return
+        }
+        if (likedUser.isActive)
+            throw CustomHttp400("이미 좋아요를 눌렀습니다.")
+        likedUser.changeActive()
+    }
+
+    @Transactional
+    override fun deleteLike(username: String, styleId: Long) {
+        val user = userRepository.findByUsername(username)!!
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        val likedUser = style.likedUsers.find { it.userId == user.id }
+        if (likedUser == null || !likedUser.isActive)
+            throw CustomHttp400("좋아요를 누른 스타일이 아닙니다.")
+        likedUser.changeActive()
     }
 }
