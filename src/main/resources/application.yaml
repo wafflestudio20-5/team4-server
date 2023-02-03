@@ -66,7 +66,7 @@ spring:
             hibernate:
                 show_sql: false
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
     security:
         oauth2:
             client:
