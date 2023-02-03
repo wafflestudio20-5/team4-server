@@ -51,6 +51,11 @@ class ReviewEntity(
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var comments: MutableList<CommentEntity> = mutableListOf()
 
+    fun addComment(user: UserEntity, content: String) {
+        val comment = CommentEntity(this, user, content)
+        this.comments.add(comment)
+    }
+
     fun update(
         request: ReviewRequest
     ) {

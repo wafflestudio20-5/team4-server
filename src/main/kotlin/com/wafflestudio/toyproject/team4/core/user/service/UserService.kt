@@ -1,9 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.service
 
-import com.wafflestudio.toyproject.team4.common.CustomHttp400
-import com.wafflestudio.toyproject.team4.common.CustomHttp403
-import com.wafflestudio.toyproject.team4.common.CustomHttp404
-import com.wafflestudio.toyproject.team4.common.CustomHttp409
+import com.wafflestudio.toyproject.team4.common.*
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
@@ -16,8 +13,10 @@ import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
@@ -53,6 +52,9 @@ interface UserService {
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
     fun deleteReview(username: String, reviewId: Long)
+    fun postComment(username: String, request: PostCommentRequest)
+    fun putComment(username: String, request: PutCommentRequest, commentId: Long)
+    fun deleteComment(username: String, commentId: Long)
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
     fun getShoppingCart(username: String): CartItemsResponse
@@ -259,6 +261,37 @@ class UserServiceImpl(
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
         reviewRepository.delete(reviewEntity)
+    }
+
+    /* **********************************************************
+    //                         Comments                        //
+    ********************************************************** */
+
+    @Transactional
+    override fun postComment(username: String, request: PostCommentRequest) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val reviewEntity = reviewRepository.findByIdOrNull(request.reviewId)
+            ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
+        reviewEntity.addComment(userEntity, request.content)
+    }
+
+    @Transactional
+    override fun putComment(username: String, request: PutCommentRequest, commentId: Long) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val commentEntity = userEntity.comments.find { it.id == commentId }
+            ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
+        commentEntity.update(request.content)
+    }
+
+    @Transactional
+    override fun deleteComment(username: String, commentId: Long) {
+        val userEntity = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val commentEntity = userEntity.comments.find { it.id == commentId }
+            ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
+        userEntity.comments.remove(commentEntity)
     }
 
     /* **********************************************************

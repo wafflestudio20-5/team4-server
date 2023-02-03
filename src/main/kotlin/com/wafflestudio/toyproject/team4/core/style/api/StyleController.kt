@@ -44,7 +44,6 @@ class StyleController(
     @Authenticated
     @PostMapping("/style")
     fun postStyle(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody postStyleRequest: PostStyleRequest
     ) = ResponseEntity(

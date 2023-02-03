@@ -4,8 +4,10 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
@@ -32,11 +34,9 @@ class UserController(
     private val authTokenService: AuthTokenService,
     private val userService: UserService
 ) {
-
     @Authenticated
     @GetMapping("/me")
     fun getMe(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
 
@@ -88,7 +88,6 @@ class UserController(
     @Authenticated
     @GetMapping("/me/reviews")
     fun getReviews(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getReviews(username), HttpStatus.OK)
 
@@ -96,7 +95,6 @@ class UserController(
     @PostMapping("/me/review")
     fun postReview(
         @RequestBody request: ReviewRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.postReview(username, request), HttpStatus.CREATED)
 
@@ -104,7 +102,6 @@ class UserController(
     @PutMapping("/me/review")
     fun putReview(
         @RequestBody request: ReviewRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.putReview(username, request), HttpStatus.OK)
 
@@ -112,14 +109,34 @@ class UserController(
     @DeleteMapping("/me/review/{reviewId}")
     fun deleteReview(
         @PathVariable(value = "reviewId") reviewId: Long,
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.deleteReview(username, reviewId), HttpStatus.OK)
 
     @Authenticated
+    @PostMapping("/me/comment")
+    fun postComment(
+        @RequestBody request: PostCommentRequest,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.postComment(username, request), HttpStatus.CREATED)
+
+    @Authenticated
+    @PutMapping("/me/comment/{commentId}")
+    fun putComment(
+        @PathVariable(value = "commentId") commentId: Long,
+        @RequestBody request: PutCommentRequest,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.putComment(username, request, commentId), HttpStatus.OK)
+
+    @Authenticated
+    @DeleteMapping("/me/comment/{commentId}")
+    fun deleteComment(
+        @PathVariable(value = "commentId") commentId: Long,
+        @UserContext username: String,
+    ) = ResponseEntity(userService.deleteComment(username, commentId), HttpStatus.OK)
+
+    @Authenticated
     @GetMapping("/me/purchases")
     fun getPurchases(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getPurchases(username), HttpStatus.OK)
 
@@ -127,7 +144,6 @@ class UserController(
     @PostMapping("/me/purchases")
     fun postPurchases(
         @RequestBody request: PurchasesRequest,
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) {
         userService.postPurchases(username, request)
@@ -136,14 +152,12 @@ class UserController(
     @Authenticated
     @GetMapping("/me/shopping-cart")
     fun getShoppingCart(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getShoppingCart(username), HttpStatus.OK)
 
     @Authenticated
     @PostMapping("/me/shopping-cart")
     fun postShoppingCart(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody postShoppingCartRequest: PostShoppingCartRequest
     ) = ResponseEntity(userService.postShoppingCart(username, postShoppingCartRequest), HttpStatus.CREATED)
@@ -151,7 +165,6 @@ class UserController(
     @Authenticated
     @PatchMapping("/me/shopping-cart")
     fun patchShoppingCart(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody patchShoppingCartRequest: PatchShoppingCartRequest
     ) = ResponseEntity(userService.patchShoppingCart(username, patchShoppingCartRequest), HttpStatus.OK)
@@ -159,7 +172,6 @@ class UserController(
     @Authenticated
     @DeleteMapping("/me/shopping-cart/{id}")
     fun deleteShoppingCart(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "id") cartItemId: Long
     ) = ResponseEntity(userService.deleteShoppingCart(username, cartItemId), HttpStatus.OK)
@@ -167,14 +179,12 @@ class UserController(
     @Authenticated
     @GetMapping("/me/recently-viewed")
     fun getRecentlyViewed(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getRecentlyViewed(username), HttpStatus.OK)
 
     @Authenticated
     @PostMapping("/me/recently-viewed")
     fun postRecentlyViewed(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody postRecentlyViewedRequest: RecentlyViewedRequest
     ) = ResponseEntity(
@@ -185,7 +195,6 @@ class UserController(
     @Authenticated
     @GetMapping("/me/item-inquiries")
     fun getItemInquiries(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestParam index: Long?,
         @RequestParam count: Long?
@@ -194,7 +203,6 @@ class UserController(
     @Authenticated
     @PutMapping("/me/item-inquiries")
     fun putItemInquiries(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody putItemInquiriesRequest: PutItemInquiriesRequest
     ) = ResponseEntity(
@@ -205,7 +213,6 @@ class UserController(
     @Authenticated
     @DeleteMapping("/me/item-inquiry/{id}")
     fun deleteItemInquiry(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @PathVariable(value = "id") itemInquiryId: Long
     ) = ResponseEntity(
