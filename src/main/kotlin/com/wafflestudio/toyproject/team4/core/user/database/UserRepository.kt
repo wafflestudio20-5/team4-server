@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.board.database.QReviewEntity.reviewEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QUserEntity.userEntity
 import com.wafflestudio.toyproject.team4.core.purchase.database.QPurchaseEntity.purchaseEntity
+import com.wafflestudio.toyproject.team4.core.purchase.database.QCartItemEntity.cartItemEntity
 import com.wafflestudio.toyproject.team4.core.style.database.QStyleEntity.styleEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QFollowEntity.followEntity
 import org.springframework.data.jpa.repository.JpaRepository
@@ -107,7 +108,8 @@ class UserRepositoryCustomImpl(
         return queryFactory
             .selectDistinct(userEntity)
             .from(userEntity)
-            .leftJoin(userEntity.cartItems).fetchJoin()
+            .leftJoin(userEntity.cartItems, cartItemEntity).fetchJoin()
+            .orderBy(cartItemEntity.createdDateTime.desc())
             .where(userEntity.username.eq(username))
             .fetchFirst()
     }

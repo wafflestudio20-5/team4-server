@@ -2,7 +2,10 @@ package com.wafflestudio.toyproject.team4.core.purchase.database
 
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.FetchType
@@ -31,6 +34,9 @@ class CartItemEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
+
+    @CreatedDate
+    var createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     fun updateQuantity(quantity: Long) {
         this.quantity = quantity

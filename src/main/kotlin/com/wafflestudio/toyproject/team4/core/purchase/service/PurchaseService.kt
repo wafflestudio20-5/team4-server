@@ -81,8 +81,8 @@ class PurchaseServiceImpl(
         // 이미 장바구니에 해당 상품이 존재하는 경우
         user.cartItems.find {
             it.item.id == postShoppingCartRequest.id &&
-                it.optionName == postShoppingCartRequest.option
-        } ?: throw CustomHttp409("이미 장바구니에 있는 상품입니다.")
+            it.optionName == postShoppingCartRequest.option
+        }?.let { throw CustomHttp409("이미 장바구니에 있는 상품입니다.") }
 
         user.addToCart(orderItem, postShoppingCartRequest)
     }
