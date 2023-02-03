@@ -2,6 +2,7 @@ package com.wafflestudio.toyproject.team4.core.style.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
+import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
@@ -52,6 +53,28 @@ class StyleController(
     )
 
     @Authenticated
+    @PatchMapping("/style/{styleId}")
+    fun patchStyle(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "styleId") styleId: Long,
+        @RequestBody patchStyleRequest: PatchStyleRequest
+    ) = ResponseEntity(
+        styleService.patchStyle(username, styleId, patchStyleRequest),
+        HttpStatus.OK
+    )
+
+    @Authenticated
+    @DeleteMapping("/style/{styleId}")
+    fun deleteStyle(
+        @RequestHeader(value = "Authorization") authorization: String,
+        @UserContext username: String,
+        @PathVariable(value = "styleId") styleId: Long,
+    ) = ResponseEntity(
+        styleService.deleteStyle(username, styleId),
+        HttpStatus.OK
+    )
+
     @PostMapping("/style/{styleId}/like")
     fun postLike(
         @RequestHeader(value = "Authorization") authorization: String,
