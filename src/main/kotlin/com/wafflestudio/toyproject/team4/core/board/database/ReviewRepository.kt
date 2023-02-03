@@ -12,22 +12,29 @@ interface ReviewRepository : JpaRepository<ReviewEntity, Long>, ReviewRepository
 }
 
 interface ReviewRepositoryCustom {
-    fun findAllByItemIdOrderByRatingDesc(itemId: Long): List<ReviewEntity>
+    fun findAllByItemIdOrderByRatingDesc(itemId: Long, index: Long, count: Long): List<ReviewEntity>
 }
 
 @Component
 class ReviewRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory,
 ) : ReviewRepositoryCustom {
-    override fun findAllByItemIdOrderByRatingDesc(itemId: Long): List<ReviewEntity> {
-        return queryFactory
-            .select(reviewEntity)
+    override fun findAllByItemIdOrderByRatingDesc(itemId: Long, index: Long, count: Long): List<ReviewEntity> {
+        val reviewIds = queryFactory
+            .select(reviewEntity.id)
             .from(reviewEntity)
-            .leftJoin(purchaseEntity)
-            .on(purchaseEntity.review.eq(reviewEntity))
-            .fetchJoin()
-            .where(purchaseEntity.item.id.eq(itemId))
-            .orderBy(reviewEntity.rating.desc())
+            .where(reviewEntity.purchase.item.id.eq(itemId))
+            .orderBy(reviewEntity.createdDateTime.desc(), reviewEntity.rating.desc())
+            .offset(index * count)
+            .limit(count)
+            .fetch()
+
+        return queryFactory
+            .selectDistinct(reviewEntity)
+            .from(reviewEntity)
+            .leftJoin(reviewEntity.purchase, purchaseEntity).fetchJoin()
+            .where(reviewEntity.id.`in`(reviewIds))
+            .orderBy(reviewEntity.createdDateTime.desc(), reviewEntity.rating.desc())
             .fetch()
     }
 }
