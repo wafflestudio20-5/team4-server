@@ -12,6 +12,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
 import javax.persistence.Table
+import kotlin.math.roundToInt
 
 @Entity
 @Table(name = "items")
@@ -25,6 +26,7 @@ class ItemEntity(
     val sex: Item.Sex,
     var reviewCount: Long = 0,
     var rating: Double = 0.0,
+    var ratingSum: Double = 0.0,
 
     val oldPrice: Long,
     var newPrice: Long? = null,
@@ -63,5 +65,22 @@ class ItemEntity(
         this.options = optionList.map { option ->
             OptionEntity(this, option)
         }.toMutableList()
+    }
+
+    fun addReview(rating: Long) {
+        this.reviewCount++
+        this.ratingSum += rating
+        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
+    }
+
+    fun changeRating(originalRating: Long, newRating: Long) {
+        this.ratingSum = this.ratingSum - originalRating + newRating
+        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
+    }
+
+    fun deleteReview(rating: Long) {
+        this.reviewCount--
+        this.ratingSum -= rating
+        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
 }
