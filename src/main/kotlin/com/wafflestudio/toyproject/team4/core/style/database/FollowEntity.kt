@@ -1,19 +1,25 @@
 package com.wafflestudio.toyproject.team4.core.style.database
 
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
 @Table(name = "follow")
 class FollowEntity(
-    val followingId: Long,
-    val followerId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    val following: UserEntity,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    val followed: UserEntity
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +32,12 @@ class FollowEntity(
     var modifiedDateTime: LocalDateTime = LocalDateTime.now()
 
     var isActive: Boolean = true
+
+    fun activate() {
+        this.isActive = true
+    }
+
+    fun deactivate() {
+        this.isActive = false
+    }
 }

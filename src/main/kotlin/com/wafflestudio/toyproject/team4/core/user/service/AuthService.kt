@@ -6,6 +6,7 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.user.api.request.LoginRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.NicknameRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PasswordRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RegisterRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.UsernameRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.AuthToken
@@ -13,6 +14,7 @@ import com.wafflestudio.toyproject.team4.core.user.api.response.NicknameResponse
 import com.wafflestudio.toyproject.team4.core.user.api.response.UsernameResponse
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -32,6 +34,8 @@ interface AuthService {
     fun checkDuplicatedUsername(usernameRequest: UsernameRequest): UsernameResponse
 
     fun checkDuplicatedNickname(nicknameRequest: NicknameRequest): NicknameResponse
+
+    fun checkCurrentPassword(username: String, passwordRequest: PasswordRequest): ResponseEntity<Unit>
 }
 
 @Service
@@ -108,5 +112,14 @@ class AuthServiceImpl(
     override fun checkDuplicatedNickname(nicknameRequest: NicknameRequest): NicknameResponse {
         val isUnique = userRepository.findByNickname(nicknameRequest.nickname) === null
         return NicknameResponse(isUnique)
+    }
+
+    override fun checkCurrentPassword(username: String, passwordRequest: PasswordRequest): ResponseEntity<Unit> {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        if (!passwordEncoder.matches(passwordRequest.currentPassword, user.encodedPassword)) {
+            throw CustomHttp401("현재 비밀번호가 올바르지 않습니다.")
+        }
+        return ResponseEntity(HttpStatus.OK)
     }
 }

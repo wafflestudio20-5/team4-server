@@ -15,6 +15,7 @@ data class User(
     var sex: String? = null,
     var description: String? = null,
     var instaUsername: String? = null,
+    val socialKey: String? = null,
 ) {
     enum class Sex {
         MALE, FEMALE
@@ -23,6 +24,13 @@ data class User(
     enum class Role {
         ROLE_USER, ROLE_ADMIN
     }
+
+    data class Simplified(
+        val id: Long,
+        val username: String,
+        val nickname: String,
+        val image: String,
+    )
 
     companion object {
         fun of(entity: UserEntity): User = entity.run {
@@ -37,7 +45,17 @@ data class User(
                 weight = weight,
                 sex = sex?.toString()?.lowercase(),
                 description = description,
-                instaUsername = instaUsername
+                instaUsername = instaUsername,
+                socialKey = socialKey?.toString()?.lowercase()
+            )
+        }
+
+        fun simplify(entity: UserEntity): Simplified = entity.run {
+            Simplified(
+                id = id,
+                username = username,
+                nickname = nickname,
+                image = image ?: ""
             )
         }
     }
