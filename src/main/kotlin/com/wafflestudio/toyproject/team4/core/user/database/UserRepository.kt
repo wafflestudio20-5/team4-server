@@ -3,7 +3,7 @@ package com.wafflestudio.toyproject.team4.core.user.database
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.user.database.QUserEntity.userEntity
 import com.wafflestudio.toyproject.team4.core.style.database.QStyleEntity.styleEntity
-import com.wafflestudio.toyproject.team4.core.style.database.QFollowEntity.followEntity
+import com.wafflestudio.toyproject.team4.core.user.database.QFollowEntity.followEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
@@ -77,23 +77,14 @@ class UserRepositoryCustomImpl(
     }
 
     override fun searchByQueryOrderByFollowers(query: String, index: Long, count: Long): List<UserEntity> {
-        if (query === "")
-            return queryFactory
-                .selectDistinct(userEntity)
-                .from(userEntity)
-                .orderBy(userEntity.followerCount.desc())
-                .offset(count * index)
-                .limit(count)
-                .fetch()
-        else
-            return queryFactory
-                .selectDistinct(userEntity)
-                .from(userEntity)
-                .where(userEntity.nickname.contains(query))
-                .orderBy(userEntity.followerCount.desc())
-                .offset(count * index)
-                .limit(count)
-                .fetch()
+        return queryFactory
+            .selectDistinct(userEntity)
+            .from(userEntity)
+            .where(if (query.isBlank()) null else userEntity.nickname.contains(query))
+            .orderBy(userEntity.followerCount.desc())
+            .offset(count * index)
+            .limit(count)
+            .fetch()
     }
 
     override fun findByUsernameFetchJoinPurchases(username: String): UserEntity? {

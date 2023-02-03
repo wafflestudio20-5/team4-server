@@ -25,7 +25,7 @@ data class RankingItem(
                 id = id,
                 name = name,
                 brand = brand,
-                images = images.map { it.imageUrl },
+                images = images.map { it.imageUrl }.sorted(),
                 label = label?.toString()?.lowercase(),
                 oldPrice = oldPrice,
                 newPrice = newPrice,

@@ -11,7 +11,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "item_options")
-class OptionEntity(
+class ItemOptionEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")
     val item: ItemEntity,

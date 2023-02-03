@@ -2,7 +2,6 @@ package com.wafflestudio.toyproject.team4.core.style.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
-import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
@@ -42,6 +41,11 @@ class StyleController(
         val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
         return styleService.getStyle(username, styleId)
     }
+
+    @GetMapping("/user/{userId}/styles")
+    fun getUserStyles(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(styleService.getUserStyles(userId), HttpStatus.OK)
 
     @Authenticated
     @PostMapping("/style")

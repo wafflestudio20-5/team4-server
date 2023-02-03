@@ -5,10 +5,10 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp403
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.style.api.request.PatchStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
+import com.wafflestudio.toyproject.team4.core.style.api.response.UserStylesResponse
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepositoryCustomImpl
@@ -17,12 +17,13 @@ import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import javax.transaction.Transactional
 import kotlin.math.ceil
 
 interface StyleService {
     fun getStyles(index: Long, count: Long, sort: String?): StylesResponse
     fun getStyle(username: String?, styleId: Long): StyleResponse
+    fun getUserStyles(userId: Long): UserStylesResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
     fun patchStyle(username: String, styleId: Long, patchStyleRequest: PatchStyleRequest)
     fun deleteStyle(username: String, styleId: Long)
@@ -77,8 +78,17 @@ class StyleServiceImpl(
         )
     }
 
+    @Transactional
+    override fun getUserStyles(userId: Long): UserStylesResponse {
+        val user = userRepository.findByIdOrNullWithStylesOrderByRecentDesc(userId)
+            ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
+
+        return UserStylesResponse(user.styles.map { Style.preview(it) })
+    }
+
     private fun findStyleItems(style: StyleEntity): List<ItemEntity> {
         val styleItemIds = style.styleItems.map { it.itemId }
+
         return itemRepository.findAllByIds(styleItemIds)
     }
 

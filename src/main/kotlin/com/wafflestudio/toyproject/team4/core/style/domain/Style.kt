@@ -15,11 +15,14 @@ data class Style(
     val hashtag: String?,
     val createdDateTime: LocalDateTime,
 ) {
+
+    data class Preview(
+        val id: Long,
+        val image: String
+    )
+
     companion object {
-        fun of(
-            entity: StyleEntity,
-            items: List<ItemEntity>
-        ) = entity.run {
+        fun of(entity: StyleEntity, items: List<ItemEntity>) = entity.run {
             Style(
                 id = id,
                 user = User.of(user),
@@ -28,6 +31,13 @@ data class Style(
                 content = content,
                 hashtag = hashtag,
                 createdDateTime = createdDateTime
+            )
+        }
+
+        fun preview(entity: StyleEntity): Preview = entity.run {
+            Preview(
+                id = id,
+                image = image1
             )
         }
     }
