@@ -9,6 +9,7 @@ import org.springframework.web.bind.MissingRequestCookieException
 import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 
 @RestControllerAdvice
 class CustomExceptionHandler {
@@ -44,5 +45,10 @@ class CustomExceptionHandler {
     @ExceptionHandler(value = [MissingRequestCookieException::class])
     fun handle(e: MissingRequestCookieException): ResponseEntity<Any> {
         return ResponseEntity("쿠키에 토큰 갱신을 위한 정보가 없습니다.", HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(value = [MaxUploadSizeExceededException::class])
+    fun handle(e: MaxUploadSizeExceededException): ResponseEntity<Any> {
+        return ResponseEntity("업로드할 파일 크기가 초과되었습니다.", HttpStatus.PAYLOAD_TOO_LARGE)
     }
 }

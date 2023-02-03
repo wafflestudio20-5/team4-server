@@ -31,6 +31,10 @@ spring:
                         token-uri: https://kauth.kakao.com/oauth/token
                         user-info-uri: https://kapi.kakao.com/v2/user/me
                         user-name-attribute: id
+    servlet:
+        multipart:
+            max-file-size: 3MB
+            max-request-size: 3MB
 
 auth.jwt:
     issuer: WAFFLE_STUDIO
@@ -80,6 +84,10 @@ spring:
                         token-uri: https://kauth.kakao.com/oauth/token
                         user-info-uri: https://kapi.kakao.com/v2/user/me
                         user-name-attribute: id
+    servlet:
+        multipart:
+            max-file-size: 3MB
+            max-request-size: 3MB
 
 auth.jwt:
     issuer: ${jwt-issuer}
