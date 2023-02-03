@@ -32,7 +32,7 @@ class MemoryDB(
     private val userRepository: UserRepository,
     private val purchaseRepository: PurchaseRepository
 ) {
-    private val doMakeMockAll = true // 일괄적으로 Mock Data를 만들려면 true로 설정
+    private val doMakeMockAll = false // 일괄적으로 Mock Data를 만들려면 true로 설정
 
     private val doMakeMockItems = false // Mock 아이템을 만들려면 true로 설정
     private val doMakeMockStyles = false // Mock 스타일을 만들려면 true로 설정
