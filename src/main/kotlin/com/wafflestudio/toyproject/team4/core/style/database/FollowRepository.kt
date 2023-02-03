@@ -2,28 +2,27 @@ package com.wafflestudio.toyproject.team4.core.style.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.toyproject.team4.core.style.database.QFollowEntity.followEntity
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 
 interface FollowRepository : JpaRepository<FollowEntity, Long>, FollowRepositoryCustom
 
 interface FollowRepositoryCustom {
-    fun findRelation(followerId: Long, followingId: Long): Boolean
+    fun findRelation(followingUser: UserEntity, followedUser: UserEntity): FollowEntity?
 }
 
 @Component
 class FollowRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : FollowRepositoryCustom {
-    override fun findRelation(followerId: Long, followingId: Long): Boolean {
-        val relation = queryFactory
+    override fun findRelation(followingUser: UserEntity, followedUser: UserEntity): FollowEntity? {
+        return queryFactory
             .select(followEntity)
             .from(followEntity)
             .where(
-                followEntity.followingId.eq(followingId),
-                followEntity.followerId.eq(followerId),
-                followEntity.isActive.eq(true)
+                followEntity.following.eq(followingUser),
+                followEntity.followed.eq(followedUser)
             ).fetchOne()
-        return relation != null
     }
 }

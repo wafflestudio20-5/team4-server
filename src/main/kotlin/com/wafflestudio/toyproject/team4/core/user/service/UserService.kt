@@ -3,31 +3,49 @@ package com.wafflestudio.toyproject.team4.core.user.service
 import com.wafflestudio.toyproject.team4.common.*
 import com.wafflestudio.toyproject.team4.core.board.api.response.InquiriesResponse
 import com.wafflestudio.toyproject.team4.core.board.api.response.ReviewsResponse
-import com.wafflestudio.toyproject.team4.core.board.database.*
+import com.wafflestudio.toyproject.team4.core.board.database.InquiryRepository
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
+import com.wafflestudio.toyproject.team4.core.board.database.ReviewRepository
 import com.wafflestudio.toyproject.team4.core.board.domain.Inquiry
 import com.wafflestudio.toyproject.team4.core.board.domain.Review
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
+import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
-import com.wafflestudio.toyproject.team4.core.user.api.request.*
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
 import com.wafflestudio.toyproject.team4.core.user.database.CartItemEntity
-import com.wafflestudio.toyproject.team4.core.user.database.CartItemRepository
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.user.database.PurchaseRepository
 import com.wafflestudio.toyproject.team4.core.user.database.RecentItemRepository
+import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.CartItem
 import com.wafflestudio.toyproject.team4.core.user.domain.Purchase
 import com.wafflestudio.toyproject.team4.core.user.domain.RecentItem
 import com.wafflestudio.toyproject.team4.core.user.domain.User
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
+import kotlin.math.ceil
 
 interface UserService {
     fun getMe(username: String): UserMeResponse
+    fun patchMe(username: String, patchMeRequest: PatchMeRequest)
     fun getUser(username: String?, userId: Long): UserResponse
+    fun getFollowers(userId: Long): UsersResponse
+    fun getFollowings(userId: Long): UsersResponse
+    fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun getUserStyles(userId: Long): StylesResponse
+    fun follow(username: String, userId: Long)
+    fun unfollow(username: String, userId: Long)
+
+    fun searchUsers(query: String?, index: Long, count: Long): UsersResponse
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)
     fun putReview(username: String, request: ReviewRequest)
@@ -43,8 +61,7 @@ interface UserService {
     fun deleteShoppingCart(username: String, cartItemId: Long)
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
-
-    fun getItemInquiries(username: String): InquiriesResponse
+    fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)
     fun deleteItemInquiry(username: String, itemInquiryId: Long)
 }
@@ -54,13 +71,11 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
     private val purchaseRepository: PurchaseRepository,
-    private val cartItemRepository: CartItemRepository,
     private val recentItemRepository: RecentItemRepository,
     private val itemRepository: ItemRepository,
-    private val reviewImageRepository: ReviewImageRepository,
     private val inquiryRepository: InquiryRepository,
-    private val inquiryImageRepository: InquiryImageRepository,
     private val followRepository: FollowRepository,
+    private val passwordEncoder: PasswordEncoder
 ) : UserService {
     @Transactional
     override fun getMe(username: String): UserMeResponse {
@@ -70,28 +85,104 @@ class UserServiceImpl(
     }
 
     @Transactional
+    override fun patchMe(username: String, patchMeRequest: PatchMeRequest) {
+        val user = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val newEncodedPassword = patchMeRequest.password?.let { passwordEncoder.encode(it) }
+        user.update(patchMeRequest, newEncodedPassword)
+    }
+
+    @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
-        val followerUser = username?.let { userRepository.findByUsername(it) }
-        val followingUser = userRepository.findByIdOrNull(userId)
+        val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
+        val closetOwner = userRepository.findByIdOrNullWithStyles(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
-        val isFollow = followerUser?.let { followRepository.findRelation(followingUser.id, it.id) } ?: false
-        val styleCount: Long = 1
-        val followerCount: Long = 1
-        val followingCount: Long = 1
+        val styleCount: Long = closetOwner.styles.size.toLong()
+        val followerCount: Long = closetOwner.followerCount
+        val followingCount: Long = closetOwner.followingCount
+        val isFollow = getIsFollow(currentUser, closetOwner)
+
         return UserResponse(
-            user = User.of(followingUser),
+            user = User.of(closetOwner),
             count = Count(styleCount, followerCount, followingCount),
             isFollow = isFollow,
         )
     }
 
+    override fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean {
+        return currentUser?.let {
+            currentUser.followings.find {
+                it.followed == closetOwner
+            }?.isActive ?: false
+        } ?: false
+    }
+
+    override fun getFollowers(userId: Long): UsersResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followers = closetOwner.followers.mapNotNull {
+            if (it.isActive) User.simplify(it.following)
+            else null
+        }
+
+        return UsersResponse(followers)
+    }
+
+    override fun getFollowings(userId: Long): UsersResponse {
+        val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followings = closetOwner.followings.mapNotNull {
+            if (it.isActive) User.simplify(it.followed)
+            else null
+        }
+
+        return UsersResponse(followings)
+    }
+
     @Transactional
     override fun getUserStyles(userId: Long): StylesResponse {
-        val userEntity = userRepository.findByIdOrNull(userId)
+        val userEntity = userRepository.findByIdOrNullWithStylesOrderByRecentDesc(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
-        return StylesResponse(userEntity.styles.map { styleEntity -> StylePreview.of(styleEntity) })
+        return StylesResponse(userEntity.styles.map { StylePreview.of(it) })
     }
+
+    @Transactional
+    override fun follow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+
+        follow?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
+        followingUser.followingCount++
+        followedUser.followerCount++
+    }
+
+    @Transactional
+    override fun unfollow(username: String, userId: Long) {
+        val followingUser = userRepository.findByUsername(username)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val followedUser = userRepository.findByIdOrNull(userId)
+            ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
+        val follow = followRepository.findRelation(followingUser, followedUser)
+            ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
+
+        follow.deactivate()
+        followingUser.followingCount--
+        followedUser.followerCount--
+    }
+
+    override fun searchUsers(query: String?, index: Long, count: Long): UsersResponse {
+        query ?: throw CustomHttp400("검색어를 입력하세요.")
+        val users = userRepository.searchByQueryOrderByFollowers(query, index, count)
+        return UsersResponse(users.map { User.simplify(it) })
+    }
+
+    /* **********************************************************
+    //                         Reviews                         //
+    ********************************************************** */
 
     @Transactional
     override fun getReviews(username: String): ReviewsResponse {
@@ -107,12 +198,12 @@ class UserServiceImpl(
         if (request.rating < 0 || request.rating > 10)
             throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
         try {
-            Size.valueOf(request.size.uppercase())
+            ReviewEntity.Size.valueOf(request.size.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("사이즈가 적절하지 않습니다.")
         }
         try {
-            Color.valueOf(request.color.uppercase())
+            ReviewEntity.Color.valueOf(request.color.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("색감이 적절하지 않습니다.")
         }
@@ -121,10 +212,12 @@ class UserServiceImpl(
             purchase = purchaseEntity,
             rating = request.rating,
             content = request.content,
-            size = Size.valueOf(request.size.uppercase()),
-            color = Color.valueOf(request.color.uppercase()),
+            image1 = request.images.getOrNull(0),
+            image2 = request.images.getOrNull(1),
+            image3 = request.images.getOrNull(2),
+            size = ReviewEntity.Size.valueOf(request.size.uppercase()),
+            color = ReviewEntity.Color.valueOf(request.color.uppercase()),
         )
-        request.images.forEach { reviewImageRepository.save(ReviewImageEntity(reviewEntity, it)) }
         reviewRepository.save(reviewEntity)
         purchaseEntity.item.reviewCount++
     }
@@ -134,12 +227,12 @@ class UserServiceImpl(
         if (request.rating < 0 || request.rating > 10)
             throw CustomHttp400("구매만족도의 범위가 올바르지 않습니다.")
         try {
-            Size.valueOf(request.size.uppercase())
+            ReviewEntity.Size.valueOf(request.size.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("사이즈가 적절하지 않습니다.")
         }
         try {
-            Color.valueOf(request.color.uppercase())
+            ReviewEntity.Color.valueOf(request.color.uppercase())
         } catch (e: IllegalArgumentException) {
             throw CustomHttp400("색감이 적절하지 않습니다.")
         }
@@ -150,12 +243,11 @@ class UserServiceImpl(
         reviewEntity.run {
             rating = request.rating
             content = request.content
-            size = Size.valueOf(request.size.uppercase())
-            color = Color.valueOf(request.color.uppercase())
-        }
-        reviewImageRepository.deleteAll(reviewEntity.images)
-        request.images.forEach {
-            reviewImageRepository.save(ReviewImageEntity(reviewEntity, it))
+            image1 = request.images.getOrNull(0)
+            image2 = request.images.getOrNull(1)
+            image3 = request.images.getOrNull(2)
+            size = ReviewEntity.Size.valueOf(request.size.uppercase())
+            color = ReviewEntity.Color.valueOf(request.color.uppercase())
         }
         reviewRepository.save(reviewEntity)
     }
@@ -168,6 +260,10 @@ class UserServiceImpl(
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
         reviewRepository.delete(reviewEntity)
     }
+
+    /* **********************************************************
+    //                        Purchases                       //
+    ********************************************************** */
 
     @Transactional
     override fun postComment(username: String, request: PostCommentRequest) {
@@ -198,17 +294,12 @@ class UserServiceImpl(
 
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinPurchases(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val purchaseEntities = purchaseRepository.findAllByUser(userEntity)
         return PurchaseItemsResponse(
-            purchaseEntities.map { purchaseEntity -> Purchase.of(purchaseEntity) }
+            userEntity.purchases.map { purchaseEntity -> Purchase.of(purchaseEntity) }
         )
     }
-
-    /* **********************************************************
-    //                      Shopping Cart                      //
-    ********************************************************** */
 
     @Transactional
     override fun postPurchases(username: String, request: PurchasesRequest) {
@@ -217,7 +308,7 @@ class UserServiceImpl(
         request.purchaseItems.forEach {
             val itemEntity = itemRepository.findByIdOrNull(it.id)
                 ?: throw CustomHttp404("아이템 정보가 올바르지 않습니다.")
-            purchaseRepository.save(
+            userEntity.purchases.add(
                 PurchaseEntity(
                     user = userEntity,
                     item = itemEntity,
@@ -229,12 +320,15 @@ class UserServiceImpl(
         }
     }
 
+    /* **********************************************************
+   //                      Shopping Cart                      //
+   ********************************************************** */
+
     @Transactional
     override fun getShoppingCart(username: String): CartItemsResponse {
-        val userEntity = userRepository.findByUsername(username)
+        val userEntity = userRepository.findByUsernameFetchJoinCartItems(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val cartItemEntities = cartItemRepository.findAllByUser(userEntity)
-        return CartItemsResponse(cartItemEntities.map { cartItemEntity -> CartItem.of(cartItemEntity) })
+        return CartItemsResponse(userEntity.cartItems.map { cartItemEntity -> CartItem.of(cartItemEntity) })
     }
 
     @Transactional
@@ -312,12 +406,13 @@ class UserServiceImpl(
     ********************************************************** */
 
     @Transactional
-    override fun getItemInquiries(username: String): InquiriesResponse {
+    override fun getItemInquiries(username: String, index: Long, count: Long): InquiriesResponse {
         val user = userRepository.findByUsername(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user)
+        val itemInquiryList = inquiryRepository.findAllByUserOrderByCreatedDateTimeDesc(user, index, count)
         return InquiriesResponse(
-            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) }
+            inquiries = itemInquiryList.map { inquiry -> Inquiry.of(inquiry) },
+            totalPages = ceil(user.itemInquiries.size.toDouble() / count).toLong()
         )
     }
 
@@ -330,13 +425,7 @@ class UserServiceImpl(
         if (targetItemInquiry.user.username != username)
             throw CustomHttp403("수정 권한이 없습니다.")
 
-        with(putItemInquiriesRequest) {
-            if (!this.images.isNullOrEmpty()) {
-                val deletedImages = inquiryImageRepository.findAllByInquiry_Id(targetInquiryId)
-                inquiryImageRepository.deleteAll(deletedImages)
-            }
-            targetItemInquiry.update(this)
-        }
+        targetItemInquiry.update(putItemInquiriesRequest)
     }
 
     @Transactional

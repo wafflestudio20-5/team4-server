@@ -2,7 +2,13 @@ package com.wafflestudio.toyproject.team4.core.user.api
 
 import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
-import com.wafflestudio.toyproject.team4.core.user.api.request.*
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.UserResponse
 import com.wafflestudio.toyproject.team4.core.user.service.AuthTokenService
 import com.wafflestudio.toyproject.team4.core.user.service.UserService
@@ -17,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -44,6 +51,37 @@ class UserController(
         val username = authToken?.let { authTokenService.getUsernameFromToken(it) }
         return userService.getUser(username, userId)
     }
+
+    @GetMapping("/{userId}/followers")
+    fun getFollowers(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowers(userId), HttpStatus.OK)
+
+    @GetMapping("/{userId}/followings")
+    fun getFollowings(
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.getFollowings(userId), HttpStatus.OK)
+
+    @Authenticated
+    @PostMapping("/{userId}/follow")
+    fun follow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.follow(username, userId), HttpStatus.CREATED)
+
+    @Authenticated
+    @DeleteMapping("/{userId}/follow")
+    fun unfollow(
+        @UserContext username: String,
+        @PathVariable(value = "userId") userId: Long
+    ) = ResponseEntity(userService.unfollow(username, userId), HttpStatus.OK)
+
+    @Authenticated
+    @PatchMapping("/me")
+    fun patchMe(
+        @UserContext username: String,
+        @RequestBody patchMeRequest: PatchMeRequest
+    ) = ResponseEntity(userService.patchMe(username, patchMeRequest), HttpStatus.OK)
 
     @Authenticated
     @GetMapping("/me/reviews")
@@ -156,7 +194,9 @@ class UserController(
     @GetMapping("/me/item-inquiries")
     fun getItemInquiries(
         @UserContext username: String,
-    ) = userService.getItemInquiries(username)
+        @RequestParam index: Long?,
+        @RequestParam count: Long?
+    ) = userService.getItemInquiries(username, index ?: 0L, count ?: 5L)
 
     @Authenticated
     @PutMapping("/me/item-inquiries")
@@ -175,6 +215,16 @@ class UserController(
         @PathVariable(value = "id") itemInquiryId: Long
     ) = ResponseEntity(
         userService.deleteItemInquiry(username, itemInquiryId),
+        HttpStatus.OK
+    )
+
+    @GetMapping("/search")
+    fun searchUsers(
+        @RequestParam query: String?,
+        @RequestParam index: Long?,
+        @RequestParam count: Long?,
+    ) = ResponseEntity(
+        userService.searchUsers(query, index ?: 0L, count ?: 10L),
         HttpStatus.OK
     )
 }

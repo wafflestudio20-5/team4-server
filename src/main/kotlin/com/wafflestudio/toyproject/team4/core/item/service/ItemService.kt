@@ -56,13 +56,12 @@ class ItemServiceImpl(
         val itemSubCategory = subCategory?.let { Item.SubCategory.valueOf(camelToUpper(it)) }
         val sortingMethod = ItemRepositoryCustomImpl.Sort.valueOf(camelToUpper(sort ?: "rating"))
 
-        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, sortingMethod)
+        val rankingList = itemRepository.findAllByOrderBy(itemCategory, itemSubCategory, index, count, sortingMethod)
+        val totalCount = itemRepository.getTotalCount(itemCategory, itemSubCategory)
 
         return ItemRankingResponse(
-            items = rankingList
-                .filterIndexed { idx, _ -> (idx / count) == index }
-                .map { entity -> RankingItem.of(entity) },
-            totalPages = ceil(rankingList.size.toDouble() / count).toLong()
+            items = rankingList.map { entity -> RankingItem.of(entity) },
+            totalPages = ceil(totalCount.toDouble() / count).toLong()
         )
     }
 
@@ -86,9 +85,12 @@ class ItemServiceImpl(
     }
 
     override fun getItemInquiries(itemId: Long, index: Long, count: Long): InquiriesResponse {
-        val itemInquiries = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId)
+        val itemInquiryList = inquiryRepository.findAllByItem_IdOrderByCreatedDateTimeDesc(itemId, index, count)
+        val itemTotalInquiryCount = inquiryRepository.getItemTotalInquiryCount(itemId)
+
         return InquiriesResponse(
-            inquiries = itemInquiries.map { entity -> Inquiry.of(entity) }
+            inquiries = itemInquiryList.map { entity -> Inquiry.of(entity) },
+            totalPages = ceil(itemTotalInquiryCount.toDouble() / count).toLong()
         )
     }
 

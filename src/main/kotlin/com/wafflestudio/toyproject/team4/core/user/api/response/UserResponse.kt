@@ -13,3 +13,7 @@ data class Count(
     val followerCount: Long,
     val followingCount: Long,
 )
+
+data class UsersResponse(
+    val users: List<User.Simplified>
+)

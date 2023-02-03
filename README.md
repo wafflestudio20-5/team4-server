@@ -1,4 +1,7 @@
 # team4-server
+## Deployment
+- AWS EC2: https://musin4.snucha.shop
+
 
 ## Prerequisites
 

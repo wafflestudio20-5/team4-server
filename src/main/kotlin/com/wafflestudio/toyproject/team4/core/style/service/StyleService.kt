@@ -4,15 +4,15 @@ import com.wafflestudio.toyproject.team4.common.CustomHttp400
 import com.wafflestudio.toyproject.team4.common.CustomHttp404
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemRepository
-import com.wafflestudio.toyproject.team4.core.style.api.PostStyleRequest
+import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.api.response.StyleResponse
 import com.wafflestudio.toyproject.team4.core.style.api.response.StylesResponse
-import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleEntity
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepository
 import com.wafflestudio.toyproject.team4.core.style.database.StyleRepositoryCustomImpl
 import com.wafflestudio.toyproject.team4.core.style.domain.Style
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
+import com.wafflestudio.toyproject.team4.core.user.service.UserService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +22,8 @@ interface StyleService {
     fun getStyles(index: Long, count: Long, sort: String?): StylesResponse
     fun getStyle(username: String?, styleId: Long): StyleResponse
     fun postStyle(username: String, postStyleRequest: PostStyleRequest)
+    fun postLike(username: String, styleId: Long)
+    fun deleteLike(username: String, styleId: Long)
 }
 
 @Service
@@ -29,7 +31,8 @@ class StyleServiceImpl(
     private val itemRepository: ItemRepository,
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
-    private val followRepository: FollowRepository
+    private val followRepository: FollowRepository,
+    private val userService: UserService
 ) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
         val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
@@ -56,7 +59,7 @@ class StyleServiceImpl(
         val style = styleRepository.findByIdOrNull(styleId)
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
 
-        val isFollow = user?.let { followRepository.findRelation(it.id, style.user.id) } ?: false
+        val isFollow = userService.getIsFollow(user, style.user)
         val likedUserIds = style.likedUsers.map { it.userId }
         val isLike = user?.let { likedUserIds.contains(it.id) } ?: false
 
@@ -82,5 +85,31 @@ class StyleServiceImpl(
         val style = postStyleRequest.toEntity(user)
 
         user.styles.add(style)
+    }
+
+    @Transactional
+    override fun postLike(username: String, styleId: Long) {
+        val user = userRepository.findByUsername(username)!!
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        val likedUser = style.likedUsers.find { it.userId == user.id }
+        if (likedUser == null) {
+            style.addLikedUser(user.id)
+            return
+        }
+        if (likedUser.isActive)
+            throw CustomHttp400("이미 좋아요를 눌렀습니다.")
+        likedUser.changeActive()
+    }
+
+    @Transactional
+    override fun deleteLike(username: String, styleId: Long) {
+        val user = userRepository.findByUsername(username)!!
+        val style = styleRepository.findByIdOrNull(styleId)
+            ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
+        val likedUser = style.likedUsers.find { it.userId == user.id }
+        if (likedUser == null || !likedUser.isActive)
+            throw CustomHttp400("좋아요를 누른 스타일이 아닙니다.")
+        likedUser.changeActive()
     }
 }
