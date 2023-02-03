@@ -1,6 +1,7 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.wafflestudio.toyproject.team4.core.board.database.QReviewEntity.reviewEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QUserEntity.userEntity
 import com.wafflestudio.toyproject.team4.core.style.database.QStyleEntity.styleEntity
 import com.wafflestudio.toyproject.team4.core.user.database.QFollowEntity.followEntity
@@ -21,6 +22,7 @@ interface UserRepositoryCustom {
     fun searchByQueryOrderByFollowers(query: String, index: Long, count: Long): List<UserEntity>
     fun findByUsernameFetchJoinPurchases(username: String): UserEntity?
     fun findByUsernameFetchJoinCartItems(username: String): UserEntity?
+    fun findByUsernameWithReviews(username: String): UserEntity?
 }
 
 @Component
@@ -101,6 +103,16 @@ class UserRepositoryCustomImpl(
             .selectDistinct(userEntity)
             .from(userEntity)
             .leftJoin(userEntity.cartItems).fetchJoin()
+            .where(userEntity.username.eq(username))
+            .fetchFirst()
+    }
+
+    override fun findByUsernameWithReviews(username: String): UserEntity? {
+        return queryFactory
+            .select(userEntity)
+            .from(userEntity)
+            .leftJoin(userEntity.reviews, reviewEntity).fetchJoin()
+            .orderBy(reviewEntity.createdDateTime.desc())
             .where(userEntity.username.eq(username))
             .fetchFirst()
     }

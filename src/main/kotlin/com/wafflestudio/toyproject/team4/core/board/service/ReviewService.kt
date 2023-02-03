@@ -25,10 +25,9 @@ class ReviewServiceImpl(
     private val purchaseRepository: PurchaseRepository,
     private val reviewRepository: ReviewRepository
 ) : ReviewService {
-
     @Transactional
     override fun getReviews(username: String): ReviewsResponse {
-        val user = userRepository.findByUsername(username)
+        val user = userRepository.findByUsernameWithReviews(username)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
 
         return ReviewsResponse(
