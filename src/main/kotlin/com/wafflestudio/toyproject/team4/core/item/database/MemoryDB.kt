@@ -43,10 +43,12 @@ class MemoryDB(
 
     /**
      * Subcategory별로 크롤링 해오는 아이템의 개수
+     *
      * 주의: totalItemCount가 makeMockStyles의 styleNum * maxItemNum 보다 크게 할 것
-     * 기본값: 250 : 60
+     *
+     * 기본값: 100 : 60
      */
-    private val itemCountPerSubCategory = 3
+    private val itemCountPerSubCategory = 4
     private val totalItemCount = itemCountPerSubCategory * 25L
 
     /**
