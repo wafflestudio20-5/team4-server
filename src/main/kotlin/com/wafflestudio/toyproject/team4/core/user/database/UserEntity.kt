@@ -1,5 +1,6 @@
 package com.wafflestudio.toyproject.team4.core.user.database
 
+import com.wafflestudio.toyproject.team4.core.board.database.CommentEntity
 import com.wafflestudio.toyproject.team4.core.board.database.InquiryEntity
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
@@ -68,6 +69,9 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var reviews: MutableList<ReviewEntity> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var comments: MutableList<CommentEntity> = mutableListOf()
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var purchases: MutableList<PurchaseEntity> = mutableListOf()

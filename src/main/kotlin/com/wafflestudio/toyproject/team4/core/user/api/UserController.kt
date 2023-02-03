@@ -26,11 +26,9 @@ class UserController(
     private val authTokenService: AuthTokenService,
     private val userService: UserService
 ) {
-
     @Authenticated
     @GetMapping("/me")
     fun getMe(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getMe(username), HttpStatus.OK)
 
@@ -77,14 +75,12 @@ class UserController(
     @Authenticated
     @GetMapping("/me/recently-viewed")
     fun getRecentlyViewed(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
     ) = ResponseEntity(userService.getRecentlyViewed(username), HttpStatus.OK)
 
     @Authenticated
     @PostMapping("/me/recently-viewed")
     fun postRecentlyViewed(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestBody postRecentlyViewedRequest: RecentlyViewedRequest
     ) = ResponseEntity(
@@ -95,7 +91,6 @@ class UserController(
     @Authenticated
     @GetMapping("/me/item-inquiries")
     fun getItemInquiries(
-        @RequestHeader(value = "Authorization") authorization: String,
         @UserContext username: String,
         @RequestParam index: Long?,
         @RequestParam count: Long?

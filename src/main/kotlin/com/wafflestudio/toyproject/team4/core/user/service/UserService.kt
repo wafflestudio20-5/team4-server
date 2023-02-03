@@ -24,9 +24,7 @@ import kotlin.math.ceil
 interface UserService {
     fun getMe(username: String): UserMeResponse
     fun patchMe(username: String, patchMeRequest: PatchMeRequest)
-
     fun getUser(username: String?, userId: Long): UserResponse
-
     fun getFollowers(userId: Long): UsersResponse
     fun getFollowings(userId: Long): UsersResponse
     fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
@@ -34,7 +32,6 @@ interface UserService {
     fun unfollow(username: String, userId: Long)
 
     fun searchUsers(query: String?, index: Long, count: Long): UsersResponse
-
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
 
@@ -102,7 +99,10 @@ class UserServiceImpl(
     override fun getFollowers(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val followers = closetOwner.followers.map { User.simplify(it.following) }
+        val followers = closetOwner.followers.mapNotNull {
+            if (it.isActive) User.simplify(it.following)
+            else null
+        }
 
         return UsersResponse(followers)
     }
@@ -124,10 +124,8 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val followedUser = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-
         val relation = followRepository.findRelation(followingUser, followedUser)
-        if (relation == null) followRepository.save(FollowEntity(followingUser, followedUser))
-        else relation.activate()
+        relation?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
         followingUser.followingCount++
         followedUser.followerCount++
     }

@@ -37,6 +37,7 @@ class WebConfig(
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
+            .allowedMethods("*")
             .allowedOrigins(
                 "https://dllflfuvssxc9.cloudfront.net/",
                 "https://musin4.netlify.app/",
