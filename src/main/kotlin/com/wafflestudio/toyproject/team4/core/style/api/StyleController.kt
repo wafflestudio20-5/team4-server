@@ -45,7 +45,6 @@ class StyleController(
         @PathVariable(value = "userId") userId: Long
     ) = ResponseEntity(styleService.getUserStyles(userId), HttpStatus.OK)
 
-
     @Authenticated
     @PostMapping("/style")
     fun postStyle(

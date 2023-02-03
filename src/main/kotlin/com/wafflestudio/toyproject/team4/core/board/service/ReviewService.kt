@@ -12,7 +12,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
-
 interface ReviewService {
     fun getReviews(username: String): ReviewsResponse
     fun postReview(username: String, request: ReviewRequest)

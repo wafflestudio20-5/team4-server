@@ -47,6 +47,9 @@ class UserEntity(
     var description: String? = null,
     var instaUsername: String? = null,
 
+    var followerCount: Long = 0L,
+    var followingCount: Long = 0L,
+
     @Enumerated(EnumType.STRING)
     var socialKey: ProviderType? = null,
 

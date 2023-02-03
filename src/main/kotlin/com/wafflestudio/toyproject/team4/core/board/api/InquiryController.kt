@@ -26,7 +26,6 @@ class InquiryController(
         HttpStatus.CREATED
     )
 
-
     @Authenticated
     @PutMapping("/user/me/item-inquiries")
     fun putItemInquiries(

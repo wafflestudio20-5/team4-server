@@ -12,7 +12,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
-
 interface InquiryService {
     fun postItemInquiry(username: String, itemId: Long, postItemInquiryRequest: PostItemInquiryRequest)
     fun putItemInquiries(username: String, putItemInquiriesRequest: PutItemInquiriesRequest)

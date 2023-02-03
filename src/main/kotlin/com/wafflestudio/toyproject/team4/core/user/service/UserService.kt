@@ -27,13 +27,13 @@ interface UserService {
 
     fun getUser(username: String?, userId: Long): UserResponse
 
-    fun getFollowers(userId: Long): FollowersResponse
-    fun getFollowings(userId: Long): FollowingsResponse
+    fun getFollowers(userId: Long): UsersResponse
+    fun getFollowings(userId: Long): UsersResponse
     fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean
     fun follow(username: String, userId: Long)
     fun unfollow(username: String, userId: Long)
 
-    fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse
+    fun searchUsers(query: String?, index: Long, count: Long): UsersResponse
 
     fun getRecentlyViewed(username: String): RecentItemsResponse
     fun postRecentlyViewed(username: String, itemId: Long)
@@ -74,12 +74,12 @@ class UserServiceImpl(
     @Transactional
     override fun getUser(username: String?, userId: Long): UserResponse {
         val currentUser = username?.let { userRepository.findByUsernameOrNullWithFollows(it) }
-        val closetOwner = userRepository.findByIdOrNullWithFollows(userId)
+        val closetOwner = userRepository.findByIdOrNullWithStyles(userId)
             ?: throw CustomHttp404("존재하지 않는 사용자입니다.")
 
         val styleCount: Long = closetOwner.styles.size.toLong()
-        val followerCount: Long = closetOwner.followers.count { it.isActive }.toLong()
-        val followingCount: Long = closetOwner.followings.count { it.isActive }.toLong()
+        val followerCount: Long = closetOwner.followerCount
+        val followingCount: Long = closetOwner.followingCount
         val isFollow = getIsFollow(currentUser, closetOwner)
 
         return UserResponse(
@@ -99,20 +99,23 @@ class UserServiceImpl(
         return relationHistory?.isActive ?: false
     }
 
-    override fun getFollowers(userId: Long): FollowersResponse {
+    override fun getFollowers(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowersWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val followers = closetOwner.followers.map { User.simplify(it.following) }
 
-        return FollowersResponse(followers)
+        return UsersResponse(followers)
     }
 
-    override fun getFollowings(userId: Long): FollowingsResponse {
+    override fun getFollowings(userId: Long): UsersResponse {
         val closetOwner = userRepository.findByIdOrNullWithFollowingsWithUsers(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val followings = closetOwner.followings.map { User.simplify(it.followed) }
+        val followings = closetOwner.followings.mapNotNull {
+            if (it.isActive) User.simplify(it.followed)
+            else null
+        }
 
-        return FollowingsResponse(followings)
+        return UsersResponse(followings)
     }
 
     @Transactional
@@ -125,6 +128,8 @@ class UserServiceImpl(
         val relation = followRepository.findRelation(followingUser, followedUser)
         if (relation == null) followRepository.save(FollowEntity(followingUser, followedUser))
         else relation.activate()
+        followingUser.followingCount++
+        followedUser.followerCount++
     }
 
     @Transactional
@@ -137,17 +142,19 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
 
         follow.deactivate()
+        followingUser.followingCount--
+        followedUser.followerCount--
     }
 
     /* **********************************************************
     //                      Search User                        //
     ********************************************************** */
 
-    override fun searchUsers(query: String?, index: Long, count: Long): UserSearchResponse {
-        if (query == "" || query == null) throw CustomHttp400("검색어를 입력하세요.")
-        val users = userRepository.searchByQuery(query, index, count)
+    override fun searchUsers(query: String?, index: Long, count: Long): UsersResponse {
+        query ?: throw CustomHttp400("검색어를 입력하세요.")
+        val users = userRepository.searchByQueryOrderByFollowers(query, index, count)
 
-        return UserSearchResponse(users.map { User.simplify(it) })
+        return UsersResponse(users.map { User.simplify(it) })
     }
 
     /* **********************************************************

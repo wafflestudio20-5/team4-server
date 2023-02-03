@@ -35,10 +35,10 @@ data class Style(
         }
 
         fun preview(entity: StyleEntity): Preview = entity.run {
-                Preview(
-                    id = id,
-                    image = image1
-                )
+            Preview(
+                id = id,
+                image = image1
+            )
         }
     }
 }

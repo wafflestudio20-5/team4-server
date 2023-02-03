@@ -101,7 +101,6 @@ class UserController(
         @RequestParam count: Long?
     ) = userService.getItemInquiries(username, index ?: 0L, count ?: 5L)
 
-
     @GetMapping("/search")
     fun searchUsers(
         @RequestParam query: String?,

@@ -81,7 +81,6 @@ class StyleServiceImpl(
         return UserStylesResponse(user.styles.map { Style.preview(it) })
     }
 
-
     private fun findStyleItems(style: StyleEntity): List<ItemEntity> {
         val styleItemIds = style.styleItems.map { it.itemId }
 
