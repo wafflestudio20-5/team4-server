@@ -4,8 +4,10 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.RecentlyViewedRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest

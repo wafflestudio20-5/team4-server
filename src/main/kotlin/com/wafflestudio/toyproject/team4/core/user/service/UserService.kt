@@ -13,8 +13,10 @@ import com.wafflestudio.toyproject.team4.core.style.database.FollowEntity
 import com.wafflestudio.toyproject.team4.core.style.database.FollowRepository
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchShoppingCartRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PostCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PostShoppingCartRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PurchasesRequest
+import com.wafflestudio.toyproject.team4.core.user.api.request.PutCommentRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.PutItemInquiriesRequest
 import com.wafflestudio.toyproject.team4.core.user.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.user.api.response.*
@@ -262,7 +264,7 @@ class UserServiceImpl(
     }
 
     /* **********************************************************
-    //                        Purchases                       //
+    //                         Comments                        //
     ********************************************************** */
 
     @Transactional
@@ -291,6 +293,10 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 댓글입니다.")
         userEntity.comments.remove(commentEntity)
     }
+
+    /* **********************************************************
+    //                        Purchases                       //
+    ********************************************************** */
 
     @Transactional
     override fun getPurchases(username: String): PurchaseItemsResponse {

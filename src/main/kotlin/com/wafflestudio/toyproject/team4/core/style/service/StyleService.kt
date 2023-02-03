@@ -31,7 +31,6 @@ class StyleServiceImpl(
     private val itemRepository: ItemRepository,
     private val styleRepository: StyleRepository,
     private val userRepository: UserRepository,
-    private val followRepository: FollowRepository,
     private val userService: UserService
 ) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
