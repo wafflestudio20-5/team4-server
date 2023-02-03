@@ -10,25 +10,38 @@ interface UserLikedStyleRepository : JpaRepository<UserLikedStyleEntity, Long>
 
 interface StyleRepository : JpaRepository<StyleEntity, Long>, StyleRepositoryCustom
 interface StyleRepositoryCustom {
-    fun findAllOrderBy(sort: StyleRepositoryCustomImpl.Sort): List<StyleEntity>
+    fun findAllOrderBy(index: Long, count: Long, sort: StyleRepositoryCustomImpl.Sort): List<StyleEntity>
+
+    fun getTotalCount(): Long
 }
 
 @Component
 class StyleRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : StyleRepositoryCustom {
-    override fun findAllOrderBy(sort: Sort): List<StyleEntity> {
-        val ordering = when (sort) {
-            Sort.RECENT -> styleEntity.createdDateTime.desc()
-            else -> styleEntity.likedUserCount.desc()
-        }
+    override fun findAllOrderBy(index: Long, count: Long, sort: Sort): List<StyleEntity> {
+        val styleIds = queryFactory
+            .select(styleEntity.id)
+            .from(styleEntity)
+            .orderBy(styleEntity.likedUserCount.desc(), styleEntity.createdDateTime.desc())
+            .offset(index * count)
+            .limit(count)
+            .fetch()
 
         return queryFactory
             .selectDistinct(styleEntity)
             .from(styleEntity)
             .leftJoin(styleEntity.styleItems).fetchJoin()
-            .orderBy(ordering)
+            .orderBy(styleEntity.likedUserCount.desc(), styleEntity.createdDateTime.desc())
+            .where(styleEntity.id.`in`(styleIds))
             .fetch()
+    }
+
+    override fun getTotalCount(): Long {
+        return queryFactory
+            .select(styleEntity.count())
+            .from(styleEntity)
+            .fetchOne()!!
     }
 
     enum class Sort {
