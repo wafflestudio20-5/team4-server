@@ -14,11 +14,11 @@ interface UserRepository : JpaRepository<UserEntity, Long>, UserRepositoryCustom
 
 interface UserRepositoryCustom {
     fun findByIdOrNullWithStylesOrderByRecentDesc(userId: Long): UserEntity?
-    fun findByIdOrNullWithFollows(userId: Long): UserEntity?
+    fun findByIdOrNullWithStyles(userId: Long): UserEntity?
     fun findByIdOrNullWithFollowersWithUsers(userId: Long): UserEntity?
     fun findByIdOrNullWithFollowingsWithUsers(userId: Long): UserEntity?
     fun findByUsernameOrNullWithFollows(username: String): UserEntity?
-    fun searchByQuery(query: String, index: Long, count: Long): List<UserEntity>
+    fun searchByQueryOrderByFollowers(query: String, index: Long, count: Long): List<UserEntity>
     fun findByUsernameFetchJoinPurchases(username: String): UserEntity?
     fun findByUsernameFetchJoinCartItems(username: String): UserEntity?
 }
@@ -37,12 +37,11 @@ class UserRepositoryCustomImpl(
             .fetchOne()
     }
 
-    override fun findByIdOrNullWithFollows(userId: Long): UserEntity? {
+    override fun findByIdOrNullWithStyles(userId: Long): UserEntity? {
         return queryFactory
             .selectDistinct(userEntity)
             .from(userEntity)
-            .leftJoin(userEntity.followings).fetchJoin()
-            .leftJoin(userEntity.followers).fetchJoin()
+            .leftJoin(userEntity.styles).fetchJoin()
             .where(userEntity.id.eq(userId))
             .fetchOne()
     }
@@ -53,7 +52,7 @@ class UserRepositoryCustomImpl(
             .from(userEntity)
             .leftJoin(userEntity.followers, followEntity).fetchJoin()
             .leftJoin(followEntity.following).fetchJoin()
-            .where(userEntity.id.eq(userId), followEntity.isActive.eq(true))
+            .where(userEntity.id.eq(userId))
             .fetchOne()
     }
 
@@ -63,7 +62,7 @@ class UserRepositoryCustomImpl(
             .from(userEntity)
             .leftJoin(userEntity.followings, followEntity).fetchJoin()
             .leftJoin(followEntity.followed).fetchJoin()
-            .where(userEntity.id.eq(userId), followEntity.isActive.eq(true))
+            .where(userEntity.id.eq(userId))
             .fetchOne()
     }
 
@@ -77,14 +76,24 @@ class UserRepositoryCustomImpl(
             .fetchOne()
     }
 
-    override fun searchByQuery(query: String, index: Long, count: Long): List<UserEntity> {
-        return queryFactory
-            .selectDistinct(userEntity)
-            .from(userEntity)
-            .where(userEntity.nickname.contains(query))
-            .offset(count * index)
-            .limit(count)
-            .fetch()
+    override fun searchByQueryOrderByFollowers(query: String, index: Long, count: Long): List<UserEntity> {
+        if (query === "")
+            return queryFactory
+                .selectDistinct(userEntity)
+                .from(userEntity)
+                .orderBy(userEntity.followerCount.desc())
+                .offset(count * index)
+                .limit(count)
+                .fetch()
+        else
+            return queryFactory
+                .selectDistinct(userEntity)
+                .from(userEntity)
+                .where(userEntity.nickname.contains(query))
+                .orderBy(userEntity.followerCount.desc())
+                .offset(count * index)
+                .limit(count)
+                .fetch()
     }
 
     override fun findByUsernameFetchJoinPurchases(username: String): UserEntity? {
