@@ -61,6 +61,7 @@ class ReviewServiceImpl(
         if (review.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
 
+        review.purchase.deleteReview(review.rating)
         reviewRepository.delete(review)
     }
 }

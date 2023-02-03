@@ -9,6 +9,7 @@ import com.wafflestudio.toyproject.team4.core.board.api.request.ReviewRequest
 import com.wafflestudio.toyproject.team4.core.board.service.ReviewService
 import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseEntity
 import com.wafflestudio.toyproject.team4.core.purchase.database.PurchaseRepository
+import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
 import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import com.wafflestudio.toyproject.team4.core.user.database.UserRepository
 import com.wafflestudio.toyproject.team4.core.user.domain.User
@@ -312,7 +313,7 @@ class MemoryDB(
                             color,
                             images
                         )
-                        userService.postReview(it.username, reviewRequest)
+                        reviewService.postReview(it.username, reviewRequest)
                     }
                 }
             }

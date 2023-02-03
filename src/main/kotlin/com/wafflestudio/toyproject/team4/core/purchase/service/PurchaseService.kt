@@ -15,7 +15,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
-
 interface PurchaseService {
     fun getPurchases(username: String): PurchaseItemsResponse
     fun postPurchases(username: String, request: PurchasesRequest)
@@ -80,7 +79,7 @@ class PurchaseServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 상품입니다.")
 
         // 이미 장바구니에 해당 상품이 존재하는 경우
-        val existingCartItem = user.cartItems.find {
+        user.cartItems.find {
             it.item.id == postShoppingCartRequest.id &&
                 it.optionName == postShoppingCartRequest.option
         } ?: throw CustomHttp409("이미 장바구니에 있는 상품입니다.")

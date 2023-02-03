@@ -92,7 +92,6 @@ class UserServiceImpl(
 
     override fun getIsFollow(currentUser: UserEntity?, closetOwner: UserEntity): Boolean {
         val relationHistory = currentUser?.followings?.find { it.followed == closetOwner }
-
         return relationHistory?.isActive ?: false
     }
 
@@ -103,7 +102,6 @@ class UserServiceImpl(
             if (it.isActive) User.simplify(it.following)
             else null
         }
-
         return UsersResponse(followers)
     }
 
@@ -114,7 +112,6 @@ class UserServiceImpl(
             if (it.isActive) User.simplify(it.followed)
             else null
         }
-
         return UsersResponse(followings)
     }
 
@@ -125,7 +122,7 @@ class UserServiceImpl(
         val followedUser = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val relation = followRepository.findRelation(followingUser, followedUser)
-        relation?.let { follow.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
+        relation?.let { relation.activate() } ?: followRepository.save(FollowEntity(followingUser, followedUser))
         followingUser.followingCount++
         followedUser.followerCount++
     }
@@ -136,10 +133,10 @@ class UserServiceImpl(
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
         val followedUser = userRepository.findByIdOrNull(userId)
             ?: throw CustomHttp404("해당 아이디로 가입된 사용자 정보가 없습니다.")
-        val follow = followRepository.findRelation(followingUser, followedUser)
+        val relation = followRepository.findRelation(followingUser, followedUser)
             ?: throw CustomHttp404("해당 사용자를 팔로우하고 있지 않습니다.")
 
-        follow.deactivate()
+        relation.deactivate()
         followingUser.followingCount--
         followedUser.followerCount--
     }

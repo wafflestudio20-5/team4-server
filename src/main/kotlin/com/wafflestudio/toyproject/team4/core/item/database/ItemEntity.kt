@@ -68,9 +68,9 @@ class ItemEntity(
     fun writeInquiry(writer: UserEntity, request: PostItemInquiryRequest) {
         val newInquiry = request.toEntity(writer, this)
         this.inquiries.add(newInquiry)
+    }
 
-    fun addReview(rating: Long) {
-        this.reviewCount++
+    fun addRating(rating: Long) {
         this.ratingSum += rating
         this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
@@ -80,8 +80,7 @@ class ItemEntity(
         this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
 
-    fun deleteReview(rating: Long) {
-        this.reviewCount--
+    fun deleteRating(rating: Long) {
         this.ratingSum -= rating
         this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
