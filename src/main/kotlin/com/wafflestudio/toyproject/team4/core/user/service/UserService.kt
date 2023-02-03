@@ -218,8 +218,8 @@ class UserServiceImpl(
             size = ReviewEntity.Size.valueOf(request.size.uppercase()),
             color = ReviewEntity.Color.valueOf(request.color.uppercase()),
         )
+        purchaseEntity.item.addReview(request.rating)
         reviewRepository.save(reviewEntity)
-        purchaseEntity.item.reviewCount++
     }
 
     @Transactional
@@ -240,6 +240,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewEntity.purchase.item.changeRating(reviewEntity.rating, request.rating)
         reviewEntity.run {
             rating = request.rating
             content = request.content
@@ -258,6 +259,7 @@ class UserServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 구매후기입니다.")
         if (reviewEntity.user.username != username)
             throw CustomHttp403("사용자의 구매후기가 아닙니다.")
+        reviewEntity.purchase.item.deleteReview(reviewEntity.rating)
         reviewRepository.delete(reviewEntity)
     }
 

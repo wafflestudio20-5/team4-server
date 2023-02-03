@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 @Table(
     name = "user_liked_styles",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "liked_style_id"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "styleId"])]
 )
 class UserLikedStyleEntity(
     val userId: Long,

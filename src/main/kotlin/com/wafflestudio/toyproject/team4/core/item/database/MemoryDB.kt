@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Math.round
-import java.util.Random
 
 @Component
 class MemoryDB(
@@ -59,37 +58,52 @@ class MemoryDB(
     fun makeMockData(event: ApplicationStartedEvent) {
         if (doMakeMockItems || doMakeMockAll) {
             /** mainCategory - subCategory
-             * TOP   : 001       - SWEATER(001006), HOODIE(001004), SWEAT_SHIRT(001005), SHIRT(001002)
-             * OUTER : 002       - COAT(002007), JACKET(002002), PADDING(002016), CARDIGAN(002020)
-             * PANTS : 003       - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
-             * SKIRT : 022       - MINISKIRT(022001), MEDI_SKIRT(022002), LONG_SKIRT(022003)
-             * BAG   : 004       - BACKPACK(004001), CROSS_BAG(004002), ECHO_BAG(004014)
-             * SHOES : 005       - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
-             * HEAD_WEAR : 007    - CAP(007001), HAT(007004), BEANIE(007005)
+             * TOP        : 001     - SWEATER(001006), HOODIE(001004), SWEAT_SHIRT(001005), SHIRT(001002)
+             * OUTER      : 002     - COAT(002007), JACKET(002002), PADDING(002016), CARDIGAN(002020)
+             * PANTS      : 003     - DENIM(003002), SLACKS(003008), JOGGER(003004), LEGGINGS(003005)
+             * SKIRT      : 022     - MINISKIRT(022001), MEDI_SKIRT(022002), LONG_SKIRT(022003)
+             * BAG        : 004     - BACKPACK(004001), CROSS_BAG(004002), ECHO_BAG(004014)
+             * SHOES      : 005     - GOODOO(005014), SANDAL(005004), SLIPPER(005018) // SNEAKERS(mainCategory = 018)
+             * HEAD_WEAR  : 007     - CAP(007001), HAT(007004), BEANIE(007005)
              **/
 
+            // TOP
             crawling("001", "001006")
             crawling("001", "001004")
             crawling("001", "001005")
             crawling("001", "001002")
+
+            // OUTER
             crawling("002", "002007")
             crawling("002", "002002")
             crawling("002", "002016")
             crawling("002", "002020")
+
+            // PANTS
             crawling("003", "003002")
             crawling("003", "003008")
             crawling("003", "003004")
             crawling("003", "003005")
+
+            // SKIRT
             crawling("022", "022001")
             crawling("022", "022002")
             crawling("022", "022003")
+
+            // BAG
             crawling("004", "004001")
             crawling("004", "004002")
             crawling("004", "004014")
+
+            // SHOES
             crawling("005", "005014")
             crawling("005", "005004")
             crawling("005", "005018")
+
+            // SNEAKERS
             crawling("018", "")
+
+            // HEAD_WEAR
             crawling("007", "007001")
             crawling("007", "007004")
             crawling("007", "007005")
@@ -123,7 +137,7 @@ class MemoryDB(
                     category = getMainCategory(mainCategoryId),
                     subCategory = getSubCategory(subCategoryId),
                     sex = getSexInfo(sexInfoList[idx]),
-                    rating = round((0.0 + Random().nextDouble() * 10) * 100) / 100.0
+                    rating = 0.0
                 )
 
                 newItem.updateImages(getItemImages(itemDetailDoc))
