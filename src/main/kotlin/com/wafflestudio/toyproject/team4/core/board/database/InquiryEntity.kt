@@ -7,6 +7,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.*
 
 @Entity
@@ -38,7 +39,7 @@ class InquiryEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var createdDateTime: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     var modifiedDateTime: LocalDateTime? = null
 
@@ -59,7 +60,7 @@ class InquiryEntity(
         this.image2 = request.images?.getOrNull(1)
         this.image3 = request.images?.getOrNull(2)
 
-        this.modifiedDateTime = LocalDateTime.now()
+        this.modifiedDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
     }
 
     enum class Type {

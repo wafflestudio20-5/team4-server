@@ -40,19 +40,19 @@ class StyleServiceImpl(
     private val userService: UserService
 ) : StyleService {
     override fun getStyles(index: Long, count: Long, sort: String?): StylesResponse {
-        val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "RECENT")
-        val allStyles = styleRepository.findAllOrderBy(sortingMethod)
+        val sortingMethod = StyleRepositoryCustomImpl.Sort.valueOf(sort?.uppercase() ?: "LIKE")
+        val allStyles = styleRepository.findAllOrderBy(index, count, sortingMethod)
+        val totalCount = styleRepository.getTotalCount()
 
         return StylesResponse(
             styles = allStyles
-                .filterIndexed { idx, _ -> (idx / count) == index }
                 .map { entity ->
                     Style.of(
                         entity = entity,
                         items = findStyleItems(entity)
                     )
                 },
-            totalPages = ceil(allStyles.size.toDouble() / count).toLong()
+            totalPages = ceil(totalCount.toDouble() / count).toLong()
         )
     }
 

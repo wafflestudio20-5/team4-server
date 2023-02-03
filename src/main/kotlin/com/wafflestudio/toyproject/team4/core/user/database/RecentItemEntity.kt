@@ -4,6 +4,7 @@ import com.wafflestudio.toyproject.team4.core.item.database.ItemEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.FetchType
@@ -32,5 +33,5 @@ class RecentItemEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var viewedDateTime: LocalDateTime = LocalDateTime.now()
+    var viewedDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 }

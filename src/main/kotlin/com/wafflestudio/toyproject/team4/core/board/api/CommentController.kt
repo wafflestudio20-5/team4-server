@@ -16,19 +16,19 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/comment")
 class CommentController(
     val commentService: CommentService
 ) {
     @Authenticated
-    @PostMapping("/me/comment")
+    @PostMapping
     fun postComment(
         @RequestBody request: PostCommentRequest,
         @UserContext username: String,
     ) = ResponseEntity(commentService.postComment(username, request), HttpStatus.CREATED)
 
     @Authenticated
-    @PutMapping("/me/comment/{commentId}")
+    @PutMapping("/{commentId}")
     fun putComment(
         @PathVariable(value = "commentId") commentId: Long,
         @RequestBody request: PutCommentRequest,
@@ -36,7 +36,7 @@ class CommentController(
     ) = ResponseEntity(commentService.putComment(username, request, commentId), HttpStatus.OK)
 
     @Authenticated
-    @DeleteMapping("/me/comment/{commentId}")
+    @DeleteMapping("/{commentId}")
     fun deleteComment(
         @PathVariable(value = "commentId") commentId: Long,
         @UserContext username: String,

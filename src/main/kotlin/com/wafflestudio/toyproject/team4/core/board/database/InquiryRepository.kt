@@ -10,7 +10,7 @@ interface InquiryRepository : JpaRepository<InquiryEntity, Long>, InquiryReposit
 
 interface InquiryRepositoryCustom {
     fun findAllByUserOrderByCreatedDateTimeDesc(user: UserEntity, index: Long, count: Long): List<InquiryEntity>
-    fun findAllByItem_IdOrderByCreatedDateTimeDesc(itemId: Long, index: Long, count: Long): List<InquiryEntity>
+    fun findAllByItemIdOrderByCreatedDateTimeDesc(itemId: Long, index: Long, count: Long): List<InquiryEntity>
     fun getItemTotalInquiryCount(itemId: Long): Long
 }
 
@@ -33,7 +33,7 @@ class InquiryRepositoryCustomImpl(
             .fetch()
     }
 
-    override fun findAllByItem_IdOrderByCreatedDateTimeDesc(
+    override fun findAllByItemIdOrderByCreatedDateTimeDesc(
         itemId: Long,
         index: Long,
         count: Long
