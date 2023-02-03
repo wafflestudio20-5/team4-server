@@ -3,7 +3,6 @@ package com.wafflestudio.toyproject.team4.core.item.database
 import com.wafflestudio.toyproject.team4.core.board.database.ReviewEntity
 import com.wafflestudio.toyproject.team4.core.image.service.ImageService
 import com.wafflestudio.toyproject.team4.core.item.domain.Item
-import com.wafflestudio.toyproject.team4.core.item.service.ItemService
 import com.wafflestudio.toyproject.team4.core.style.api.request.PostStyleRequest
 import com.wafflestudio.toyproject.team4.core.style.service.StyleService
 import com.wafflestudio.toyproject.team4.core.user.api.request.PatchMeRequest
@@ -31,10 +30,9 @@ class MemoryDB(
     private val styleService: StyleService,
     private val userService: UserService,
     private val userRepository: UserRepository,
-    private val purchaseRepository: PurchaseRepository,
-    private val itemService: ItemService
+    private val purchaseRepository: PurchaseRepository
 ) {
-    private val doMakeMockAll = false // 일괄적으로 Mock Data를 만들려면 true로 설정
+    private val doMakeMockAll = true // 일괄적으로 Mock Data를 만들려면 true로 설정
 
     private val doMakeMockItems = false // Mock 아이템을 만들려면 true로 설정
     private val doMakeMockStyles = false // Mock 스타일을 만들려면 true로 설정
@@ -272,17 +270,11 @@ class MemoryDB(
     fun makeMockReviews(event: ApplicationStartedEvent) {
         if (doMakeMockReviews || doMakeMockAll) {
             val userNum = 20 // 리뷰를 남기는 사용자의 수
+            val itemNum = 10 // 리뷰가 작성되는 상품의 수
             val users = makeMockUsers(userNum, "review")
-            val items = itemService.getItemRankingList( // 리뷰를 작성할 상품은 상위 10개 상품
-                null,
-                null,
-                index = 0L,
-                count = 10L,
-                null
-            )
-            items.items.forEach {
-                val itemId = it.id
-                val item = itemRepository.findById(itemId).get()
+            val itemIds = (1..totalItemCount).shuffled().take(itemNum) // 리뷰를 작성할 상품은 상위 10개 상품
+            itemIds.forEach {
+                val item = itemRepository.findById(it).get()
                 val itemSex = item.sex.toString()
                 users.forEach { // 리뷰 작성 전 각 사용자의 구매 내역 생성
                     val userSex = it.sex?.toString()
