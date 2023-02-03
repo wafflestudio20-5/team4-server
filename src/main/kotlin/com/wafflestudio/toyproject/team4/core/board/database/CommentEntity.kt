@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.FetchType
@@ -34,10 +35,10 @@ class CommentEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var createdDateTime: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @LastModifiedDate
-    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+    var modifiedDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     fun update(content: String) {
         this.content = content

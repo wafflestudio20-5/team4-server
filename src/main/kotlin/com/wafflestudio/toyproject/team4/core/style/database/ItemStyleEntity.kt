@@ -3,6 +3,7 @@ package com.wafflestudio.toyproject.team4.core.style.database
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -28,10 +29,10 @@ class ItemStyleEntity(
     val id: Long = 0L
 
     @CreatedDate
-    val createdDateTime: LocalDateTime = LocalDateTime.now()
+    val createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @LastModifiedDate
-    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+    var modifiedDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     var isActive: Boolean = true
 }

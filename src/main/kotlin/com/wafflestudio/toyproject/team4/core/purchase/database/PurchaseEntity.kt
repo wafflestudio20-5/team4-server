@@ -9,6 +9,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
@@ -42,7 +43,7 @@ class PurchaseEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var createdDateTime: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @OneToOne(mappedBy = "purchase", cascade = [CascadeType.ALL], orphanRemoval = true)
     var review: ReviewEntity? = null

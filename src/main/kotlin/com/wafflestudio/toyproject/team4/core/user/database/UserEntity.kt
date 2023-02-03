@@ -15,6 +15,7 @@ import com.wafflestudio.toyproject.team4.oauth.entity.ProviderType
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -65,7 +66,7 @@ class UserEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var registrationDate: LocalDateTime = LocalDateTime.now()
+    var registrationDate: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var reviews: MutableList<ReviewEntity> = mutableListOf()

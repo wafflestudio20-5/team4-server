@@ -5,6 +5,7 @@ import com.wafflestudio.toyproject.team4.core.user.database.UserEntity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -35,10 +36,10 @@ class StyleEntity(
     val id: Long = 0L
 
     @CreatedDate
-    var createdDateTime: LocalDateTime = LocalDateTime.now()
+    var createdDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @LastModifiedDate
-    var modifiedDateTime: LocalDateTime = LocalDateTime.now()
+    var modifiedDateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
 
     @OneToMany(mappedBy = "style", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var styleItems: MutableList<ItemStyleEntity> = mutableListOf()
