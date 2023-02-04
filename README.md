@@ -91,9 +91,10 @@ src/main/kotlin/com/wafflestudio/toyproject/team4
 ```
   
 ## :card_file_box: ERD
-ERD 만들어서 사진 올릴 예정 ---- 
-<br>
+![ERD](https://user-images.githubusercontent.com/90292371/216746923-864bccf4-a2aa-4ef2-9328-538d2c7c50fd.png)
   
+<br>
+
 
 
 ## :angel: API
