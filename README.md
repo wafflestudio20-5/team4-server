@@ -1,5 +1,5 @@
 <!-- HEADER -->
-  ![header](https://capsule-render.vercel.app/api?type=soft&color=gradient&height=100&section=header&text=Welcome%20to%20Team4-Server%20Repository&animation=fadeIn&fontSize=30)
+  ![rect](https://capsule-render.vercel.app/api?type=rect&color=gradient&text=%20TEAM4%20&fontAlign=27&fontSize=30&textBg=true&desc=Welcome%20to%20%27team4-server%27%20Reopository!&descAlign=62&descAlignY=50)
   
    
 <!-- PROJECT LOGO -->
