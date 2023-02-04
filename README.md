@@ -37,7 +37,7 @@
 | | :crown: 차동주 | 서보성 | 양찬혁 |
 |---|:---:|:---:|:---:|
 |Github Id|@dongjoocha|@Boseong-Seo|@yangchanhk98|
-|Profile  | | <img src="https://user-images.githubusercontent.com/90292371/216748303-dc61d1ff-3033-4c84-a10d-0a40d809fba0.jpg" width="180px" height="240px" style='border-radius: 50%'></a>|  <img src="https://user-images.githubusercontent.com/90292371/216748416-92993327-e40c-4a5a-942e-03cb75f32a63.jpg" width="180px" height="240px"  style='border-radius: 50%'></a>|
+|Profile  | <img src="https://res.cloudinary.com/dehnixjg0/image/upload/v1675487751/IMG_2316-%E1%84%89%E1%85%AE%E1%84%8C%E1%85%A5%E1%86%BC_hwkjfj.jpg" width="180px" height="240px">| <img src="https://user-images.githubusercontent.com/90292371/216748303-dc61d1ff-3033-4c84-a10d-0a40d809fba0.jpg" width="180px" height="240px" style='border-radius: 50%'></a>|  <img src="https://user-images.githubusercontent.com/90292371/216748416-92993327-e40c-4a5a-942e-03cb75f32a63.jpg" width="180px" height="240px"  style='border-radius: 50%'></a>|
 |Role     | - login<br> - auth<br> - 배포<br> (\+Frontend..)| - items<br> - item-inquries<br> - style  | - mypage<br> - review<br> - comment|
 
 <br>
@@ -45,7 +45,7 @@
 
 
 :speaking_head: 6주간 고생 많았던 백엔드 팀원분들 ! 소감 한 마디씩 부탁해요  
-> 동주 : _"할말하않^^;;"_ <br>
+> 동주 : _"할 말 하 않"_ <br>
 > 보성 : _"아 리드미 너무 힘들다"_ <br>
 > 찬혁 : _"동주님 보성님 찬양합니다"_ <br>
 
