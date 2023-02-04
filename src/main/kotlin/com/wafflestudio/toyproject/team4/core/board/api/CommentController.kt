@@ -4,6 +4,7 @@ import com.wafflestudio.toyproject.team4.common.Authenticated
 import com.wafflestudio.toyproject.team4.common.UserContext
 import com.wafflestudio.toyproject.team4.core.board.api.request.PostCommentRequest
 import com.wafflestudio.toyproject.team4.core.board.api.request.PutCommentRequest
+import com.wafflestudio.toyproject.team4.core.board.api.response.CommentResponse
 import com.wafflestudio.toyproject.team4.core.board.service.CommentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,9 @@ class CommentController(
     fun postComment(
         @RequestBody request: PostCommentRequest,
         @UserContext username: String,
-    ) = ResponseEntity(commentService.postComment(username, request), HttpStatus.CREATED)
+    ): ResponseEntity<CommentResponse> {
+        return ResponseEntity(commentService.postComment(username, request), HttpStatus.CREATED)
+    }
 
     @Authenticated
     @PutMapping("/{commentId}")
