@@ -69,5 +69,6 @@ class PurchaseEntity(
         this.item.reviewCount--
         this.item.deleteRating(rating)
         this.user.reviewCount--
+        this.review = null
     }
 }

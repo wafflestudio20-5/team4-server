@@ -72,16 +72,23 @@ class ItemEntity(
 
     fun addRating(rating: Long) {
         this.ratingSum += rating
-        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
+        this.recalculateRating()
     }
 
     fun changeRating(originalRating: Long, newRating: Long) {
         this.ratingSum = this.ratingSum - originalRating + newRating
-        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
+        this.recalculateRating()
     }
 
     fun deleteRating(rating: Long) {
         this.ratingSum -= rating
+        if (reviewCount == 0L)
+            this.rating = 0.0
+        else
+            this.recalculateRating()
+    }
+
+    fun recalculateRating() {
         this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
 }
