@@ -25,7 +25,9 @@ data class Review(
                 createdDateTime = createdDateTime,
                 size = size.toString().lowercase(),
                 color = color.toString().lowercase(),
-                comments = comments.map { commentEntity -> Comment.of(commentEntity) },
+                comments = comments
+                    .sortedByDescending { it.createdDateTime }
+                    .map { commentEntity -> Comment.of(commentEntity) },
                 images = listOfNotNull(image1, image2, image3),
             )
         }
