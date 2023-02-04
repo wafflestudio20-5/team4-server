@@ -20,10 +20,15 @@ class StyleRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : StyleRepositoryCustom {
     override fun findAllOrderBy(index: Long, count: Long, sort: Sort): List<StyleEntity> {
+        val ordering = when (sort) {
+            Sort.RECENT -> styleEntity.createdDateTime.desc()
+            else -> styleEntity.likedUserCount.desc()
+        }
+
         val styleIds = queryFactory
             .select(styleEntity.id)
             .from(styleEntity)
-            .orderBy(styleEntity.likedUserCount.desc(), styleEntity.createdDateTime.desc())
+            .orderBy(ordering, styleEntity.createdDateTime.desc())
             .offset(index * count)
             .limit(count)
             .fetch()
@@ -32,7 +37,7 @@ class StyleRepositoryCustomImpl(
             .selectDistinct(styleEntity)
             .from(styleEntity)
             .leftJoin(styleEntity.styleItems).fetchJoin()
-            .orderBy(styleEntity.likedUserCount.desc(), styleEntity.createdDateTime.desc())
+            .orderBy(ordering, styleEntity.createdDateTime.desc())
             .where(styleEntity.id.`in`(styleIds))
             .fetch()
     }
