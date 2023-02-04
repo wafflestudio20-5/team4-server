@@ -30,7 +30,6 @@ class CommentController(
         return ResponseEntity(commentService.postComment(username, request), HttpStatus.CREATED)
     }
 
-
     @Authenticated
     @PutMapping("/{commentId}")
     fun putComment(
