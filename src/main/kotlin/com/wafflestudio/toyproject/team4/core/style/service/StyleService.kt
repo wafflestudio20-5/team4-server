@@ -65,9 +65,7 @@ class StyleServiceImpl(
             ?: throw CustomHttp404("존재하지 않는 스타일입니다.")
 
         val isFollow = userService.getIsFollow(user, style.user)
-
-        val userLikedStyle = style.likedUsers.find { it.userId == user?.id && it.isActive }
-        val isLike = userLikedStyle != null
+        val isLike = style.likedUsers.find { it.userId == user?.id && it.isActive }?.let { true } ?: false
 
         return StyleResponse(
             style = Style.of(
