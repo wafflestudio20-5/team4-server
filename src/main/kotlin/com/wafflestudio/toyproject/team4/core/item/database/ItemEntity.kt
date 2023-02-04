@@ -82,6 +82,9 @@ class ItemEntity(
 
     fun deleteRating(rating: Long) {
         this.ratingSum -= rating
-        this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
+        if (reviewCount == 0L)
+            this.rating = 0.0
+        else
+            this.rating = ((this.ratingSum / this.reviewCount) * 10).roundToInt() / 10.0
     }
 }
