@@ -65,9 +65,10 @@ class ReviewEntity(
         this.color = Color.valueOf(request.color.uppercase())
     }
 
-    fun addComment(user: UserEntity, content: String) {
+    fun addComment(user: UserEntity, content: String): CommentEntity {
         val comment = CommentEntity(this, user, content)
         this.comments.add(comment)
+        return comment
     }
 
     enum class Size {
