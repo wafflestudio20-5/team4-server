@@ -1,5 +1,5 @@
 <!-- HEADER -->
-  ![rect](https://capsule-render.vercel.app/api?type=rect&color=gradient&text=%20TEAM4%20&fontAlign=27&fontSize=30&textBg=true&desc=Welcome%20to%20%27team4-server%27%20Reopository!&descAlign=62&descAlignY=50)
+  ![rect](https://capsule-render.vercel.app/api?type=rect&color=gradient&text=%20TEAM4%20&fontAlign=27&fontSize=30&textBg=true&desc=Welcome%20to%20%27team4-server%27%20Repository!&descAlign=62&descAlignY=50)
   
    
 <!-- PROJECT LOGO -->
@@ -37,15 +37,17 @@
 | | :crown: 차동주 | 서보성 | 양찬혁 |
 |---|:---:|:---:|:---:|
 |Github Id|@dongjoocha|@Boseong-Seo|@yangchanhk98|
-|Profile  | | | |
+|Profile  | | <img src="https://user-images.githubusercontent.com/90292371/216748303-dc61d1ff-3033-4c84-a10d-0a40d809fba0.jpg" width="180px" height="240px" style='border-radius: 50%'></a>|  <img src="https://user-images.githubusercontent.com/90292371/216748416-92993327-e40c-4a5a-942e-03cb75f32a63.jpg" width="180px" height="240px"  style='border-radius: 50%'></a>|
 |Role     | - login<br> - auth<br> - 배포<br> (\+Frontend..)| - items<br> - item-inquries<br> - style  | - mypage<br> - review<br> - comment|
 
 <br>
+  
+
 
 :speaking_head: 6주간 고생 많았던 백엔드 팀원분들 ! 소감 한 마디씩 부탁해요  
-> 동주 :    <br>
+> 동주 : _"할말하않^^;;"_ <br>
 > 보성 : _"아 리드미 너무 힘들다"_ <br>
-> 찬혁 :    <br>
+> 찬혁 : _"동주님 보성님 찬양합니다"_ <br>
 
 
 
@@ -57,26 +59,24 @@
 
 ## :card_file_box: Project Structure
 저희 프로젝트는 대략적으로 아래와 같은 구조로 되어 있어요. <br>
-각 패키지의 역할은 주석으로 간략하게 작성해뒀어요. 참고 부탁드릴게요 ! <br>
-  
-노션을 활용해 RESTful하게 API를 구성한 만큼, 이를 잘 담아내기 위해 패키지 구조를 잘 짰다 ..?
+    
 ```bash
 src/main/kotlin/com/wafflestudio/toyproject/team4
-├─common       //
-├─config       //
-├─core         //
-│  ├─board
-│  ├─image
+├─common       
+├─config       
+├─core          
+│  ├─board      // review, comment, inquiry 관련 API 담당
+│  ├─image      // 이미지 업로드 API
 │  ├─item
 │  ├─purchase
 │  ├─style
 │  └─user
-└─oauth       // 
+└─oauth        
 ```
-그리고 `core`의 (image 패키지를 제외한) 모든 패키지는 아래와 같은 구조를 가지고 있어요.  
+그리고 `core`의 (`image` 패키지를 제외한) 모든 패키지는 아래와 같은 구조를 가지고 있어요.  
   
-이때, Controller-Service-Repository 각 layer 단에서 어떤 역할을 하는지 거듭해서 고민하고,  
-한 layer에 역할이 가중되지 않도록 주의해가며 코드를 작성했어요.
+이때, Controller - Service - Repository 각 layer 단에서 어떤 역할을 하는지 거듭해서 고민하고,  
+특정 패키지의 한 layer에 역할이 가중되지 않도록 주의해가며 코드를 작성했어요.
 ```bash
 ├─api
 │  ├─request
@@ -99,8 +99,10 @@ src/main/kotlin/com/wafflestudio/toyproject/team4
 
 ## :angel: API
 저희가 구현한 API를 표로 요약해 나타내자면 다음과 같아요!  
-최대한 페이지별로, 기능별로 묶어서 정리했어요     
-<br>
+  
+최대한 페이지별로, 기능별로 묶어서 정리했어요  
+페이지 관련 API들을 중심으로 작성했고, 때문에 저희가 구현한 것 중 포함되지 않은 API도 일부 있어요.  
+  
 이때 자물쇠 표시(:lock:)은, _해당 API에서 `@RequestHeader`로 AccessToken을 요하고 있다_, 라는 의미예요.  
   
 보다 자세한 설명은 [**이 노션 페이지**](https://www.notion.so/Rest-API-e92a1784fecf4f42832601e65d1e53b5)를 참고해주세요 :wink:    
@@ -147,8 +149,6 @@ src/main/kotlin/com/wafflestudio/toyproject/team4
 ## :waffle: Getting Started
 마지막으로 제일 중요한 :star:로컬 상에서의 실행 방법:star:을 알려드릴게요!  
 
-< ----- 와플 굽는 중 ------ >
-
 ### Prerequisites
 :white_check_mark: Docker(Desktop)  
 :white_check_mark: Docker Compose  
@@ -157,29 +157,28 @@ src/main/kotlin/com/wafflestudio/toyproject/team4
   
 ### How to run
 1. 현 repository 주소를 본인이 원하는 로컬 상 주소에다가 복제해주세요.
-```
-git clone https://github.com/wafflestudio20-5/team4-server.git
-```
+    ```
+    git clone https://github.com/wafflestudio20-5/team4-server.git
+    ```
 
 2. 'Docker Desktop'을 실행한 다음, 아래의 명령어를 터미널에 입력해주세요.
-``` 
-docker-compose up -d
-```
-  이때, 아래 첨부한 사진과 같이 뜨는지 확인해주세요!
+    ``` 
+    docker-compose up -d
+    ```
+    이때, 아래 첨부한 사진과 같이 뜨는지 확인해주세요!
+      
+    <img src="https://user-images.githubusercontent.com/74580163/210161547-74fff8db-a2d3-477b-8af9-86a831b71b70.png" alt="docker-compose 실행 화면" width="800" height="450">
 
-  <img src="https://user-images.githubusercontent.com/74580163/210161547-74fff8db-a2d3-477b-8af9-86a831b71b70.png" alt="docker-compose 실행 화면" width="800" height="450">
+3. 'IntelliJ'를 실행한 다음, 조금 전에 복제해온 repository를 열어주세요. 그런 다음, 프로젝트를 build 하고서, build가 꼭 완료된 후에 application(Team4Application)을 run해주세요   
+      
+    <img src="https://user-images.githubusercontent.com/74580163/210161740-012a71e3-3d68-49e2-92cd-9b823801cedf.png" alt="빌드 후 run" width="590">
 
-3. Run intelliJ, open the repository, and run the application(Team4Application) after build completion
-
-  ![image](https://user-images.githubusercontent.com/74580163/210161740-012a71e3-3d68-49e2-92cd-9b823801cedf.png)
-
-- Run DataGrip and configure to observe the database
-  - File -> New -> Data Source -> MySQL
-  - Configure as below
-  - ❗️ Don't forget to enter password: `team4`
-
-    ![image](https://user-images.githubusercontent.com/74580163/210161569-b67a4db2-e77f-4afa-ae39-208ff4b66f2e.png)
-    
-  - Check `Test Connection` as well  
-    
-    ![image](https://user-images.githubusercontent.com/74580163/210161829-e2e0ff9c-b94c-41fe-a2ef-53101757c935.png)
+4. 'DataGrip'을 실행한 다음, 로컬에서 database를 확인할 수 있도록 아래의 설정을 해주세요!
+    - `File` -> `New` -> `Data Source` -> `MySQL` 순서로 클릭한 다음, 아래와 같이 설정해주세요.  
+    - 이때, password 입력해주셔야 하는 거 잊지 마세요 :heavy_exclamation_mark: : `team4`   
+         
+      <img src="https://user-images.githubusercontent.com/74580163/210161569-b67a4db2-e77f-4afa-ae39-208ff4b66f2e.png" alt="data-grip 설정 화면" width="570">  
+        
+    - 설정하고나서, 꼭 !! `Test Connection`이 잘 이루어지는지도 확인해주셔야 해요  
+          
+      <img src="https://user-images.githubusercontent.com/74580163/210161829-e2e0ff9c-b94c-41fe-a2ef-53101757c935.png" width="570">
